@@ -1,11 +1,17 @@
 import { UserRepository } from "../repositories/user.repository";
 import { IAuthService } from "../interfaces/user.interface";
-import { User, UserWithTokens, SafeUser } from "../types/auth.types";
+import {
+    User,
+    UserWithTokens,
+    SafeUser,
+    AuthTokens,
+} from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { comparePassword, hashPassword } from "../utils/hash.util";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { JwtUtil } from "../utils/jwt.util";
 import { RefreshSessionService } from "./refreshSession.service";
+import { JwtPayload, JwtRefreshPayload } from "../types";
 
 export class AuthService implements IAuthService {
     constructor(
@@ -77,7 +83,38 @@ export class AuthService implements IAuthService {
             throw new BadRequestError("Invalid or expired refresh token");
         }
     }
-    async refresh(): Promise<UserWithTokens> {
-        throw new Error("Method not implemented.");
+    async refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens> {
+        let payload: JwtRefreshPayload;
+
+        try {
+            payload = JwtUtil.verifyRefreshToken(refreshToken);
+        } catch (error) {
+            throw new BadRequestError("Invalid or expired refresh token");
+        }
+
+        if (payload.typ !== "refresh") {
+            throw new BadRequestError("Invalid token type");
+        }
+
+        const newSession = await this.refreshSessionService.rotateSession(
+            payload.jti,
+        );
+
+        if (!newSession) {
+            throw new BadRequestError("Invalid or expired refresh token");
+        }
+
+        const newAccessToken = JwtUtil.generateAccessToken({
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        });
+
+        const newRefreshToken = JwtUtil.generateRefreshToken(newSession);
+
+        return {
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+        };
     }
 }

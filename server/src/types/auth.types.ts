@@ -18,4 +18,9 @@ export type UserWithTokens = {
     refreshToken: string;
 };
 
+export type AuthTokens = {
+    accessToken: string;
+    refreshToken: string;
+};
+
 export type SafeUser = Omit<User, "password">;

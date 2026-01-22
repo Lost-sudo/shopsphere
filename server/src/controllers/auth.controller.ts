@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
 import { AuthService } from "../services/auth.service";
 import { UserLoginInput, UserRegisterInput } from "../schemas/auth.schema";
+import { JwtPayload } from "../types";
 
 export class AuthController {
     constructor(private authService: AuthService) {}
@@ -52,6 +53,28 @@ export class AuthController {
         res.status(200).json({
             success: true,
             message: "User logged out successfully",
+        });
+    });
+    refresh = asyncHandler(async (req: Request, res: Response) => {
+        const refreshToken = req.cookies.refreshToken;
+        const authenticatedUser: JwtPayload = req.user!;
+
+        const result = await this.authService.refresh(
+            refreshToken,
+            authenticatedUser,
+        );
+
+        res.cookie("refreshToken", result.refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            maxAge: 60 * 60 * 24 * 7 * 1000,
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Token refreshed successfully",
+            accessToken: result.accessToken,
         });
     });
 }
