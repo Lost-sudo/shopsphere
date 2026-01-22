@@ -65,8 +65,17 @@ export class AuthService implements IAuthService {
             refreshToken,
         };
     }
-    async logout(): Promise<void> {
-        throw new Error("Method not implemented.");
+    async logout(refreshToken: string): Promise<void> {
+        if (!refreshToken) {
+            throw new BadRequestError("Refresh token is required");
+        }
+
+        try {
+            const payload = JwtUtil.verifyRefreshToken(refreshToken);
+            await this.refreshSessionService.revokeSession(payload.jti);
+        } catch (error) {
+            throw new BadRequestError("Invalid or expired refresh token");
+        }
     }
     async refresh(): Promise<UserWithTokens> {
         throw new Error("Method not implemented.");

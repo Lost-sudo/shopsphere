@@ -1,12 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
 import { AuthService } from "../services/auth.service";
-import {
-    loginSchema,
-    registerSchema,
-    UserLoginInput,
-    UserRegisterInput,
-} from "../schemas/auth.schema";
+import { UserLoginInput, UserRegisterInput } from "../schemas/auth.schema";
 
 export class AuthController {
     constructor(private authService: AuthService) {}
@@ -40,6 +35,23 @@ export class AuthController {
             message: "User logged in successfully",
             user: result.user,
             accessToken: result.accessToken,
+        });
+    });
+
+    logout = asyncHandler(async (req: Request, res: Response) => {
+        const refreshToken = req.cookies.refreshToken;
+
+        await this.authService.logout(refreshToken);
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "User logged out successfully",
         });
     });
 }

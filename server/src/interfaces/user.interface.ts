@@ -19,6 +19,6 @@ export interface IRefreshSessionService {
 export interface IAuthService {
     register(data: UserRegisterInput): Promise<SafeUser>;
     login(data: UserLoginInput): Promise<UserWithTokens>;
-    logout(): Promise<void>;
+    logout(refreshToken: string): Promise<void>;
     refresh(): Promise<UserWithTokens>;
 }
