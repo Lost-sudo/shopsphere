@@ -6,7 +6,6 @@ import { JwtPayload } from "../types";
 
 export class AuthController {
     constructor(private authService: AuthService) {}
-
     register = asyncHandler(async (req: Request, res: Response) => {
         const data = req.body as UserRegisterInput;
 
@@ -38,7 +37,6 @@ export class AuthController {
             accessToken: result.accessToken,
         });
     });
-
     logout = asyncHandler(async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
 

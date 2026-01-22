@@ -35,6 +35,7 @@ export class AuthService implements IAuthService {
 
         return safeUser;
     }
+    // TODO: Add validation if the email is verified
     async login(data: UserLoginInput): Promise<UserWithTokens> {
         const user = await this.userRepository.getUserByEmail(data.email);
 
