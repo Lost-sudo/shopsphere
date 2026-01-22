@@ -1,10 +1,8 @@
-declare module "express" {
+import { JwtPayload } from "./index";
+
+declare module "express-serve-static-core" {
     interface Request {
-        user?: {
-            id: string;
-            email: string;
-            role: string;
-        };
+        user?: JwtPayload;
     }
 }
 
