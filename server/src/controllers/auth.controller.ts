@@ -12,23 +12,23 @@ export class AuthController {
     constructor(private authService: AuthService) {}
 
     register = asyncHandler(async (req: Request, res: Response) => {
-        const data: UserRegisterInput = registerSchema.parse(req.body);
+        const data = req.body as UserRegisterInput;
 
         const user = await this.authService.register(data);
 
         res.status(201).json({
             success: true,
             message: "User registered successfully",
-            data: user,
+            user,
         });
     });
 
     login = asyncHandler(async (req: Request, res: Response) => {
-        const data: UserLoginInput = loginSchema.parse(req.body);
+        const data = req.body as UserLoginInput;
 
-        const user = await this.authService.login(data);
+        const result = await this.authService.login(data);
 
-        res.cookie("refreshToken", user.refreshToken, {
+        res.cookie("refreshToken", result.refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: "strict",
@@ -38,8 +38,8 @@ export class AuthController {
         res.status(200).json({
             success: true,
             message: "User logged in successfully",
-            data: user.user,
-            accessToken: user.accessToken,
+            user: result.user,
+            accessToken: result.accessToken,
         });
     });
 }
