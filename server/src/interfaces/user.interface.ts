@@ -1,4 +1,4 @@
-import { User, UserWithTokens } from "../types/auth.types";
+import { User, UserWithTokens, SafeUser } from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 
 export interface IUserRepository {
@@ -9,8 +9,15 @@ export interface IUserRepository {
     deleteUser(id: string): Promise<User>;
 }
 
+export interface IRefreshSessionService {
+    createSession(jti: string, userId: string): Promise<string>;
+    verifySession(jti: string): Promise<{ userId: string }>;
+    revokeSession(jti: string): Promise<void>;
+    rotateSession(jti: string): Promise<string | null>;
+}
+
 export interface IAuthService {
-    register(data: UserRegisterInput): Promise<User>;
+    register(data: UserRegisterInput): Promise<SafeUser>;
     login(data: UserLoginInput): Promise<UserWithTokens>;
     logout(): Promise<void>;
     refresh(): Promise<UserWithTokens>;

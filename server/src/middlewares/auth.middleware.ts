@@ -9,17 +9,30 @@ export const authenticated = (
 ) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        throw new UnauthorizedError("Unauthorized");
+        throw new UnauthorizedError("Please log in to get access");
     }
+
     const token = authHeader.split(" ")[1];
-    const decodedToken = JwtUtil.verifyAccessToken(token);
-    if (!decodedToken) {
-        throw new UnauthorizedError("Unauthorized");
+
+    try {
+        const decodedToken = JwtUtil.verifyAccessToken(token);
+
+        req.user = {
+            id: decodedToken.id,
+            email: decodedToken.email,
+            role: decodedToken.role,
+        };
+
+        next();
+    } catch (error: any) {
+        if (error.name === "TokenExpiredError") {
+            throw new UnauthorizedError(
+                "Your token has expired! Please log in again.",
+            );
+        }
+        if (error.name === "JsonWebTokenError") {
+            throw new UnauthorizedError("Invalid token. Please log in again.");
+        }
+        throw error;
     }
-    req.user = {
-        id: decodedToken.id,
-        email: decodedToken.email,
-        role: decodedToken.role,
-    };
-    next();
 };

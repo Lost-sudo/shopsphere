@@ -5,10 +5,13 @@ dotenv.config();
 
 const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
 
-export const hashPassword = (password: string): string => {
-    return bcrypt.hashSync(password, SALT_ROUNDS);
+export const hashPassword = async (password: string): Promise<string> => {
+    return bcrypt.hash(password, SALT_ROUNDS);
 };
 
-export const comparePassword = (password: string, hash: string): boolean => {
-    return bcrypt.compareSync(password, hash);
+export const comparePassword = async (
+    password: string,
+    hash: string,
+): Promise<boolean> => {
+    return bcrypt.compare(password, hash);
 };

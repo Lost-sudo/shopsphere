@@ -1,14 +1,18 @@
 import { UserRepository } from "../repositories/user.repository";
 import { IAuthService } from "../interfaces/user.interface";
-import { User, UserWithTokens } from "../types/auth.types";
+import { User, UserWithTokens, SafeUser } from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { comparePassword, hashPassword } from "../utils/hash.util";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { JwtUtil } from "../utils/jwt.util";
+import { RefreshSessionService } from "./refreshSession.service";
 
 export class AuthService implements IAuthService {
-    constructor(private userRepository: UserRepository) {}
-    async register(data: UserRegisterInput): Promise<User> {
+    constructor(
+        private userRepository: UserRepository,
+        private refreshSessionService: RefreshSessionService,
+    ) {}
+    async register(data: UserRegisterInput): Promise<SafeUser> {
         const user = await this.userRepository.getUserByEmail(data.email);
 
         if (user) {
@@ -21,7 +25,9 @@ export class AuthService implements IAuthService {
             password: hashedPassword,
         });
 
-        return newUser;
+        const { password, ...safeUser } = newUser;
+
+        return safeUser;
     }
     async login(data: UserLoginInput): Promise<UserWithTokens> {
         const user = await this.userRepository.getUserByEmail(data.email);
@@ -39,15 +45,24 @@ export class AuthService implements IAuthService {
             throw new BadRequestError("Invalid credentials");
         }
 
+        const jti = JwtUtil.generateTokenId();
+
+        await this.refreshSessionService.createSession(jti, user.id);
+
         const accessToken = JwtUtil.generateAccessToken({
             id: user.id,
             email: user.email,
             role: user.role,
         });
 
+        const refreshToken = JwtUtil.generateRefreshToken(jti);
+
+        const { password, ...safeUser } = user;
+
         return {
-            ...user,
+            ...safeUser,
             accessToken,
+            refreshToken,
         };
     }
     async logout(): Promise<void> {
