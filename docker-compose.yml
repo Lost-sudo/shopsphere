@@ -24,6 +24,7 @@ services:
         container_name: shopsphere-backend
         ports:
             - "${BACKEND_PORT}:${BACKEND_PORT}"
+            - "5555:5555"
         volumes:
             - ./server:/app
             - /app/node_modules
