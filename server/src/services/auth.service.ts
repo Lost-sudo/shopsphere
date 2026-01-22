@@ -1,9 +1,10 @@
 import { UserRepository } from "../repositories/user.repository";
 import { IAuthService } from "../interfaces/user.interface";
-import { User } from "../types/auth.types";
+import { User, UserWithTokens } from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { comparePassword, hashPassword } from "../utils/hash.util";
 import { BadRequestError } from "../utils/errors/badRequestError";
+import { JwtUtil } from "../utils/jwt.util";
 
 export class AuthService implements IAuthService {
     constructor(private userRepository: UserRepository) {}
@@ -22,7 +23,7 @@ export class AuthService implements IAuthService {
 
         return newUser;
     }
-    async login(data: UserLoginInput): Promise<User> {
+    async login(data: UserLoginInput): Promise<UserWithTokens> {
         const user = await this.userRepository.getUserByEmail(data.email);
 
         if (!user) {
@@ -38,12 +39,21 @@ export class AuthService implements IAuthService {
             throw new BadRequestError("Invalid credentials");
         }
 
-        return user;
+        const accessToken = JwtUtil.generateAccessToken({
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        });
+
+        return {
+            ...user,
+            accessToken,
+        };
     }
     async logout(): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    async refresh(): Promise<User> {
+    async refresh(): Promise<UserWithTokens> {
         throw new Error("Method not implemented.");
     }
 }

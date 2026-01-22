@@ -1,4 +1,4 @@
-import { User } from "../types/auth.types";
+import { User, UserWithTokens } from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 
 export interface IUserRepository {
@@ -11,7 +11,7 @@ export interface IUserRepository {
 
 export interface IAuthService {
     register(data: UserRegisterInput): Promise<User>;
-    login(data: UserLoginInput): Promise<User>;
+    login(data: UserLoginInput): Promise<UserWithTokens>;
     logout(): Promise<void>;
-    refresh(): Promise<User>;
+    refresh(): Promise<UserWithTokens>;
 }

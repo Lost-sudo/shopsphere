@@ -12,4 +12,10 @@ export type User = {
     updatedAt: Date;
 };
 
+export type AuthTokens = {
+    accessToken: string;
+};
+
+export type UserWithTokens = User & AuthTokens;
+
 export type SafeUser = Omit<User, "password">;
