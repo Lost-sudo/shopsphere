@@ -5,6 +5,8 @@ import morgan from "morgan";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 import { notFound } from "./middlewares/notFound.middleware";
 
+import routes from "./routes";
+
 const app: Express = express();
 
 // Global Middlewares
@@ -20,6 +22,8 @@ app.get("/health", (req: Request, res: Response) => {
         message: "ShopSphere API is running",
     });
 });
+
+app.use("/api/v1", routes);
 
 // 404 Handler - must come after all routes
 app.use(notFound);

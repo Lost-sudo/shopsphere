@@ -60,7 +60,7 @@ export class AuthService implements IAuthService {
         const { password, ...safeUser } = user;
 
         return {
-            ...safeUser,
+            user: safeUser,
             accessToken,
             refreshToken,
         };
