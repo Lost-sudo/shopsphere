@@ -1,4 +1,9 @@
-import { User, UserWithTokens, SafeUser, AuthTokens } from "../types/auth.types";
+import {
+    User,
+    UserWithTokens,
+    SafeUser,
+    AuthTokens,
+} from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { JwtPayload } from "../types";
 
@@ -22,4 +27,6 @@ export interface IAuthService {
     login(data: UserLoginInput): Promise<UserWithTokens>;
     logout(refreshToken: string): Promise<void>;
     refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens>;
+    verifyVerificationToken(token: string): Promise<void>;
+    requestVerificationEmail(email: string): Promise<void>;
 }

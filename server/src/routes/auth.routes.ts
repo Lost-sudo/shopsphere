@@ -10,5 +10,10 @@ router.post("/register", validate(registerSchema), authController.register);
 router.post("/login", validate(loginSchema), authController.login);
 router.post("/logout", authController.logout);
 router.post("/refresh", authenticated, authController.refresh);
+router.get("/verify", authController.verifyVerificationToken);
+router.post(
+    "/request-verification-email",
+    authController.requestVerificationEmail,
+);
 
 export default router;

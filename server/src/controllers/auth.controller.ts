@@ -13,7 +13,8 @@ export class AuthController {
 
         res.status(201).json({
             success: true,
-            message: "User registered successfully",
+            message:
+                "User registered successfully. Please verify your email before logging in.",
             user,
         });
     });
@@ -75,4 +76,29 @@ export class AuthController {
             accessToken: result.accessToken,
         });
     });
+    verifyVerificationToken = asyncHandler(
+        async (req: Request, res: Response) => {
+            const token = req.query.token as string;
+
+            await this.authService.verifyVerificationToken(token);
+
+            res.status(200).json({
+                success: true,
+                message: "Email verified successfully. You can now log in.",
+            });
+        },
+    );
+    requestVerificationEmail = asyncHandler(
+        async (req: Request, res: Response) => {
+            const { email } = req.body;
+
+            await this.authService.requestVerificationEmail(email);
+
+            res.status(200).json({
+                success: true,
+                message:
+                    "Verification email sent successfully. Please check your inbox.",
+            });
+        },
+    );
 }

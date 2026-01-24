@@ -1,4 +1,5 @@
 import { UserRepository } from "../repositories/user.repository";
+import { VerificationRepository } from "../repositories/verification.repository";
 import { IAuthService } from "../interfaces/user.interface";
 import {
     User,
@@ -12,11 +13,14 @@ import { BadRequestError } from "../utils/errors/badRequestError";
 import { JwtUtil } from "../utils/jwt.util";
 import { RefreshSessionService } from "./refreshSession.service";
 import { JwtPayload, JwtRefreshPayload } from "../types";
+import { VerificationUtil } from "../utils/verification.util";
+import { NotFoundError } from "../utils/errors/notFoundError";
 
 export class AuthService implements IAuthService {
     constructor(
         private userRepository: UserRepository,
         private refreshSessionService: RefreshSessionService,
+        private verificationRepository: VerificationRepository,
     ) {}
     async register(data: UserRegisterInput): Promise<SafeUser> {
         const user = await this.userRepository.getUserByEmail(data.email);
@@ -31,11 +35,22 @@ export class AuthService implements IAuthService {
             password: hashedPassword,
         });
 
+        // Create Verification Token for User
+        const verificationToken = VerificationUtil.generateVerificationToken();
+        await this.verificationRepository.createVerificationToken({
+            userId: newUser.id,
+            token: verificationToken,
+        });
+        // Send the Verification Email
+        await VerificationUtil.sendVerificationEmail(
+            newUser.email,
+            verificationToken,
+        );
+
         const { password, ...safeUser } = newUser;
 
         return safeUser;
     }
-    // TODO: Add validation if the email is verified
     async login(data: UserLoginInput): Promise<UserWithTokens> {
         const user = await this.userRepository.getUserByEmail(data.email);
 
@@ -50,6 +65,12 @@ export class AuthService implements IAuthService {
 
         if (!isPasswordValid) {
             throw new BadRequestError("Invalid credentials");
+        }
+
+        if (!user.emailVerified) {
+            throw new BadRequestError(
+                "Email not verified. Please verify your email before logging in.",
+            );
         }
 
         const jti = JwtUtil.generateTokenId();
@@ -117,5 +138,55 @@ export class AuthService implements IAuthService {
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         };
+    }
+    async verifyVerificationToken(token: string): Promise<void> {
+        const verificationToken =
+            await this.verificationRepository.getVerificationTokenUserId(token);
+
+        if (!verificationToken) {
+            throw new BadRequestError("Token is missing or invalid");
+        }
+
+        const result = await this.userRepository.updateUser(
+            verificationToken.userId,
+            {
+                emailVerified: true,
+            },
+        );
+
+        if (result) {
+            await this.verificationRepository.deleteVerificationToken(
+                verificationToken.userId,
+            );
+        }
+    }
+    async requestVerificationEmail(email: string): Promise<void> {
+        const user = await this.userRepository.getUserByEmail(email);
+
+        if (!user) {
+            throw new NotFoundError(
+                "User with the provided email does not exist.",
+            );
+        }
+
+        if (user.emailVerified) {
+            throw new BadRequestError("Email is already verified.");
+        }
+
+        let verificationToken;
+
+        const existingToken =
+            await this.verificationRepository.getVerificationToken(user.id);
+
+        if (existingToken) {
+            verificationToken = existingToken.token;
+        } else {
+            verificationToken = VerificationUtil.generateVerificationToken();
+        }
+
+        await VerificationUtil.sendVerificationEmail(
+            user.email,
+            verificationToken,
+        );
     }
 }
