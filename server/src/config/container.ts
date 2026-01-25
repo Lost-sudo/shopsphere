@@ -1,3 +1,6 @@
+// Dependency Injection Container
+
+// Auth Dependencies
 import { AuthController } from "../controllers/auth.controller";
 import { UserRepository } from "../repositories/user.repository";
 import { AuthService } from "../services/auth.service";
@@ -13,3 +16,12 @@ export const authService = new AuthService(
     verificationRepository,
 );
 export const authController = new AuthController(authService);
+
+// Address Dependencies
+import { AddressRepository } from "../repositories/address.repository";
+import { AddressService } from "../services/address.service";
+import { AddressController } from "../controllers/address.controller";
+
+const addressRepository = new AddressRepository();
+export const addressService = new AddressService(addressRepository);
+export const addressController = new AddressController(addressService);
