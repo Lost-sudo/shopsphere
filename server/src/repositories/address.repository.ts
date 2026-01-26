@@ -1,6 +1,6 @@
 import prisma from "../config/db";
 import { IAddressRepository } from "../interfaces/address.interface";
-import { AddressInput } from "../schemas/address.schema";
+import { AddressInput, UpdateAddressInput } from "../schemas/address.schema";
 import { Address } from "../types/address.types";
 
 export class AddressRepository implements IAddressRepository {
@@ -28,7 +28,7 @@ export class AddressRepository implements IAddressRepository {
     }
     async updateAddress(
         addressId: string,
-        input: Partial<AddressInput>,
+        input: Partial<UpdateAddressInput>,
     ): Promise<Address | null> {
         return prisma.address.update({
             where: {

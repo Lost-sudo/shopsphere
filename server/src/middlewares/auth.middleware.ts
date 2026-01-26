@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "../utils/errors/unauthorizedError";
+import { ForbiddenError } from "../utils/errors/forbiddenError";
 import { JwtUtil } from "../utils/jwt.util";
 import { Role } from "../types/auth.types";
 
@@ -21,7 +22,7 @@ export const authenticated = (
         req.user = {
             id: decodedToken.id,
             email: decodedToken.email,
-            role: decodedToken.role,
+            role: decodedToken.role as Role,
         };
 
         next();
@@ -43,7 +44,7 @@ export const authorized = (allowedRole: Role[]) => {
         const userRole = req.user?.role as Role;
 
         if (!userRole || !allowedRole.includes(userRole)) {
-            throw new UnauthorizedError(
+            throw new ForbiddenError(
                 "You do not have permission to perform this action",
             );
         }

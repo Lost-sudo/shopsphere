@@ -1,4 +1,4 @@
-import { AddressInput } from "../schemas/address.schema";
+import { AddressInput, UpdateAddressInput } from "../schemas/address.schema";
 import { Address } from "../types/address.types";
 
 export interface IAddressRepository {
@@ -7,7 +7,7 @@ export interface IAddressRepository {
     getAddressById(addressId: string): Promise<Address | null>;
     updateAddress(
         addressId: string,
-        input: Partial<AddressInput>,
+        input: Partial<UpdateAddressInput>,
     ): Promise<Address | null>;
     deleteAddress(addressId: string): Promise<boolean>;
 }
@@ -18,7 +18,7 @@ export interface IAddressService {
     getAddress(addressId: string): Promise<Address | null>;
     modifyAddress(
         addressId: string,
-        input: Partial<AddressInput>,
+        input: Partial<UpdateAddressInput>,
     ): Promise<Address | null>;
     setDefaultAddress(
         userId: string,

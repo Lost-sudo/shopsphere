@@ -38,7 +38,6 @@ yarn-error.log*
 .vscode/
 .idea/
 
-design.md
-prd.md
-tech-stack.md
-todo.md
+/dev-doc/
+
+/.agent/

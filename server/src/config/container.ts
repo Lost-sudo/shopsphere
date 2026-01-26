@@ -25,3 +25,12 @@ import { AddressController } from "../controllers/address.controller";
 const addressRepository = new AddressRepository();
 export const addressService = new AddressService(addressRepository);
 export const addressController = new AddressController(addressService);
+
+// Category Dependencies
+import { CategoryRepository } from "../repositories/category.repository";
+import { CategoryService } from "../services/category.service";
+import { CategoryController } from "../controllers/category.controller";
+
+const categoryRepository = new CategoryRepository();
+export const categoryService = new CategoryService(categoryRepository);
+export const categoryController = new CategoryController(categoryService);

@@ -1,15 +1,13 @@
 import { IAddressService } from "../interfaces/address.interface";
 import { AddressRepository } from "../repositories/address.repository";
-import { AddressInput } from "../schemas/address.schema";
+import { AddressInput, UpdateAddressInput } from "../schemas/address.schema";
 import { Address } from "../types/address.types";
 import { AppError } from "../utils/errors/appError";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
 
 export class AddressService implements IAddressService {
-    constructor(
-        private addressRepository: AddressRepository,
-    ) {}
+    constructor(private addressRepository: AddressRepository) {}
     async addAddress(input: AddressInput, userId: string): Promise<Address> {
         const newAddress = await this.addressRepository.createAddress(
             input,
@@ -43,7 +41,7 @@ export class AddressService implements IAddressService {
     }
     async modifyAddress(
         addressId: string,
-        input: Partial<AddressInput>,
+        input: Partial<UpdateAddressInput>,
     ): Promise<Address | null> {
         const isExisting =
             await this.addressRepository.getAddressById(addressId);
