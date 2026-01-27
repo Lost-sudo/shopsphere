@@ -47,7 +47,6 @@ export class CategoryController {
         await this.categoryService.removeCategory(req.params.id as string);
         res.status(204).json({
             status: "success",
-            data: null,
         });
     });
 }
