@@ -38,6 +38,6 @@ yarn-error.log*
 .vscode/
 .idea/
 
-/dev-doc/
+/dev-docs/
 
 /.agent/

@@ -34,3 +34,12 @@ import { CategoryController } from "../controllers/category.controller";
 const categoryRepository = new CategoryRepository();
 export const categoryService = new CategoryService(categoryRepository);
 export const categoryController = new CategoryController(categoryService);
+
+// Product Dependencies
+import { ProductRepository } from "../repositories/product.repository";
+import { ProductService } from "../services/product.service";
+import { ProductController } from "../controllers/product.controller";
+
+const productRepository = new ProductRepository();
+export const productService = new ProductService(productRepository, categoryRepository);
+export const productController = new ProductController(productService);
