@@ -1,9 +1,5 @@
 import app from "./app";
-import dotenv from "dotenv";
 import { connectDBs, disconnectDBs } from "./config/connection";
-
-// Load environment variables
-dotenv.config();
 
 const port = process.env.PORT || 5000;
 

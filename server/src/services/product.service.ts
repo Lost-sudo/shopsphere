@@ -12,7 +12,6 @@ export class ProductService implements IProductService {
     ) { }
 
     async createProduct(input: ProductInput): Promise<Product> {
-        // Validation: Check category exists
         const category = await this.categoryRepository.getCategoryById(input.categoryId);
         if (!category) {
             throw new BadRequestError("Invalid category ID");
@@ -35,7 +34,6 @@ export class ProductService implements IProductService {
     }
 
     async updateProduct(id: string, input: Partial<UpdateProductInput>): Promise<Product | null> {
-        // If updating category, check if it exists
         if (input.categoryId) {
             const category = await this.categoryRepository.getCategoryById(input.categoryId);
             if (!category) {

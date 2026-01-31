@@ -16,7 +16,6 @@ export class ProductController {
     });
 
     getProducts = asyncHandler(async (req: Request, res: Response) => {
-        // req.query is validated and transformed by middleware
         const query = req.query as unknown as ProductQuery;
         const result = await this.productService.listProducts(query);
         res.status(200).json({

@@ -5,6 +5,8 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { globalErrorHandler } from "./middlewares/error.middleware";
 import { notFound } from "./middlewares/notFound.middleware";
+import dotenv from "dotenv";
+dotenv.config();
 
 import routes from "./routes";
 
