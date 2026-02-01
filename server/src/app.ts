@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+import path from "path";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -18,6 +19,7 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use("/public", express.static(path.join(process.cwd(), "public")));
 
 // Routes
 app.get("/health", (req: Request, res: Response) => {

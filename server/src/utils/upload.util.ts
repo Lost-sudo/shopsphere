@@ -31,7 +31,7 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
 };
 
 // Multer upload instance
-const upload = multer({
+export const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {

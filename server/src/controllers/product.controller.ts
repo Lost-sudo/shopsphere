@@ -8,6 +8,19 @@ export class ProductController {
 
     createProduct = asyncHandler(async (req: Request, res: Response) => {
         const data: ProductInput = req.body;
+
+        if (req.files && Array.isArray(req.files)) {
+            const protocol = req.protocol;
+            const host = req.get("host");
+            const files = req.files as Express.Multer.File[];
+
+            const imageUrls = files.map((file) => {
+                return `${protocol}://${host}/public/uploads/products/${file.filename}`;
+            });
+
+            data.images = imageUrls;
+        }
+
         const product = await this.productService.createProduct(data);
         res.status(201).json({
             status: "success",

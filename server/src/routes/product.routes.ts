@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { productController } from "../config/container";
 import { validate } from "../middlewares/zodValidate.middleware";
+import { upload } from "../utils/upload.util";
 import {
     productSchema,
     updateProductSchema,
@@ -21,6 +22,7 @@ router.post(
     "/",
     authenticated,
     authorized(["ADMIN", "SUPER_ADMIN"]),
+    upload.array("images", 5),
     validate(productSchema),
     productController.createProduct
 );
