@@ -26,6 +26,7 @@ export interface IAuthService {
     register(data: UserRegisterInput): Promise<SafeUser>;
     login(data: UserLoginInput): Promise<UserWithTokens>;
     logout(refreshToken: string): Promise<void>;
+    getMe(user: JwtPayload): Promise<SafeUser>;
     refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens>;
     verifyVerificationToken(token: string): Promise<void>;
     requestVerificationEmail(email: string): Promise<void>;

@@ -54,6 +54,17 @@ export class AuthController {
             message: "User logged out successfully",
         });
     });
+    getMe = asyncHandler(async (req: Request, res: Response) => {
+        const authenticatedUser: JwtPayload = req.user!;
+
+        const user = await this.authService.getMe(authenticatedUser);
+
+        res.status(200).json({
+            success: true,
+            message: "User fetched successfully",
+            user,
+        });
+    });
     refresh = asyncHandler(async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
         const authenticatedUser: JwtPayload = req.user!;

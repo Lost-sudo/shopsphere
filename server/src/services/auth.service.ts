@@ -105,6 +105,14 @@ export class AuthService implements IAuthService {
             throw new BadRequestError("Invalid or expired refresh token");
         }
     }
+    async getMe(user: JwtPayload): Promise<SafeUser> {
+        const existingUser = await this.userRepository.getUserById(user.id);
+        if (!existingUser) {
+            throw new NotFoundError("User not found");
+        }
+        const { password, ...safeUser } = existingUser;
+        return safeUser;
+    }
     async refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens> {
         let payload: JwtRefreshPayload;
 
