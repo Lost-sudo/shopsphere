@@ -22,3 +22,9 @@ export type LoginResponse = {
     user: User;
     accessToken: string;
 };
+
+export type GetMeResponse = {
+    success: boolean;
+    message: string;
+    user: User;
+};

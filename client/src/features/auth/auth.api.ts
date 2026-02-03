@@ -1,14 +1,18 @@
 import { baseApi } from "@/lib/baseApi";
-import { RegisterResponse, LoginResponse, User } from "./auth.types";
+import { RegisterResponse, LoginResponse, GetMeResponse } from "./auth.types";
 import {
     RegisterFormValues,
     LoginFormValues,
 } from "@/schemas/auth/auth.schema";
 import { cookieManager } from "@/lib/cookie-manager";
+import { setAuthUser } from "./auth.slice";
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        register: builder.mutation<RegisterResponse, RegisterFormValues>({
+        register: builder.mutation<
+            RegisterResponse,
+            Omit<RegisterFormValues, "confirmPassword">
+        >({
             query: (credentials) => ({
                 url: "/auth/register",
                 method: "POST",
@@ -49,11 +53,19 @@ export const authApi = baseApi.injectEndpoints({
             },
         }),
 
-        getMe: builder.query<User, void>({
+        getMe: builder.query<GetMeResponse, void>({
             query: () => ({
                 url: "/auth/get-me",
                 method: "GET",
             }),
+            async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    dispatch(setAuthUser(data));
+                } catch (error) {
+                    console.error("GetMe failed:", error);
+                }
+            },
         }),
     }),
 });

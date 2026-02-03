@@ -1,11 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { Search, ShoppingCart, Bell, HelpCircle } from "lucide-react";
+import {
+    Search,
+    ShoppingCart,
+    Bell,
+    HelpCircle,
+    User,
+    ChevronDown,
+    LogOut,
+    UserCircle,
+    Package,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/lib/store";
+import { useLogoutMutation } from "@/features/auth/auth.api";
+import { clearUser } from "@/features/auth/auth.slice";
+import { useRouter } from "next/navigation";
 
 export function Header() {
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const user = useSelector((state: RootState) => state.auth.user);
+    const [logout] = useLogoutMutation();
+
+    const handleLogout = async () => {
+        try {
+            await logout().unwrap();
+            dispatch(clearUser());
+            router.push("/");
+        } catch (error) {
+            console.error("Failed to logout:", error);
+        }
+    };
+
+    const displayName = user?.name || user?.email?.split("@")[0] || "User";
     return (
         <header className="w-full bg-shopee text-white">
             {/* Top Bar */}
@@ -43,20 +74,64 @@ export function Header() {
                         <HelpCircle size={14} />
                         Help
                     </Link>
-                    <div className="flex gap-3 font-medium">
-                        <Link
-                            href="/register"
-                            className="hover:text-white/80 transition-colors border-r border-white/20 pr-3"
-                        >
-                            Sign Up
-                        </Link>
-                        <Link
-                            href="/login"
-                            className="hover:text-white/80 transition-colors"
-                        >
-                            Login
-                        </Link>
-                    </div>
+                    {user ? (
+                        <div className="relative group">
+                            <button className="flex items-center gap-2 hover:text-white/80 transition-colors cursor-pointer py-1">
+                                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/30">
+                                    <User size={14} />
+                                </div>
+                                <span className="max-w-[100px] truncate">
+                                    {displayName}
+                                </span>
+                                <ChevronDown
+                                    size={12}
+                                    className="group-hover:rotate-180 transition-transform duration-200"
+                                />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            <div className="absolute right-0 top-full pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 translate-y-2 group-hover:translate-y-0">
+                                <div className="bg-white text-gray-800 rounded-sm shadow-xl border border-gray-100 py-1 min-w-[160px] overflow-hidden">
+                                    <Link
+                                        href="/user/profile"
+                                        className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm"
+                                    >
+                                        <UserCircle size={16} />
+                                        My Account
+                                    </Link>
+                                    <Link
+                                        href="/user/purchase"
+                                        className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm"
+                                    >
+                                        <Package size={16} />
+                                        My Purchase
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm text-left border-t border-gray-100"
+                                    >
+                                        <LogOut size={16} />
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex gap-3 font-medium">
+                            <Link
+                                href="/register"
+                                className="hover:text-white/80 transition-colors border-r border-white/20 pr-3"
+                            >
+                                Sign Up
+                            </Link>
+                            <Link
+                                href="/login"
+                                className="hover:text-white/80 transition-colors"
+                            >
+                                Login
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
 
