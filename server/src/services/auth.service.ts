@@ -1,6 +1,6 @@
 import { UserRepository } from "../repositories/user.repository";
 import { VerificationRepository } from "../repositories/verification.repository";
-import { IAuthService } from "../interfaces/user.interface";
+import { AuthServiceImp } from "../interfaces/user.interface";
 import {
     User,
     UserWithTokens,
@@ -16,12 +16,17 @@ import { JwtPayload, JwtRefreshPayload } from "../types";
 import { VerificationUtil } from "../utils/verification.util";
 import { NotFoundError } from "../utils/errors/notFoundError";
 
-export class AuthService implements IAuthService {
+export class AuthService implements AuthServiceImp {
     constructor(
         private userRepository: UserRepository,
         private refreshSessionService: RefreshSessionService,
         private verificationRepository: VerificationRepository,
     ) {}
+    private safeUser(data: User) {
+        const { password, ...safeUser } = data;
+
+        return safeUser;
+    }
     async register(data: UserRegisterInput): Promise<SafeUser> {
         const user = await this.userRepository.getUserByEmail(data.email);
 
@@ -47,7 +52,7 @@ export class AuthService implements IAuthService {
             verificationToken,
         );
 
-        const { password, ...safeUser } = newUser;
+        const safeUser = this.safeUser(newUser);
 
         return safeUser;
     }
@@ -85,7 +90,7 @@ export class AuthService implements IAuthService {
 
         const refreshToken = JwtUtil.generateRefreshToken(jti);
 
-        const { password, ...safeUser } = user;
+        const safeUser = this.safeUser(user)
 
         return {
             user: safeUser,
@@ -110,7 +115,7 @@ export class AuthService implements IAuthService {
         if (!existingUser) {
             throw new NotFoundError("User not found");
         }
-        const { password, ...safeUser } = existingUser;
+        const safeUser = this.safeUser(existingUser);
         return safeUser;
     }
     async refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens> {

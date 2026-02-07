@@ -6,6 +6,7 @@ import {
 } from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { JwtPayload } from "../types";
+import { UpdateUserEmail, UpdateUserName, UpdateUserPassword } from "../schemas/user.schema";
 
 export interface IUserRepository {
     getUserById(id: string): Promise<User | null>;
@@ -22,7 +23,7 @@ export interface IRefreshSessionService {
     rotateSession(jti: string): Promise<string | null>;
 }
 
-export interface IAuthService {
+export interface AuthServiceImp {
     register(data: UserRegisterInput): Promise<SafeUser>;
     login(data: UserLoginInput): Promise<UserWithTokens>;
     logout(refreshToken: string): Promise<void>;
@@ -30,4 +31,13 @@ export interface IAuthService {
     refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens>;
     verifyVerificationToken(token: string): Promise<void>;
     requestVerificationEmail(email: string): Promise<void>;
+}
+
+export interface UserServiceImp {
+    getProfile(id: string): Promise<SafeUser>
+    getProfileById(id: string): Promise<SafeUser>
+    updateUserName(id: string, data: UpdateUserName): Promise<SafeUser>;
+    updateUserEmail(id: string, data: UpdateUserEmail): Promise<SafeUser>;
+    updateUserPassword(id: string, data: UpdateUserPassword): Promise<boolean>;
+    deleteUser(id: string): Promise<boolean>
 }
