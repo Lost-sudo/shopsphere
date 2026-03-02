@@ -1,9 +1,12 @@
 import prisma from "../config/db";
-import { IUserRepository } from "../interfaces/user.interface";
+import { UserRepositoryImp } from "../interfaces/user.interface";
 import { User } from "../types/auth.types";
 import { UserRegisterInput } from "../schemas/auth.schema";
 
-export class UserRepository implements IUserRepository {
+export class UserRepository implements UserRepositoryImp {
+    async getAllUser(): Promise<User[]> {
+        return prisma.user.findMany();
+    }
     async getUserById(id: string): Promise<User | null> {
         return prisma.user.findUnique({
             where: {

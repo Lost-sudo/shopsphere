@@ -7,6 +7,9 @@ import { AuthService } from "../services/auth.service";
 import { RefreshSessionService } from "../services/refreshSession.service";
 import { VerificationRepository } from "../repositories/verification.repository";
 
+import { UserController } from "../controllers/user.controller";
+import { UserSerive } from "../services/user.service";
+
 const userRepo = new UserRepository();
 const refreshSessionService = new RefreshSessionService();
 const verificationRepository = new VerificationRepository();
@@ -43,3 +46,7 @@ import { ProductController } from "../controllers/product.controller";
 const productRepository = new ProductRepository();
 export const productService = new ProductService(productRepository, categoryRepository);
 export const productController = new ProductController(productService);
+
+// User Dependencies
+const userService = new UserSerive(userRepo);
+export const userController = new UserController(userService);

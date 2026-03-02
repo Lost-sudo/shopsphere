@@ -7,11 +7,14 @@ import { NotFoundError } from '../utils/errors/notFoundError';
 export class UserSerive implements UserServiceImp {
     constructor(
         private userRepository: UserRepository
-    ) {}
+    ) { }
     private async safeUser(data: User) {
         const { password, ...safeUser } = data;
 
         return safeUser;
+    }
+    async getAllUser(): Promise<User[]> {
+        return this.userRepository.getAllUser();
     }
     async getProfile(id: string): Promise<SafeUser> {
         const existingUser = await this.userRepository.getUserById(id);

@@ -3,6 +3,7 @@ import authRoutes from "./auth.routes";
 import addressRoutes from "./address.routes";
 import categoryRoutes from "./category.routes";
 import productRoutes from "./product.routes";
+import userRoutes from "./user.routes";
 
 
 
@@ -12,6 +13,6 @@ router.use("/auth", authRoutes);
 router.use("/address", addressRoutes);
 router.use("/category", categoryRoutes);
 router.use("/products", productRoutes);
-
+router.use("/users", userRoutes);
 
 export default router;
