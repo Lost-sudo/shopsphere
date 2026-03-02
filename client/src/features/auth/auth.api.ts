@@ -63,7 +63,7 @@ export const authApi = baseApi.injectEndpoints({
                     const { data } = await queryFulfilled;
                     dispatch(setAuthUser(data));
                 } catch (error) {
-                    console.error("GetMe failed:", error);
+                    console.log("Please log in.")
                 }
             },
         }),

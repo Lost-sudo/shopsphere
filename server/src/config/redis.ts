@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
+const redisUrl = process.env.REDIS_URL;
 
-const redis = new Redis(redisUrl);
+const redis = new Redis(redisUrl!);
 
 redis.on("connect", () => {
     console.log("📶[redis]: Connected to Redis");
