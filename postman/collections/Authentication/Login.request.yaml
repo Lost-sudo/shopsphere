@@ -1,0 +1,14 @@
+$kind: http-request
+name: Login
+url: http://localhost:5000/api/v1/auth/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"lostsudo.dev+1@gmail.com\",\r
+
+    \    \"password\": \"Lostsudo1.dev\"\r
+
+    }"
+order: 1155016392511210

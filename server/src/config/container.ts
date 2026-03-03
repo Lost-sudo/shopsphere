@@ -8,7 +8,7 @@ import { RefreshSessionService } from "../services/refreshSession.service";
 import { VerificationRepository } from "../repositories/verification.repository";
 
 import { UserController } from "../controllers/user.controller";
-import { UserSerive } from "../services/user.service";
+import { UserService } from "../services/user.service";
 
 const userRepo = new UserRepository();
 const refreshSessionService = new RefreshSessionService();
@@ -48,5 +48,5 @@ export const productService = new ProductService(productRepository, categoryRepo
 export const productController = new ProductController(productService);
 
 // User Dependencies
-const userService = new UserSerive(userRepo);
+const userService = new UserService(userRepo);
 export const userController = new UserController(userService);

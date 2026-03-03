@@ -35,7 +35,7 @@ export interface AuthServiceImp {
 }
 
 export interface UserServiceImp {
-    getAllUser(): Promise<User[]>;
+    getAllUser(): Promise<SafeUser[]>;
     getProfile(id: string): Promise<SafeUser>
     getProfileById(id: string): Promise<SafeUser>
     updateUserName(id: string, data: UpdateUserName): Promise<SafeUser>;

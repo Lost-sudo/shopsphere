@@ -4,17 +4,18 @@ import { UpdateUserName, UpdateUserEmail, UpdateUserPassword } from "../schemas/
 import { SafeUser, User } from '../types/auth.types';
 import { NotFoundError } from '../utils/errors/notFoundError';
 
-export class UserSerive implements UserServiceImp {
+export class UserService implements UserServiceImp {
     constructor(
         private userRepository: UserRepository
     ) { }
-    private async safeUser(data: User) {
+    private safeUser(data: User): SafeUser {
         const { password, ...safeUser } = data;
 
         return safeUser;
     }
-    async getAllUser(): Promise<User[]> {
-        return this.userRepository.getAllUser();
+    async getAllUser(): Promise<SafeUser[]> {
+        const users = await this.userRepository.getAllUser();
+        return users.map(user => this.safeUser(user));
     }
     async getProfile(id: string): Promise<SafeUser> {
         const existingUser = await this.userRepository.getUserById(id);
@@ -50,7 +51,7 @@ export class UserSerive implements UserServiceImp {
             name: data.name
         };
 
-        const updatedUser = await this.safeUser(await this.userRepository.updateUser(id, updatedUserName));
+        const updatedUser = this.safeUser(await this.userRepository.updateUser(id, updatedUserName));
 
         return updatedUser;
     }
@@ -68,7 +69,7 @@ export class UserSerive implements UserServiceImp {
             email: data.email
         };
 
-        const updatedUser = await this.safeUser(await this.userRepository.updateUser(id, updatedUserEmail));
+        const updatedUser = this.safeUser(await this.userRepository.updateUser(id, updatedUserEmail));
 
         return updatedUser;
     }
@@ -86,19 +87,16 @@ export class UserSerive implements UserServiceImp {
             password: data.password
         }
 
-        const updatedPassword = await this.safeUser(await this.userRepository.updateUser(id, updatedUserPassword));
+        const updatedPassword = this.safeUser(await this.userRepository.updateUser(id, updatedUserPassword));
         if (!updatedPassword) return false;
         return true;
     }
     async deleteUser(id: string): Promise<boolean> {
-        const existingUser = await this.userRepository.deleteUser(id);
-
-        if (!existingUser) {
-            throw new NotFoundError("User with the given ID does not exist.")
+        try {
+            await this.userRepository.deleteUser(id);
+            return true;
+        } catch (error) {
+            throw new NotFoundError("User with the given ID does not exist.");
         }
-
-        await this.userRepository.deleteUser(id);
-
-        return true;
     }
 }
