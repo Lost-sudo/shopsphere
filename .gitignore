@@ -38,8 +38,8 @@ yarn-error.log*
 .vscode/
 .idea/
 
-/dev-docs/
-
 /.agent/
 
 /images/
+
+.postman/

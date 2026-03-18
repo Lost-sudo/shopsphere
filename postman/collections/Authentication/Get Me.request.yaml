@@ -5,5 +5,5 @@ method: GET
 auth:
   type: bearer
   credentials:
-    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxYzdjM2Y4LTNhOGUtNDY1ZC1hNmZkLWMwMmUzNmI4YmYwYyIsImVtYWlsIjoibG9zdHN1ZG8uZGV2KzFAZ21haWwuY29tIiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzcyNTQ1NDA5LCJleHAiOjE3NzI1NDYzMDl9.9RWR8Zy4UZ6KcZSfHUXn9N8HKwfW2W1npmzA9oLzrkg
+    token: "{{accessToken}}"
 order: 2013683591823035

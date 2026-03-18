@@ -1,0 +1,24 @@
+$kind: http-request
+name: Update Address
+url: "{{endpoint}}/address/update-address/c64fa63e-668c-4e46-b5ce-d141bc4e9418"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"street\": \"Street Example 1\",\r
+
+    \    \"city\": \"City Example 1\",\r
+
+    \    \"state\": \"State Example 1\",\r
+
+    \    \"country\": \"Country Example 1\",\r
+
+    \    \"postalCode\": \"1234\"\r
+
+    }"
+auth:
+  credentials:
+    token: "{{accessToken}}"
+  type: bearer
+order: 4492259124338138

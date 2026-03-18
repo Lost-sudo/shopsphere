@@ -1,0 +1,24 @@
+$kind: http-request
+name: Create Address
+url: http://localhost:5000/api/v1/address/create-address
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"street\": \"Street Example 2\",\r
+
+    \    \"city\": \"City Example 2\",\r
+
+    \    \"state\": \"State Example 2\",\r
+
+    \    \"country\": \"Country Example 2\",\r
+
+    \    \"postalCode\": \"1234\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{accessToken}}"
+order: 1773843232911
