@@ -11,7 +11,6 @@ import {
     Edit, 
     Trash2, 
     Filter,
-    ArrowUpRight,
     Package
 } from "lucide-react";
 import Image from "next/image";
