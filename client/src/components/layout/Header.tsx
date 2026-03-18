@@ -10,6 +10,7 @@ import {
     ChevronDown,
     LogOut,
     UserCircle,
+    LayoutDashboard,
     Package,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -98,6 +99,13 @@ export function Header() {
                                     >
                                         <UserCircle size={16} />
                                         My Account
+                                    </Link>
+                                    <Link
+                                        href="/admin"
+                                        className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm"
+                                    >
+                                        <LayoutDashboard size={16} />
+                                        Admin Dashboard
                                     </Link>
                                     <Link
                                         href="/user/purchase"
