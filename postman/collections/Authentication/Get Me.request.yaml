@@ -1,9 +1,0 @@
-$kind: http-request
-name: Get Me
-url: http://localhost:5000/api/v1/auth/get-me
-method: GET
-auth:
-  type: bearer
-  credentials:
-    token: "{{accessToken}}"
-order: 2013683591823035

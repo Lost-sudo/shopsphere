@@ -1,9 +1,0 @@
-$kind: http-request
-name: Delete Address
-url: http://localhost:5000/api/v1/address/delete-address/98a57e1e-c8f6-4453-bce8-d43c7aab9e00
-method: DELETE
-auth:
-  type: bearer
-  credentials:
-    token: "{{accessToken}}"
-order: 4502776296279954

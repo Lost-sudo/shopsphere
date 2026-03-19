@@ -1,5 +1,0 @@
-name: Server
-values:
-  - key: accessToken
-    value: ''
-    enabled: true

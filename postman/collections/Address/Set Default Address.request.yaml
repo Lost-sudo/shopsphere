@@ -1,9 +1,0 @@
-$kind: http-request
-name: Set Default Address
-url: http://localhost:5000/api/v1/address/set-default-address/c64fa63e-668c-4e46-b5ce-d141bc4e9418
-method: PUT
-auth:
-  type: bearer
-  credentials:
-    token: "{{accessToken}}"
-order: 4501286735188515

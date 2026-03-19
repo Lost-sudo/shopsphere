@@ -1,9 +1,0 @@
-$kind: http-request
-name: Get Address By ID
-url: http://localhost:5000/api/v1/address/get-address/c64fa63e-668c-4e46-b5ce-d141bc4e9418
-method: GET
-auth:
-  type: bearer
-  credentials:
-    token: "{{accessToken}}"
-order: 4451631922789040
