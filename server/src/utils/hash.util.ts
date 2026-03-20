@@ -3,9 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
-
 export const hashPassword = async (password: string): Promise<string> => {
+    const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
     return bcrypt.hash(password, SALT_ROUNDS);
 };
 
