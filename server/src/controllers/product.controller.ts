@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
 import { ProductService } from "../services/product.service";
-import { ProductInput, ProductQuery, UpdateProductInput } from "../schemas/product.schema";
+import { ProductInput, ProductQuery, UpdateProductInput, ProductVariantInput, UpdateVariantInput } from "../schemas/product.schema";
 
 export class ProductController {
     constructor(private productService: ProductService) { }
+
+    // ─── Product handlers ─────────────────────────────────────────────────────────
 
     createProduct = asyncHandler(async (req: Request, res: Response) => {
         const data: ProductInput = req.body;
@@ -60,6 +62,58 @@ export class ProductController {
     deleteProduct = asyncHandler(async (req: Request, res: Response) => {
         const id = req.params.id as string;
         await this.productService.deleteProduct(id);
+        res.status(204).json({
+            status: "success",
+        });
+    });
+
+    // ─── Variant handlers ─────────────────────────────────────────────────────────
+
+    createVariant = asyncHandler(async (req: Request, res: Response) => {
+        const productId = req.params.id as string;
+        const data: ProductVariantInput = req.body;
+        const variant = await this.productService.addVariant(productId, data);
+        res.status(201).json({
+            status: "success",
+            data: { variant },
+        });
+    });
+
+    getVariants = asyncHandler(async (req: Request, res: Response) => {
+        const productId = req.params.id as string;
+        const variants = await this.productService.getVariants(productId);
+        res.status(200).json({
+            status: "success",
+            results: variants.length,
+            data: { variants },
+        });
+    });
+
+    getVariant = asyncHandler(async (req: Request, res: Response) => {
+        const productId = req.params.id as string;
+        const variantId = req.params.variantId as string;
+        const variant = await this.productService.getVariant(productId, variantId);
+        res.status(200).json({
+            status: "success",
+            data: { variant },
+        });
+    });
+
+    updateVariant = asyncHandler(async (req: Request, res: Response) => {
+        const productId = req.params.id as string;
+        const variantId = req.params.variantId as string;
+        const data: Partial<UpdateVariantInput> = req.body;
+        const variant = await this.productService.updateVariant(productId, variantId, data);
+        res.status(200).json({
+            status: "success",
+            data: { variant },
+        });
+    });
+
+    deleteVariant = asyncHandler(async (req: Request, res: Response) => {
+        const productId = req.params.id as string;
+        const variantId = req.params.variantId as string;
+        await this.productService.removeVariant(productId, variantId);
         res.status(204).json({
             status: "success",
         });

@@ -1,7 +1,7 @@
 import { IProductService, IProductRepository } from "../interfaces/product.interface";
 import { ICategoryRepository } from "../interfaces/category.interface";
-import { ProductInput, UpdateProductInput, ProductQuery } from "../schemas/product.schema";
-import { Product, ProductListResponse } from "../types/product.types";
+import { ProductInput, UpdateProductInput, ProductQuery, ProductVariantInput, UpdateVariantInput } from "../schemas/product.schema";
+import { Product, ProductListResponse, ProductVariant } from "../types/product.types";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
 
@@ -10,6 +10,8 @@ export class ProductService implements IProductService {
         private productRepository: IProductRepository,
         private categoryRepository: ICategoryRepository
     ) { }
+
+    // ─── Product methods ──────────────────────────────────────────────────────────
 
     async createProduct(input: ProductInput): Promise<Product> {
         const category = await this.categoryRepository.getCategoryById(input.categoryId);
@@ -52,6 +54,65 @@ export class ProductService implements IProductService {
         const deleted = await this.productRepository.delete(id);
         if (!deleted) {
             throw new NotFoundError("Product not found");
+        }
+        return true;
+    }
+
+    // ─── Variant methods ──────────────────────────────────────────────────────────
+
+    private async assertProductExists(productId: string): Promise<void> {
+        const product = await this.productRepository.findById(productId);
+        if (!product) {
+            throw new NotFoundError("Product not found");
+        }
+    }
+
+    async addVariant(productId: string, data: ProductVariantInput): Promise<ProductVariant> {
+        await this.assertProductExists(productId);
+        const variant = await this.productRepository.createVariant(productId, data);
+        return variant;
+    }
+
+    async getVariants(productId: string): Promise<ProductVariant[]> {
+        await this.assertProductExists(productId);
+        return await this.productRepository.findVariantsByProductId(productId);
+    }
+
+    async getVariant(productId: string, variantId: string): Promise<ProductVariant> {
+        await this.assertProductExists(productId);
+        const variant = await this.productRepository.findVariantById(variantId);
+        if (!variant || variant.productId !== productId) {
+            throw new NotFoundError("Variant not found");
+        }
+        return variant;
+    }
+
+    async updateVariant(productId: string, variantId: string, data: Partial<UpdateVariantInput>): Promise<ProductVariant> {
+        await this.assertProductExists(productId);
+
+        const existing = await this.productRepository.findVariantById(variantId);
+        if (!existing || existing.productId !== productId) {
+            throw new NotFoundError("Variant not found");
+        }
+
+        const updated = await this.productRepository.updateVariant(variantId, data);
+        if (!updated) {
+            throw new NotFoundError("Variant not found");
+        }
+        return updated;
+    }
+
+    async removeVariant(productId: string, variantId: string): Promise<boolean> {
+        await this.assertProductExists(productId);
+
+        const existing = await this.productRepository.findVariantById(variantId);
+        if (!existing || existing.productId !== productId) {
+            throw new NotFoundError("Variant not found");
+        }
+
+        const deleted = await this.productRepository.deleteVariant(variantId);
+        if (!deleted) {
+            throw new NotFoundError("Variant not found");
         }
         return true;
     }

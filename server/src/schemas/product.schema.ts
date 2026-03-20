@@ -42,7 +42,15 @@ export const productQuerySchema = z.object({
     isActive: z.union([z.boolean(), z.string().transform(val => val === 'true')]).optional(),
 });
 
+export const updateVariantSchema = productVariantSchema.partial();
+
+export const variantParamSchema = z.object({
+    variantId: z.uuid("Invalid variant ID"),
+});
+
 export type ProductVariantInput = z.infer<typeof productVariantSchema>;
+export type UpdateVariantInput = z.infer<typeof updateVariantSchema>;
+export type VariantParamInput = z.infer<typeof variantParamSchema>;
 export type ProductInput = z.infer<typeof productSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type ProductQuery = z.infer<typeof productQuerySchema>;

@@ -1,25 +1,32 @@
 import prisma from "../config/db";
 import { IProductRepository } from "../interfaces/product.interface";
-import { ProductInput, UpdateProductInput, ProductQuery } from "../schemas/product.schema";
-import { Product, ProductListResponse } from "../types/product.types";
+import { ProductInput, UpdateProductInput, ProductQuery, ProductVariantInput, UpdateVariantInput } from "../schemas/product.schema";
+import { Product, ProductListResponse, ProductVariant } from "../types/product.types";
 import { Prisma } from "../generated/client";
 
 export class ProductRepository implements IProductRepository {
-    // Helper to transform Prisma result to our Product type
+    // ─── Helpers ─────────────────────────────────────────────────────────────────
+
     private mapToProduct(prismaProduct: any): Product {
         return {
             ...prismaProduct,
             price: Number(prismaProduct.price),
-            variants: prismaProduct.variants?.map((v: any) => ({
-                ...v,
-                price: v.price ? Number(v.price) : null,
-            })) || [],
+            variants: prismaProduct.variants?.map((v: any) => this.mapToVariant(v)) || [],
             category: prismaProduct.category ? {
                 id: prismaProduct.category.id,
                 name: prismaProduct.category.name,
             } : undefined,
         };
     }
+
+    private mapToVariant(v: any): ProductVariant {
+        return {
+            ...v,
+            price: v.price !== null && v.price !== undefined ? Number(v.price) : null,
+        };
+    }
+
+    // ─── Product CRUD ─────────────────────────────────────────────────────────────
 
     async create(data: ProductInput): Promise<Product> {
         const { variants, ...productData } = data;
@@ -99,7 +106,7 @@ export class ProductRepository implements IProductRepository {
         ]);
 
         return {
-            products: products.map(this.mapToProduct),
+            products: products.map(p => this.mapToProduct(p)),
             total,
             page,
             limit,
@@ -122,15 +129,6 @@ export class ProductRepository implements IProductRepository {
 
     async update(id: string, data: Partial<UpdateProductInput>): Promise<Product | null> {
         const { variants, ...productData } = data;
-
-        // Transaction to handle variant updates if necessary
-        // For simplicity, we'll update basic fields. Variant management might need specific methods or more complex logic.
-        // If variants are provided, we will delete existing and recreate them for now (simplest full update),
-        // or we could implement smarter diffing. Given the schema 'variants' is optional in update,
-        // let's assume if it is provided, we replace.
-
-        // However, Prisma makes deep updates tricky without explicit IDs.
-        // Let's stick to updating product fields first. If variants are passed, we handle them.
 
         const updateData: any = { ...productData };
 
@@ -156,6 +154,51 @@ export class ProductRepository implements IProductRepository {
     async delete(id: string): Promise<boolean> {
         try {
             await prisma.product.delete({ where: { id } });
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    // ─── Variant CRUD ─────────────────────────────────────────────────────────────
+
+    async createVariant(productId: string, data: ProductVariantInput): Promise<ProductVariant> {
+        const variant = await prisma.productVariant.create({
+            data: { ...data, productId },
+        });
+        return this.mapToVariant(variant);
+    }
+
+    async findVariantsByProductId(productId: string): Promise<ProductVariant[]> {
+        const variants = await prisma.productVariant.findMany({
+            where: { productId },
+        });
+        return variants.map(v => this.mapToVariant(v));
+    }
+
+    async findVariantById(variantId: string): Promise<ProductVariant | null> {
+        const variant = await prisma.productVariant.findUnique({
+            where: { id: variantId },
+        });
+        if (!variant) return null;
+        return this.mapToVariant(variant);
+    }
+
+    async updateVariant(variantId: string, data: Partial<UpdateVariantInput>): Promise<ProductVariant | null> {
+        try {
+            const variant = await prisma.productVariant.update({
+                where: { id: variantId },
+                data,
+            });
+            return this.mapToVariant(variant);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async deleteVariant(variantId: string): Promise<boolean> {
+        try {
+            await prisma.productVariant.delete({ where: { id: variantId } });
             return true;
         } catch (error) {
             return false;
