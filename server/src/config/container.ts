@@ -14,9 +14,9 @@ const userRepo = new UserRepository();
 const refreshSessionService = new RefreshSessionService();
 const verificationRepository = new VerificationRepository();
 export const authService = new AuthService(
-    userRepo,
-    refreshSessionService,
-    verificationRepository,
+  userRepo,
+  refreshSessionService,
+  verificationRepository,
 );
 export const authController = new AuthController(authService);
 
@@ -44,9 +44,21 @@ import { ProductService } from "../services/product.service";
 import { ProductController } from "../controllers/product.controller";
 
 const productRepository = new ProductRepository();
-export const productService = new ProductService(productRepository, categoryRepository);
+export const productService = new ProductService(
+  productRepository,
+  categoryRepository,
+);
 export const productController = new ProductController(productService);
 
 // User Dependencies
 const userService = new UserService(userRepo);
 export const userController = new UserController(userService);
+
+// Order Dependencies
+import { OrderRepository } from "../repositories/order.repository";
+import { OrderService } from "../services/order.service";
+import { OrderController } from "../controllers/order.controller";
+
+const orderRepository = new OrderRepository();
+export const orderService = new OrderService(orderRepository);
+export const orderController = new OrderController(orderService);
