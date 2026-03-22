@@ -1,11 +1,10 @@
-import { CategoryRepository } from "../repositories/category.repository";
-import { ICategoryService } from "../interfaces/category.interface";
+import { ICategoryService, ICategoryRepository } from "../interfaces/category.interface";
 import { CategoryInput, UpdateCategoryInput } from "../schemas/category.schema";
 import { Category } from "../types/category.types";
 import { BadRequestError } from "../utils/errors/badRequestError";
 
 export class CategoryService implements ICategoryService {
-    constructor(private categoryRepository: CategoryRepository) {}
+    constructor(private categoryRepository: ICategoryRepository) {}
     async addNewCategory(input: CategoryInput): Promise<Category> {
         const newCategory = await this.categoryRepository.createCategory(input);
 

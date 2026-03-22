@@ -5,10 +5,10 @@ export interface IVerificationRepository {
         payload: VerificationTokenPayload,
     ): Promise<VerificationReturnValue>;
     getVerificationTokenUserId(
-        userId: string,
-    ): Promise<VerificationReturnValue | null>;
-    getVerificationTokenUserId(
         token: string,
     ): Promise<VerificationReturnValue | null>;
     deleteVerificationToken(userId: string): Promise<void>;
+    getVerificationToken(
+        userId: string,
+    ): Promise<VerificationReturnValue | null>;
 }

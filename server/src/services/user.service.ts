@@ -1,12 +1,11 @@
-import { UserServiceImp } from "../interfaces/user.interface";
-import { UserRepository } from "../repositories/user.repository";
+import { IUserService, IUserRepository } from "../interfaces/user.interface";
 import { UpdateUserName, UpdateUserEmail, UpdateUserPassword } from "../schemas/user.schema";
 import { SafeUser, User } from '../types/auth.types';
 import { NotFoundError } from '../utils/errors/notFoundError';
 
-export class UserService implements UserServiceImp {
+export class UserService implements IUserService {
     constructor(
-        private userRepository: UserRepository
+        private userRepository: IUserRepository
     ) { }
     private safeUser(data: User): SafeUser {
         const { password, ...safeUser } = data;

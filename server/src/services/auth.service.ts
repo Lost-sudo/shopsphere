@@ -1,6 +1,5 @@
-import { UserRepository } from "../repositories/user.repository";
-import { VerificationRepository } from "../repositories/verification.repository";
-import { AuthServiceImp } from "../interfaces/user.interface";
+import { IUserRepository, IRefreshSessionService, IAuthService } from "../interfaces/user.interface";
+import { IVerificationRepository } from "../interfaces/verification.interface";
 import {
     User,
     UserWithTokens,
@@ -11,16 +10,15 @@ import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { comparePassword, hashPassword } from "../utils/hash.util";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { JwtUtil } from "../utils/jwt.util";
-import { RefreshSessionService } from "./refreshSession.service";
 import { JwtPayload, JwtRefreshPayload } from "../types";
 import { VerificationUtil } from "../utils/verification.util";
 import { NotFoundError } from "../utils/errors/notFoundError";
 
-export class AuthService implements AuthServiceImp {
+export class AuthService implements IAuthService {
     constructor(
-        private userRepository: UserRepository,
-        private refreshSessionService: RefreshSessionService,
-        private verificationRepository: VerificationRepository,
+        private userRepository: IUserRepository,
+        private refreshSessionService: IRefreshSessionService,
+        private verificationRepository: IVerificationRepository,
     ) {}
     private safeUser(data: User) {
         const { password, ...safeUser } = data;

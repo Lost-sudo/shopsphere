@@ -1,5 +1,4 @@
-import { IAddressService } from "../interfaces/address.interface";
-import { AddressRepository } from "../repositories/address.repository";
+import { IAddressService, IAddressRepository } from "../interfaces/address.interface";
 import { AddressInput, UpdateAddressInput } from "../schemas/address.schema";
 import { Address } from "../types/address.types";
 import { AppError } from "../utils/errors/appError";
@@ -7,7 +6,7 @@ import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
 
 export class AddressService implements IAddressService {
-    constructor(private addressRepository: AddressRepository) {}
+    constructor(private addressRepository: IAddressRepository) {}
     async addAddress(input: AddressInput, userId: string): Promise<Address> {
         const newAddress = await this.addressRepository.createAddress(
             input,

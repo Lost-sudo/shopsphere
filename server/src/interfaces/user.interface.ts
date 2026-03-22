@@ -8,12 +8,12 @@ import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { JwtPayload } from "../types";
 import { UpdateUserEmail, UpdateUserName, UpdateUserPassword } from "../schemas/user.schema";
 
-export interface UserRepositoryImp {
+export interface IUserRepository {
     getAllUser(): Promise<User[]>;
     getUserById(id: string): Promise<User | null>;
     getUserByEmail(email: string): Promise<User | null>;
     createUser(user: UserRegisterInput): Promise<User>;
-    updateUser(id: string, user: Partial<UserRegisterInput>): Promise<User>;
+    updateUser(id: string, user: Partial<User>): Promise<User>;
     deleteUser(id: string): Promise<User>;
 }
 
@@ -24,7 +24,7 @@ export interface IRefreshSessionService {
     rotateSession(jti: string): Promise<string | null>;
 }
 
-export interface AuthServiceImp {
+export interface IAuthService {
     register(data: UserRegisterInput): Promise<SafeUser>;
     login(data: UserLoginInput): Promise<UserWithTokens>;
     logout(refreshToken: string): Promise<void>;
@@ -34,7 +34,7 @@ export interface AuthServiceImp {
     requestVerificationEmail(email: string): Promise<void>;
 }
 
-export interface UserServiceImp {
+export interface IUserService {
     getAllUser(): Promise<SafeUser[]>;
     getProfile(id: string): Promise<SafeUser>
     getProfileById(id: string): Promise<SafeUser>

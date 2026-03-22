@@ -1,9 +1,9 @@
 import prisma from "../config/db";
-import { UserRepositoryImp } from "../interfaces/user.interface";
+import { IUserRepository } from "../interfaces/user.interface";
 import { User } from "../types/auth.types";
 import { UserRegisterInput } from "../schemas/auth.schema";
 
-export class UserRepository implements UserRepositoryImp {
+export class UserRepository implements IUserRepository {
     async getAllUser(): Promise<User[]> {
         return prisma.user.findMany();
     }
