@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
-import { ProductService } from "../services/product.service";
+import { IProductService } from "../interfaces/product.interface";
 import { ProductInput, ProductQuery, UpdateProductInput, ProductVariantInput, UpdateVariantInput } from "../schemas/product.schema";
 
 export class ProductController {
-    constructor(private productService: ProductService) { }
+    constructor(private productService: IProductService) { }
 
     // ─── Product handlers ─────────────────────────────────────────────────────────
 

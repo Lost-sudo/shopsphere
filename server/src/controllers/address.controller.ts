@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
-import { AddressService } from "../services/address.service";
+import { IAddressService } from "../interfaces/address.interface";
 import { AddressInput, UpdateAddressInput } from "../schemas/address.schema";
 
 export class AddressController {
-    constructor(private addressService: AddressService) {}
+    constructor(private addressService: IAddressService) {}
 
     createAddress = asyncHandler(async (req: Request, res: Response) => {
         const input = req.body as AddressInput;

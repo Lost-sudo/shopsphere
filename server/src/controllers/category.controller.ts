@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
-import { CategoryService } from "../services/category.service";
+import { ICategoryService } from "../interfaces/category.interface";
 
 export class CategoryController {
-    constructor(private categoryService: CategoryService) {}
+    constructor(private categoryService: ICategoryService) {}
 
     createCategory = asyncHandler(async (req: Request, res: Response) => {
         const category = await this.categoryService.addNewCategory(req.body);

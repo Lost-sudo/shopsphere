@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
-import { UserService } from "../services/user.service";
+import { IUserService } from "../interfaces/user.interface";
 
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: IUserService) {}
   getAllUser = asyncHandler(async (req: Request, res: Response) => {
     const users = await this.userService.getAllUser();
 

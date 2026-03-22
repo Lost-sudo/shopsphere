@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
-import { AuthService } from "../services/auth.service";
+import { IAuthService } from "../interfaces/user.interface";
 import { UserLoginInput, UserRegisterInput } from "../schemas/auth.schema";
 import { JwtPayload } from "../types";
 
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: IAuthService) {}
     register = asyncHandler(async (req: Request, res: Response) => {
         const data = req.body as UserRegisterInput;
 
