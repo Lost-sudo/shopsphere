@@ -1,24 +1,106 @@
+import prisma from "../config/db";
 import { IOrderRepository } from "../interfaces/order.interface";
 import { Order } from "../types/order.types";
 import { OrderInput, UpdateOrderInput } from "../schemas/order.schema";
+import { OrderStatus } from "../generated/client";
 
 export class OrderRepository implements IOrderRepository {
-  createOrder(input: OrderInput, userId: string): Promise<Order> {
-    throw new Error("Method not implemented.");
+  private mapPrismaOrderToOrder(prismaOrder: any): Order {
+    return {
+      id: prismaOrder.id,
+      userId: prismaOrder.userId,
+      items: prismaOrder.items.map((item: any) => ({
+        id: item.id,
+        orderId: item.orderId,
+        productId: item.productId,
+        quantity: item.quantity,
+        price: Number(item.price),
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      })),
+      totalAmount: Number(prismaOrder.totalAmount),
+      shippingAddress: prismaOrder.shippingAddress,
+      paymentMethod: prismaOrder.paymentMethod,
+      status: prismaOrder.status.toLowerCase(),
+      createdAt: prismaOrder.createdAt,
+      updatedAt: prismaOrder.updatedAt,
+    };
   }
-  getOrderById(orderId: string): Promise<Order | null> {
-    throw new Error("Method not implemented.");
+
+  async createOrder(input: OrderInput, userId: string): Promise<Order> {
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        totalAmount: input.totalAmount,
+        shippingAddress: input.shippingAddress,
+        paymentMethod: input.paymentMethod,
+        status: (input.status?.toUpperCase() as OrderStatus) || OrderStatus.PENDING,
+        items: {
+          create: input.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      },
+      include: {
+        items: true,
+      },
+    });
+
+    return this.mapPrismaOrderToOrder(order);
   }
-  getOrdersByUserId(userId: string): Promise<Order[]> {
-    throw new Error("Method not implemented.");
+
+  async getOrderById(orderId: string): Promise<Order | null> {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: true,
+      },
+    });
+
+    if (!order) return null;
+    return this.mapPrismaOrderToOrder(order);
   }
-  updateOrder(
+
+  async getOrdersByUserId(userId: string): Promise<Order[]> {
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      include: {
+        items: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return orders.map((order) => this.mapPrismaOrderToOrder(order));
+  }
+
+  async updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,
   ): Promise<Order | null> {
-    throw new Error("Method not implemented.");
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: input.status?.toUpperCase() as OrderStatus,
+        totalAmount: input.totalAmount,
+        shippingAddress: input.shippingAddress,
+        paymentMethod: input.paymentMethod,
+      },
+      include: {
+        items: true,
+      },
+    });
+
+    return this.mapPrismaOrderToOrder(order);
   }
-  deleteOrder(orderId: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
+
+  async deleteOrder(orderId: string): Promise<boolean> {
+    await prisma.order.delete({
+      where: { id: orderId },
+    });
+    return true;
   }
 }

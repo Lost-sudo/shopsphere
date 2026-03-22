@@ -1,26 +1,47 @@
 import { IOrderService, IOrderRepository } from "../interfaces/order.interface";
 import { Order } from "../types/order.types";
 import { OrderInput, UpdateOrderInput } from "../schemas/order.schema";
+import { BadRequestError } from "../utils/errors/badRequestError";
+import { NotBeforeError } from "jsonwebtoken";
+import { NotFoundError } from "../utils/errors/notFoundError";
 
 export class OrderService implements IOrderService {
   constructor(private readonly orderRepository: IOrderRepository) {}
 
-  createOrder(input: OrderInput, userId: string): Promise<Order> {
-    throw new Error("Method not implemented.");
+  async createOrder(input: OrderInput, userId: string): Promise<Order> {
+    if (!userId) throw new BadRequestError("User ID is required.");
+
+    if (input.items.length === 0)
+      throw new BadRequestError("Order must contain at least one item.");
+    const order = await this.orderRepository.createOrder(input, userId);
+    return order;
   }
-  getOrderById(orderId: string): Promise<Order | null> {
-    throw new Error("Method not implemented.");
+  async getOrderById(orderId: string): Promise<Order | null> {
+    const order = await this.orderRepository.getOrderById(orderId);
+
+    if (!order)
+      throw new NotFoundError("Order with the given ID does not exist.");
+    return order;
   }
-  getOrdersByUserId(userId: string): Promise<Order[]> {
-    throw new Error("Method not implemented.");
+  async getOrdersByUserId(userId: string): Promise<Order[]> {
+    const orders = await this.orderRepository.getOrdersByUserId(userId);
+    return orders;
   }
-  updateOrder(
+  async updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,
   ): Promise<Order | null> {
-    throw new Error("Method not implemented.");
+    const existingOrder = await this.orderRepository.getOrderById(orderId);
+    if (!existingOrder)
+      throw new NotFoundError("Order with the given ID does not exist.");
+    const updatedOrder = await this.orderRepository.updateOrder(orderId, input);
+    return updatedOrder;
   }
-  deleteOrder(orderId: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async deleteOrder(orderId: string): Promise<boolean> {
+    const existingOrder = await this.orderRepository.getOrderById(orderId);
+    if (!existingOrder)
+      throw new NotFoundError("Order with the given ID does not exist.");
+    await this.orderRepository.deleteOrder(orderId);
+    return true;
   }
 }
