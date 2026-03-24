@@ -12,11 +12,17 @@ export type JwtRefreshPayload = {
 export type VerificationTokenPayload = {
     userId: string;
     token: string;
+    type?: string;
+    metadata?: any;
+    expiresAt?: Date | null;
 };
 
 export type VerificationReturnValue = {
     id: string;
     userId: string;
     token: string;
+    type: string;
+    metadata: any;
+    expiresAt: Date | null;
     createdAt: Date;
 };

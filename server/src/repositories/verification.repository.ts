@@ -10,8 +10,11 @@ export class VerificationRepository implements IVerificationRepository {
             data: {
                 userId: payload.userId,
                 token: payload.token,
+                type: payload.type as any,
+                metadata: payload.metadata,
+                expiresAt: payload.expiresAt,
             },
-        });
+        }) as any;
     }
     async getVerificationTokenUserId(
         token: string,

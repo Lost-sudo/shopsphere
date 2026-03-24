@@ -51,14 +51,45 @@ export const productService = new ProductService(
 export const productController = new ProductController(productService);
 
 // User Dependencies
-const userService = new UserService(userRepo);
+import { VerificationService } from "../services/verification.service";
+import { VerificationController } from "../controllers/verification.controller";
+export const verificationService = new VerificationService(
+  verificationRepository,
+  userRepo,
+);
+const userService = new UserService(userRepo, verificationService);
 export const userController = new UserController(userService);
+export const verificationController = new VerificationController(
+  verificationService,
+  userRepo,
+);
 
 // Order Dependencies
 import { OrderRepository } from "../repositories/order.repository";
 import { OrderService } from "../services/order.service";
 import { OrderController } from "../controllers/order.controller";
 
-const orderRepository = new OrderRepository();
+export const orderRepository = new OrderRepository();
 export const orderService = new OrderService(orderRepository);
 export const orderController = new OrderController(orderService);
+
+// Cart Dependencies
+import { CartRepository } from "../repositories/cart.repository";
+import { CartService } from "../services/cart.service";
+import { CartController } from "../controllers/cart.controller";
+
+export const cartRepository = new CartRepository();
+export const cartService = new CartService(cartRepository);
+export const cartController = new CartController(cartService);
+
+// Payment Dependencies
+import { PaymentRepository } from "../repositories/payment.repository";
+import { PaymentService } from "../services/payment.service";
+import { PaymentController } from "../controllers/payment.controller";
+
+export const paymentRepository = new PaymentRepository();
+export const paymentService = new PaymentService(
+  paymentRepository,
+  orderRepository,
+);
+export const paymentController = new PaymentController(paymentService);

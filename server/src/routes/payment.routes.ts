@@ -1,18 +1,11 @@
 import { Router } from "express";
-import { PaymentController } from "../controllers/payment.controller";
-import { PaymentService } from "../services/payment.service";
-import { PaymentRepository } from "../repositories/payment.repository";
-import { OrderRepository } from "../repositories/order.repository";
 import { authenticated } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/zodValidate.middleware";
 import { paymentSchema } from "../schemas/payment.schema";
 
-const router = Router();
+import { paymentController } from "../config/container";
 
-const orderRepository = new OrderRepository();
-const paymentRepository = new PaymentRepository();
-const paymentService = new PaymentService(paymentRepository, orderRepository);
-const paymentController = new PaymentController(paymentService);
+const router = Router();
 
 router.post(
   "/:orderId",

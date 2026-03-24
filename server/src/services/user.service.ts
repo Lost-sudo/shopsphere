@@ -1,101 +1,101 @@
 import { IUserService, IUserRepository } from "../interfaces/user.interface";
-import { UpdateUserName, UpdateUserEmail, UpdateUserPassword } from "../schemas/user.schema";
-import { SafeUser, User } from '../types/auth.types';
-import { NotFoundError } from '../utils/errors/notFoundError';
+import {
+  UpdateUserName,
+  UpdateUserEmail,
+  UpdateUserPassword,
+} from "../schemas/user.schema";
+import { SafeUser, User } from "../types/auth.types";
+import { NotFoundError } from "../utils/errors/notFoundError";
+import { VerificationService } from "./verification.service";
 
 export class UserService implements IUserService {
-    constructor(
-        private userRepository: IUserRepository
-    ) { }
-    private safeUser(data: User): SafeUser {
-        const { password, ...safeUser } = data;
+  constructor(
+    private userRepository: IUserRepository,
+    private verificationService: VerificationService,
+  ) {}
+  private safeUser(data: User): SafeUser {
+    const { password, ...safeUser } = data;
 
-        return safeUser;
+    return safeUser;
+  }
+  async getAllUser(): Promise<SafeUser[]> {
+    const users = await this.userRepository.getAllUser();
+    return users.map((user) => this.safeUser(user));
+  }
+  async getProfile(id: string): Promise<SafeUser> {
+    const existingUser = await this.userRepository.getUserById(id);
+
+    if (!existingUser) {
+      throw new NotFoundError("User with the given ID does not exist.");
     }
-    async getAllUser(): Promise<SafeUser[]> {
-        const users = await this.userRepository.getAllUser();
-        return users.map(user => this.safeUser(user));
+
+    const user = this.safeUser(existingUser);
+
+    return user;
+  }
+  async getProfileById(id: string): Promise<SafeUser> {
+    const existingUser = await this.userRepository.getUserById(id);
+
+    if (!existingUser) {
+      throw new NotFoundError("User with the given ID does not exist.");
     }
-    async getProfile(id: string): Promise<SafeUser> {
-        const existingUser = await this.userRepository.getUserById(id);
 
-        if (!existingUser) {
-            throw new NotFoundError("User with the given ID does not exist.")
-        }
+    const user = this.safeUser(existingUser);
 
-        const user = this.safeUser(existingUser);
+    return user;
+  }
+  async updateUserName(id: string, data: UpdateUserName): Promise<SafeUser> {
+    const existingUser = await this.userRepository.getUserById(id);
 
-        return user;
+    if (!existingUser) {
+      throw new NotFoundError("User with the given ID does not exist.");
     }
-    async getProfileById(id: string): Promise<SafeUser> {
-        const existingUser = await this.userRepository.getUserById(id);
 
-        if (!existingUser) {
-            throw new NotFoundError("User with the given ID does not exist.")
-        }
+    const updatedUserName: Partial<User> = {
+      ...existingUser,
+      name: data.name,
+    };
 
-        const user = this.safeUser(existingUser);
+    const updatedUser = this.safeUser(
+      await this.userRepository.updateUser(id, updatedUserName),
+    );
 
-        return user;
+    return updatedUser;
+  }
+
+  async updateUserEmail(id: string, data: UpdateUserEmail): Promise<SafeUser> {
+    const existingUser = await this.userRepository.getUserById(id);
+
+    if (!existingUser) {
+      throw new NotFoundError("User with the given ID does not exist.");
     }
-    async updateUserName(id: string, data: UpdateUserName): Promise<SafeUser> {
-        const existingUser = await this.userRepository.getUserById(id);
 
-        if (!existingUser) {
-            throw new NotFoundError("User with the given ID does not exist.")
-        }
+    // Trigger email verification instead of immediate change
+    await this.verificationService.initiateEmailUpdate(id, data.email);
 
-        const updatedUserName: Partial<User> = {
-            ...existingUser,
-            name: data.name
-        };
+    return this.safeUser(existingUser); // New email is not yet updated
+  }
+  async updateUserPassword(
+    id: string,
+    data: UpdateUserPassword,
+  ): Promise<boolean> {
+    const existingUser = await this.userRepository.getUserById(id);
 
-        const updatedUser = this.safeUser(await this.userRepository.updateUser(id, updatedUserName));
-
-        return updatedUser;
+    if (!existingUser) {
+      throw new NotFoundError("User with the given ID does not exist.");
     }
-    async updateUserEmail(id: string, data: UpdateUserEmail): Promise<SafeUser> {
-        const existingUser = await this.userRepository.getUserById(id);
 
-        if (!existingUser) {
-            throw new NotFoundError("User with the given ID does not exist.")
-        }
+    // Trigger password reset verification instead of immediate change
+    await this.verificationService.initiatePasswordReset(existingUser.email);
 
-        // TODO: Implement a email verification (Send a code to the user email both the old and new email)
-
-        const updatedUserEmail: Partial<User> = {
-            ...existingUser,
-            email: data.email
-        };
-
-        const updatedUser = this.safeUser(await this.userRepository.updateUser(id, updatedUserEmail));
-
-        return updatedUser;
+    return true;
+  }
+  async deleteUser(id: string): Promise<boolean> {
+    try {
+      await this.userRepository.deleteUser(id);
+      return true;
+    } catch (error) {
+      throw new NotFoundError("User with the given ID does not exist.");
     }
-    async updateUserPassword(id: string, data: UpdateUserPassword): Promise<boolean> {
-        const existingUser = await this.userRepository.getUserById(id);
-
-        if (!existingUser) {
-            throw new NotFoundError("User with the given ID does not exist.")
-        }
-
-        // TODO: Implement a verification service before processing the password update.
-
-        const updatedUserPassword: Partial<User> = {
-            ...existingUser,
-            password: data.password
-        }
-
-        const updatedPassword = this.safeUser(await this.userRepository.updateUser(id, updatedUserPassword));
-        if (!updatedPassword) return false;
-        return true;
-    }
-    async deleteUser(id: string): Promise<boolean> {
-        try {
-            await this.userRepository.deleteUser(id);
-            return true;
-        } catch (error) {
-            throw new NotFoundError("User with the given ID does not exist.");
-        }
-    }
+  }
 }
