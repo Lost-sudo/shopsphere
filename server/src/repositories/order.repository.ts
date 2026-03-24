@@ -9,7 +9,7 @@ export class OrderRepository implements IOrderRepository {
     return {
       id: prismaOrder.id,
       userId: prismaOrder.userId,
-      items: prismaOrder.items.map((item: any) => ({
+      items: prismaOrder.items?.map((item: any) => ({
         id: item.id,
         orderId: item.orderId,
         productId: item.productId,
@@ -17,11 +17,21 @@ export class OrderRepository implements IOrderRepository {
         price: Number(item.price),
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
-      })),
+      })) || [],
       totalAmount: Number(prismaOrder.totalAmount),
       shippingAddress: prismaOrder.shippingAddress,
       paymentMethod: prismaOrder.paymentMethod,
       status: prismaOrder.status.toLowerCase(),
+      payment: prismaOrder.payment ? {
+        id: prismaOrder.payment.id,
+        orderId: prismaOrder.payment.orderId,
+        method: prismaOrder.payment.method,
+        transactionId: prismaOrder.payment.transactionId,
+        amount: Number(prismaOrder.payment.amount),
+        status: prismaOrder.payment.status,
+        createdAt: prismaOrder.payment.createdAt,
+        updatedAt: prismaOrder.payment.updatedAt,
+      } : undefined,
       createdAt: prismaOrder.createdAt,
       updatedAt: prismaOrder.updatedAt,
     };
@@ -45,6 +55,7 @@ export class OrderRepository implements IOrderRepository {
       },
       include: {
         items: true,
+        payment: true,
       },
     });
 
@@ -56,6 +67,7 @@ export class OrderRepository implements IOrderRepository {
       where: { id: orderId },
       include: {
         items: true,
+        payment: true,
       },
     });
 
@@ -68,6 +80,7 @@ export class OrderRepository implements IOrderRepository {
       where: { userId },
       include: {
         items: true,
+        payment: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -91,6 +104,7 @@ export class OrderRepository implements IOrderRepository {
       },
       include: {
         items: true,
+        payment: true,
       },
     });
 
