@@ -113,6 +113,7 @@ model Order {
   totalAmount     Decimal     @db.Decimal(10, 2)
   shippingAddress String
   paymentMethod   String
+  idempotencyKey  String?     @unique
 
   items   OrderItem[]
   payment Payment?

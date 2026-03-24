@@ -32,6 +32,7 @@ export class OrderRepository implements IOrderRepository {
         createdAt: prismaOrder.payment.createdAt,
         updatedAt: prismaOrder.payment.updatedAt,
       } : undefined,
+      idempotencyKey: prismaOrder.idempotencyKey,
       createdAt: prismaOrder.createdAt,
       updatedAt: prismaOrder.updatedAt,
     };
@@ -44,6 +45,7 @@ export class OrderRepository implements IOrderRepository {
         totalAmount: input.totalAmount,
         shippingAddress: input.shippingAddress,
         paymentMethod: input.paymentMethod,
+        idempotencyKey: input.idempotencyKey,
         status: (input.status?.toUpperCase() as OrderStatus) || OrderStatus.PENDING,
         items: {
           create: input.items.map((item) => ({
@@ -59,6 +61,19 @@ export class OrderRepository implements IOrderRepository {
       },
     });
 
+    return this.mapPrismaOrderToOrder(order);
+  }
+
+  async getOrderByIdempotencyKey(key: string): Promise<Order | null> {
+    const order = await prisma.order.findUnique({
+      where: { idempotencyKey: key },
+      include: {
+        items: true,
+        payment: true,
+      },
+    });
+
+    if (!order) return null;
     return this.mapPrismaOrderToOrder(order);
   }
 

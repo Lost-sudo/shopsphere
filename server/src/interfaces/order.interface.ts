@@ -10,6 +10,7 @@ export interface IOrderRepository {
     input: Partial<UpdateOrderInput>,
   ): Promise<Order | null>;
   deleteOrder(orderId: string): Promise<boolean>;
+  getOrderByIdempotencyKey(key: string): Promise<Order | null>;
 }
 
 export interface IOrderService {
@@ -21,4 +22,5 @@ export interface IOrderService {
     input: Partial<UpdateOrderInput>,
   ): Promise<Order | null>;
   deleteOrder(orderId: string): Promise<boolean>;
+  getOrderByIdempotencyKey(key: string): Promise<Order | null>;
 }

@@ -10,9 +10,10 @@ export class OrderController {
   createOrder = asyncHandler(async (req: Request, res: Response) => {
     const orderInput = req.body as OrderInput;
     const authenticatedUser: JwtPayload = req.user!;
+    const idempotencyKey = req.headers["x-idempotency-key"] as string | undefined;
 
     const order = await this.orderService.createOrder(
-      orderInput,
+      { ...orderInput, idempotencyKey },
       authenticatedUser.id,
     );
 

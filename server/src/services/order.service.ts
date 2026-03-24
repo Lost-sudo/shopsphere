@@ -13,8 +13,20 @@ export class OrderService implements IOrderService {
 
     if (input.items.length === 0)
       throw new BadRequestError("Order must contain at least one item.");
+
+    if (input.idempotencyKey) {
+      const existingOrder = await this.orderRepository.getOrderByIdempotencyKey(input.idempotencyKey);
+      if (existingOrder) {
+        return existingOrder;
+      }
+    }
+
     const order = await this.orderRepository.createOrder(input, userId);
     return order;
+  }
+
+  async getOrderByIdempotencyKey(key: string): Promise<Order | null> {
+    return await this.orderRepository.getOrderByIdempotencyKey(key);
   }
   async getOrderById(orderId: string): Promise<Order | null> {
     const order = await this.orderRepository.getOrderById(orderId);

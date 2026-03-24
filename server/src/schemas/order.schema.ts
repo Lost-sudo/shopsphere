@@ -12,6 +12,7 @@ export const orderSchema = z.object({
   totalAmount: z.number().min(0),
   shippingAddress: z.string().min(1),
   paymentMethod: z.string().min(1),
+  idempotencyKey: z.string().optional(),
   status: z.string().optional().default("pending"),
 });
 
