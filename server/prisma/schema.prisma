@@ -65,8 +65,10 @@ model Address {
   userId     String
   user       User     @relation(fields: [userId], references: [id])
   street     String
+  barangay   String
   city       String
-  state      String
+  province   String
+  region     String
   country    String
   postalCode String
   isDefault  Boolean  @default(false)
@@ -115,17 +117,18 @@ model ProductVariant {
 }
 
 model Order {
-  id          String      @id @default(uuid())
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
   status          OrderStatus @default(PENDING)
   totalAmount     Decimal     @db.Decimal(10, 2)
   shippingAddress String
   paymentMethod   String
   idempotencyKey  String?     @unique
 
-  items   OrderItem[]
-  payment Payment?
+  items    OrderItem[]
+  payment  Payment?
+  shipment Shipment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -172,4 +175,15 @@ model CartItem {
   productId String
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
+}
+
+model Shipment {
+  id             String   @id @default(uuid())
+  orderId        String   @unique
+  order          Order    @relation(fields: [orderId], references: [id])
+  trackingNumber String   @unique
+  carrier        String
+  status         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
