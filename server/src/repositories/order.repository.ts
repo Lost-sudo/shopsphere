@@ -15,6 +15,19 @@ export class OrderRepository implements IOrderRepository {
         productId: item.productId,
         quantity: item.quantity,
         price: Number(item.price),
+        product: item.product ? {
+          id: item.product.id,
+          name: item.product.name,
+          description: item.product.description,
+          price: Number(item.product.price),
+          stock: item.product.stock,
+          images: item.product.images,
+          isActive: item.product.isActive,
+          categoryId: item.product.categoryId,
+          weight: Number(item.product.weight),
+          createdAt: item.product.createdAt,
+          updatedAt: item.product.updatedAt,
+        } : undefined,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       })) || [],
@@ -48,7 +61,7 @@ export class OrderRepository implements IOrderRepository {
         idempotencyKey: input.idempotencyKey,
         status: (input.status?.toUpperCase() as OrderStatus) || OrderStatus.PENDING,
         items: {
-          create: input.items.map((item) => ({
+          create: input.items.map((item: any) => ({
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
@@ -56,7 +69,11 @@ export class OrderRepository implements IOrderRepository {
         },
       },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
         payment: true,
       },
     });
@@ -68,7 +85,11 @@ export class OrderRepository implements IOrderRepository {
     const order = await prisma.order.findUnique({
       where: { idempotencyKey: key },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
         payment: true,
       },
     });
@@ -81,7 +102,11 @@ export class OrderRepository implements IOrderRepository {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
         payment: true,
       },
     });
@@ -94,7 +119,11 @@ export class OrderRepository implements IOrderRepository {
     const orders = await prisma.order.findMany({
       where: { userId },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
         payment: true,
       },
       orderBy: {
@@ -118,7 +147,11 @@ export class OrderRepository implements IOrderRepository {
         paymentMethod: input.paymentMethod,
       },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
         payment: true,
       },
     });

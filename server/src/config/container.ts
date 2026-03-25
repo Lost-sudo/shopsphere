@@ -68,9 +68,14 @@ export const verificationController = new VerificationController(
 import { OrderRepository } from "../repositories/order.repository";
 import { OrderService } from "../services/order.service";
 import { OrderController } from "../controllers/order.controller";
+import { ShipmentRepository } from "../repositories/shipment.repository";
+import { ShipmentService } from "../services/shipment.service";
+
+export const shipmentRepository = new ShipmentRepository();
+export const shipmentService = new ShipmentService(shipmentRepository);
 
 export const orderRepository = new OrderRepository();
-export const orderService = new OrderService(orderRepository);
+export const orderService = new OrderService(orderRepository, shipmentService);
 export const orderController = new OrderController(orderService);
 
 // Cart Dependencies

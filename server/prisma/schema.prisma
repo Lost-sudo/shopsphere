@@ -61,19 +61,22 @@ model VerificationToken {
 }
 
 model Address {
-  id         String   @id @default(uuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  street     String
-  barangay   String
-  city       String
-  province   String
-  region     String
-  country    String
-  postalCode String
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  firstName   String
+  lastName    String
+  phoneNumber String
+  street      String
+  barangay    String
+  city        String
+  province    String
+  region      String
+  country     String
+  postalCode  String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Category {
@@ -93,6 +96,7 @@ model Product {
   stock       Int      @default(0)
   images      String[]
   isActive    Boolean  @default(true)
+  weight      Decimal  @db.Decimal(10, 2)
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
@@ -184,6 +188,10 @@ model Shipment {
   trackingNumber String   @unique
   carrier        String
   status         String
+  shipping_fee   Decimal  @db.Decimal(10, 2)
+  sender         Json
+  recipient      Json
+  weight         Decimal  @db.Decimal(10, 2)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }

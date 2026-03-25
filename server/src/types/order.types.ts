@@ -1,4 +1,5 @@
 import { Payment } from "./payment.types";
+import { Product } from "./product.types";
 
 export type Order = {
   id: string;
@@ -20,6 +21,7 @@ export type OrderItem = {
   productId: string;
   quantity: number;
   price: number;
+  product?: Product;
   createdAt: Date;
   updatedAt: Date;
 };

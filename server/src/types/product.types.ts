@@ -20,6 +20,7 @@ export type Product = {
     categoryId: string;
     createdAt: Date;
     updatedAt: Date;
+    weight: number;
     variants?: ProductVariant[];
     category?: {
         id: string;

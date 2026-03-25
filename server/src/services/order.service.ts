@@ -2,11 +2,16 @@ import { IOrderService, IOrderRepository } from "../interfaces/order.interface";
 import { Order } from "../types/order.types";
 import { OrderInput, UpdateOrderInput } from "../schemas/order.schema";
 import { BadRequestError } from "../utils/errors/badRequestError";
-import { NotBeforeError } from "jsonwebtoken";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { IShipmentService } from "../interfaces/shipment.interface";
+import { Carrier, ShipmentStatus } from "../schemas/shipment.schema";
+import { Shipment } from "../generated/client";
 
 export class OrderService implements IOrderService {
-  constructor(private readonly orderRepository: IOrderRepository) {}
+  constructor(
+    private readonly orderRepository: IOrderRepository,
+    private readonly shipmentService: IShipmentService,
+  ) {}
 
   async createOrder(input: OrderInput, userId: string): Promise<Order> {
     if (!userId) throw new BadRequestError("User ID is required.");
@@ -55,5 +60,52 @@ export class OrderService implements IOrderService {
       throw new NotFoundError("Order with the given ID does not exist.");
     await this.orderRepository.deleteOrder(orderId);
     return true;
+  }
+
+  async processShipment(orderId: string, carrier: Carrier): Promise<Shipment> {
+    const order = await this.orderRepository.getOrderById(orderId);
+    if (!order) {
+      throw new NotFoundError("Order not found.");
+    }
+
+    if (order.status.toUpperCase() !== "PAID") {
+      throw new BadRequestError(
+        "Order must be paid before processing shipment.",
+      );
+    }
+
+    // Calculate total weight
+    const totalWeight = order.items.reduce((acc, item) => {
+      return acc + (item.product?.weight || 0) * item.quantity;
+    }, 0);
+
+    // Mock sender info - in real app would come from warehouse/config
+    const sender = {
+      name: "ShopSphere Warehouse",
+      address: "123 Warehouse St, Manila, Philippines",
+      phone: "09123456789",
+    };
+
+    // Recipient info from order's shipping address
+    const recipient = {
+      address: order.shippingAddress,
+      name: "Customer", // Placeholder
+    };
+
+    const shipment = await this.shipmentService.createShipment({
+      orderId: order.id,
+      carrier,
+      status: ShipmentStatus.PENDING,
+      sender,
+      recipient,
+      weight: totalWeight,
+    });
+
+    // Update order status to SHIPPED
+    await this.orderRepository.updateOrder(orderId, {
+      status: "SHIPPED",
+    });
+
+    return shipment;
   }
 }

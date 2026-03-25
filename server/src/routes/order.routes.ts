@@ -40,4 +40,11 @@ router.delete(
   orderController.deleteOrder,
 );
 
+router.post(
+  "/process-shipment/:id",
+  authenticated,
+  authorized(["ADMIN", "SUPER_ADMIN"]),
+  orderController.processShipment,
+);
+
 export default router;
