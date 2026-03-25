@@ -69,4 +69,19 @@ export class OrderController {
 
     res.status(204).send();
   });
+
+  processShipment = asyncHandler(async (req: Request, res: Response) => {
+    const orderId = req.params.id;
+    const { carrier } = req.body;
+    const shipment = await this.orderService.processShipment(
+      orderId as string,
+      carrier,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Shipment processed successfully",
+      shipment,
+    });
+  });
 }
