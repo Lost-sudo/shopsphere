@@ -15,6 +15,9 @@ jest.mock("../src/config/db", () => ({
     payment: {
       findUnique: jest.fn(),
     },
+    shipment: {
+      create: jest.fn(),
+    },
   },
 }));
 
@@ -53,6 +56,7 @@ describe("Order API", () => {
   };
 
   let customerToken: string;
+  let adminToken: string;
 
   beforeAll(() => {
     process.env.JWT_SECRET = "testsecret";
@@ -60,6 +64,11 @@ describe("Order API", () => {
       id: mockUser.id,
       email: mockUser.email,
       role: Role.CUSTOMER as any,
+    });
+    adminToken = JwtUtil.generateAccessToken({
+      id: "admin-id-123",
+      email: "admin@example.com",
+      role: Role.ADMIN as any,
     });
   });
 
@@ -217,6 +226,50 @@ describe("Order API", () => {
         .set("Authorization", `Bearer ${customerToken}`);
 
       expect(response.status).toBe(204);
+    });
+  });
+
+  describe("POST /api/v1/orders/process-shipment/:id", () => {
+    it("should process shipment successfully", async () => {
+      const mockPaidOrder = { ...mockOrder, status: "PAID" };
+      (prisma.order.findUnique as jest.Mock).mockResolvedValue(mockPaidOrder);
+      (prisma.order.update as jest.Mock).mockResolvedValue({
+        ...mockPaidOrder,
+        status: OrderStatus.SHIPPED,
+      });
+      (prisma.shipment.create as jest.Mock).mockResolvedValue({
+        id: "shipment-1",
+        orderId: mockOrder.id,
+        trackingNumber: "JNT-12345",
+        carrier: "JNT",
+        status: "PENDING",
+      });
+
+      const response = await request(app)
+        .post(`/api/v1/orders/process-shipment/${mockOrder.id}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({
+          carrier: "JNT",
+        });
+
+      if (response.status !== 200) console.log(response.body);
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.shipment).toBeDefined();
+    });
+
+    it("should return 400 if order is not paid", async () => {
+      (prisma.order.findUnique as jest.Mock).mockResolvedValue(mockOrder); // Default mockOrder is PENDING
+
+      const response = await request(app)
+        .post(`/api/v1/orders/process-shipment/${mockOrder.id}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({
+          carrier: "JNT",
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Order must be paid before processing shipment.");
     });
   });
 });

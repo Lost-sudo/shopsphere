@@ -13,6 +13,7 @@ export const productSchema = z.object({
     description: z.string().min(10),
     price: z.coerce.number().min(0),
     stock: z.coerce.number().int().min(0).default(0),
+    weight: z.coerce.number().min(0).default(0),
     images: z.array(z.string()).optional().default([]),
     isActive: z.union([z.boolean(), z.string().transform(val => val === 'true')]).default(true),
     categoryId: z.uuid(),
