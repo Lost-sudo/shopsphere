@@ -68,8 +68,31 @@ export class UserController {
     });
   });
 
+  updateUserRole = asyncHandler(async (req: Request, res: Response) => {
+    const user = await this.userService.updateUserRole(
+      req.params.id as string,
+      req.body,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "User role updated successfully",
+      user,
+    });
+  });
+
+  adminCreateUser = asyncHandler(async (req: Request, res: Response) => {
+    const user = await this.userService.adminCreateUser(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user,
+    });
+  });
+
   deleteUser = asyncHandler(async (req: Request, res: Response) => {
-    const user = await this.userService.deleteUser(req.user!.id);
+    const user = await this.userService.deleteUser(req.params.id as string);
 
     res.status(200).json({
       success: true,

@@ -52,7 +52,7 @@ const getStatusColor = (status: string) => {
     switch (status) {
         case "Delivered": return "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400";
         case "Processing": return "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400";
-        case "Shipped": return "bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400";
+        case "Shipped": return "bg-primary/10 dark:bg-primary/20 text-primary";
         case "On Hold": return "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400";
         default: return "bg-slate-50 text-slate-600";
     }
@@ -63,7 +63,7 @@ export function RecentOrders() {
         <Card className="col-span-1 lg:col-span-2 border-none shadow-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
                 <CardTitle className="text-lg font-bold">Recent Orders</CardTitle>
-                <button className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 group">
+                <button className="text-sm font-medium text-primary hover:underline flex items-center gap-1 group">
                     View all <MoveRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </button>
             </CardHeader>

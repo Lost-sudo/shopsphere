@@ -27,7 +27,7 @@ const sidebarLinks = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
-    { name: "Customers", href: "/admin/customers", icon: Users },
+    { name: "Users", href: "/admin/users", icon: Users },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
@@ -62,7 +62,7 @@ export function AdminSidebar() {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 h-16 border-b border-slate-200 dark:border-slate-800">
                     {!collapsed && (
-                        <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-indigo-600 dark:text-indigo-400">
+                        <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-primary">
                             <Store className="w-8 h-8" />
                             <span>ShopSphere</span>
                         </Link>
@@ -90,13 +90,13 @@ export function AdminSidebar() {
                                 className={cn(
                                     "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group",
                                     isActive 
-                                        ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400" 
+                                        ? "bg-primary/10 dark:bg-primary/20 text-primary" 
                                         : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                                 )}
                             >
                                 <Icon className={cn(
                                     "w-5 h-5 shrink-0 transition-transform group-hover:scale-110",
-                                    isActive && "text-indigo-600 dark:text-indigo-400"
+                                    isActive && "text-primary"
                                 )} />
                                 {!collapsed && <span className="font-medium">{link.name}</span>}
                             </Link>

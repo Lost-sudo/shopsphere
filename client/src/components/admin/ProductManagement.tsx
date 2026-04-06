@@ -98,7 +98,7 @@ export function ProductManagement() {
                     </Button>
                     <Button 
                         onClick={() => setIsAddModalOpen(true)}
-                        className="h-10 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none flex items-center gap-2 font-semibold"
+                        className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 dark:shadow-none flex items-center gap-2 font-semibold"
                     >
                         <Plus className="w-4 h-4" />
                         Add Product
@@ -109,7 +109,7 @@ export function ProductManagement() {
             <Card className="border-none shadow-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm overflow-hidden">
                 <CardHeader className="border-b border-slate-100 dark:border-slate-800">
                     <CardTitle className="text-lg font-bold flex items-center gap-2">
-                        <Package className="w-5 h-5 text-indigo-500" />
+                        <Package className="w-5 h-5 text-primary" />
                         All Products
                     </CardTitle>
                 </CardHeader>

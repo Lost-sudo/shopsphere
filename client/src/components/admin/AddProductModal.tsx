@@ -94,7 +94,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
             <DialogContent className="sm:max-w-[600px] border-none shadow-2xl bg-white dark:bg-slate-950 backdrop-blur-xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="space-y-3">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400">
+                        <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary">
                             <Package className="w-6 h-6" />
                         </div>
                         <div>
@@ -118,7 +118,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                         <FormControl>
                                             <Input 
                                                 placeholder="e.g. Wireless ANC Headphones" 
-                                                className="h-11 border-slate-200 dark:border-slate-800 focus:ring-indigo-500 rounded-lg"
+                                                className="h-11 border-slate-200 dark:border-slate-800 focus:ring-primary rounded-lg"
                                                 {...field}
                                                 value={field.value as string}
                                             />
@@ -250,7 +250,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                             <Button 
                                 type="submit" 
                                 disabled={isLoading}
-                                className="h-11 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-200 dark:shadow-none min-w-[140px]"
+                                className="h-11 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 dark:shadow-none min-w-[140px]"
                             >
                                 {isLoading ? (
                                     <>

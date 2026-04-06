@@ -6,7 +6,7 @@ import {
 } from "../types/auth.types";
 import { UserRegisterInput, UserLoginInput } from "../schemas/auth.schema";
 import { JwtPayload } from "../types";
-import { UpdateUserEmail, UpdateUserName, UpdateUserPassword } from "../schemas/user.schema";
+import { UpdateUserEmail, UpdateUserName, UpdateUserPassword, UpdateUserRole, AdminCreateUser } from "../schemas/user.schema";
 
 export interface IUserRepository {
     getAllUser(): Promise<User[]>;
@@ -41,5 +41,7 @@ export interface IUserService {
     updateUserName(id: string, data: UpdateUserName): Promise<SafeUser>;
     updateUserEmail(id: string, data: UpdateUserEmail): Promise<SafeUser>;
     updateUserPassword(id: string, data: UpdateUserPassword): Promise<boolean>;
+    updateUserRole(id: string, data: UpdateUserRole): Promise<SafeUser>;
+    adminCreateUser(data: AdminCreateUser): Promise<SafeUser>;
     deleteUser(id: string): Promise<boolean>
 }

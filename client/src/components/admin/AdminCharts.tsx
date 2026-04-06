@@ -5,17 +5,17 @@ import { TrendingUp, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const chartData = [
-    { name: "Jan", value: 3400, color: "bg-indigo-500" },
-    { name: "Feb", value: 2800, color: "bg-indigo-500" },
-    { name: "Mar", value: 4500, color: "bg-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none" },
-    { name: "Apr", value: 3900, color: "bg-indigo-500" },
-    { name: "May", value: 5200, color: "bg-indigo-500" },
-    { name: "Jun", value: 4800, color: "bg-indigo-500" },
-    { name: "Jul", value: 6100, color: "bg-indigo-500" },
+    { name: "Jan", value: 3400, color: "bg-primary" },
+    { name: "Feb", value: 2800, color: "bg-primary" },
+    { name: "Mar", value: 4500, color: "bg-primary shadow-lg shadow-primary/20 dark:shadow-none" },
+    { name: "Apr", value: 3900, color: "bg-primary" },
+    { name: "May", value: 5200, color: "bg-primary" },
+    { name: "Jun", value: 4800, color: "bg-primary" },
+    { name: "Jul", value: 6100, color: "bg-primary" },
 ];
 
 const topProducts = [
-    { name: "Wireless Headphones", sales: "1,200", growth: "+12%", color: "bg-indigo-600" },
+    { name: "Wireless Headphones", sales: "1,200", growth: "+12%", color: "bg-primary" },
     { name: "Mechanical Keyboard", sales: "850", growth: "+8%", color: "bg-purple-600" },
     { name: "Gaming Mouse", sales: "640", growth: "+15%", color: "bg-blue-600" },
     { name: "Monitor Stand", sales: "420", growth: "+5%", color: "bg-emerald-600" },
@@ -94,7 +94,7 @@ export function AdminCharts() {
                             <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-800" />
                             <div className="text-center">
                                 <p className="text-[10px] uppercase font-bold text-slate-500 mb-1">Stock</p>
-                                <p className="text-xl font-bold text-indigo-600 tracking-tight">85%</p>
+                                <p className="text-xl font-bold text-primary tracking-tight">85%</p>
                             </div>
                             <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-800" />
                             <div className="text-center">

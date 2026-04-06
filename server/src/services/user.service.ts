@@ -3,11 +3,15 @@ import {
   UpdateUserName,
   UpdateUserEmail,
   UpdateUserPassword,
+  UpdateUserRole,
+  AdminCreateUser,
 } from "../schemas/user.schema";
 import { SafeUser, User } from "../types/auth.types";
 import { NotFoundError } from "../utils/errors/notFoundError";
 import { VerificationService, verificationService } from "./verification.service";
 import { userRepository } from "../repositories/user.repository";
+import { hashPassword } from "../utils/hash.util";
+import { BadRequestError } from "../utils/errors/badRequestError";
 
 export class UserService implements IUserService {
   constructor(
@@ -91,6 +95,47 @@ export class UserService implements IUserService {
 
     return true;
   }
+
+  async updateUserRole(id: string, data: UpdateUserRole): Promise<SafeUser> {
+    const existingUser = await this.userRepository.getUserById(id);
+
+    if (!existingUser) {
+      throw new NotFoundError("User with the given ID does not exist.");
+    }
+
+    const updatedUser = this.safeUser(
+      await this.userRepository.updateUser(id, { role: data.role }),
+    );
+
+    return updatedUser;
+  }
+
+  async adminCreateUser(data: AdminCreateUser): Promise<SafeUser> {
+    const existingUser = await this.userRepository.getUserByEmail(data.email);
+
+    if (existingUser) {
+      throw new BadRequestError("User with this email already exists.");
+    }
+
+    const hashedPassword = await hashPassword(data.password);
+    
+    // Create the user with email verified
+    const newUser = await this.userRepository.createUser({
+      email: data.email,
+      name: data.name,
+      password: hashedPassword,
+    });
+
+    // Update role and set email verified flag to true immediately 
+    // since an admin created them.
+    const finalUser = await this.userRepository.updateUser(newUser.id, {
+        role: data.role,
+        emailVerified: true
+    });
+
+    return this.safeUser(finalUser);
+  }
+
   async deleteUser(id: string): Promise<boolean> {
     try {
       await this.userRepository.deleteUser(id);

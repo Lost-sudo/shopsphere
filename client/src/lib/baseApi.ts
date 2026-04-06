@@ -37,7 +37,7 @@ const baseQueryWithReauth: BaseQueryFn<
         );
 
         if (refreshResult.data) {
-            const { accessToken } = refreshResult.data as any;
+            const { accessToken } = refreshResult.data as { accessToken: string };
 
             cookieManager.setToken(accessToken);
 
@@ -54,6 +54,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const baseApi = createApi({
     reducerPath: "baseApi",
     baseQuery: baseQueryWithReauth,
-    tagTypes: [],
+    tagTypes: ["Users"],
     endpoints: () => ({}),
 });

@@ -36,8 +36,8 @@ const stats = [
         diff: "+19%",
         trend: "up",
         icon: Users,
-        color: "text-indigo-600 dark:text-indigo-400",
-        bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
+        color: "text-primary",
+        bgColor: "bg-primary/10 dark:bg-primary/20",
     },
     {
         title: "Growth",

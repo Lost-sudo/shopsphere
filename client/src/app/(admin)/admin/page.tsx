@@ -22,7 +22,7 @@ export default function AdminPage() {
                         <Download className="w-4 h-4" />
                         Export Report
                     </Button>
-                    <Button className="h-10 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none flex items-center gap-2 font-semibold">
+                    <Button className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 dark:shadow-none flex items-center gap-2 font-semibold">
                         <Plus className="w-4 h-4 font-black" />
                         New Order
                     </Button>
