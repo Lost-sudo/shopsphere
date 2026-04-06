@@ -6,7 +6,8 @@ import {
 } from "../schemas/user.schema";
 import { SafeUser, User } from "../types/auth.types";
 import { NotFoundError } from "../utils/errors/notFoundError";
-import { VerificationService } from "./verification.service";
+import { VerificationService, verificationService } from "./verification.service";
+import { userRepository } from "../repositories/user.repository";
 
 export class UserService implements IUserService {
   constructor(
@@ -99,3 +100,5 @@ export class UserService implements IUserService {
     }
   }
 }
+
+export const userService = new UserService(userRepository, verificationService);

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
 import { IPaymentService } from "../interfaces/payment.interface";
+import { paymentService } from "@/services/payment.service";
 
 export class PaymentController {
   constructor(private readonly paymentService: IPaymentService) {}
@@ -9,7 +10,10 @@ export class PaymentController {
     const orderId = req.params.orderId as string;
     const { paymentMethod } = req.body;
 
-    const payment = await this.paymentService.processPayment(orderId, paymentMethod);
+    const payment = await this.paymentService.processPayment(
+      orderId,
+      paymentMethod,
+    );
 
     res.status(200).json({
       success: true,
@@ -29,3 +33,5 @@ export class PaymentController {
     });
   });
 }
+
+export const paymentController = new PaymentController(paymentService);

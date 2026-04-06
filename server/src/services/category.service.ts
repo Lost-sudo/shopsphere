@@ -6,6 +6,7 @@ import { CategoryInput, UpdateCategoryInput } from "../schemas/category.schema";
 import { Category } from "../types/category.types";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { categoryRepository } from "../repositories/category.repository";
 
 export class CategoryService implements ICategoryService {
   constructor(private categoryRepository: ICategoryRepository) {}
@@ -61,3 +62,5 @@ export class CategoryService implements ICategoryService {
     return deletedCategory;
   }
 }
+
+export const categoryService = new CategoryService(categoryRepository);

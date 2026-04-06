@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { validate } from "../middlewares/zodValidate.middleware";
 import { loginSchema, registerSchema } from "../schemas/auth.schema";
-import { authController } from "../config/container";
 import { authenticated } from "../middlewares/auth.middleware";
+import { authController } from "@/controllers/auth.controller";
 
 const router = Router();
 
@@ -13,8 +13,8 @@ router.get("/get-me", authenticated, authController.getMe);
 router.post("/refresh", authenticated, authController.refresh);
 router.get("/verify", authController.verifyVerificationToken);
 router.post(
-    "/request-verification-email",
-    authController.requestVerificationEmail,
+  "/request-verification-email",
+  authController.requestVerificationEmail,
 );
 
 export default router;

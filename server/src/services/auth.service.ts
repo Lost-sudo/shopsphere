@@ -13,6 +13,9 @@ import { JwtUtil } from "../utils/jwt.util";
 import { JwtPayload, JwtRefreshPayload } from "../types";
 import { VerificationUtil } from "../utils/verification.util";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { userRepository } from "../repositories/user.repository";
+import { refreshSessionService } from "./refreshSession.service";
+import { verificationRepository } from "../repositories/verification.repository";
 
 export class AuthService implements IAuthService {
     constructor(
@@ -201,3 +204,9 @@ export class AuthService implements IAuthService {
         );
     }
 }
+
+export const authService = new AuthService(
+    userRepository,
+    refreshSessionService,
+    verificationRepository,
+);

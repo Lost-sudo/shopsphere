@@ -42,3 +42,5 @@ export class VerificationRepository implements IVerificationRepository {
         });
     }
 }
+
+export const verificationRepository = new VerificationRepository();

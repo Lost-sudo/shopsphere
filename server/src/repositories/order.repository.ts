@@ -166,3 +166,5 @@ export class OrderRepository implements IOrderRepository {
     return true;
   }
 }
+
+export const orderRepository = new OrderRepository();

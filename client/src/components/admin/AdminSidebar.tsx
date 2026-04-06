@@ -17,6 +17,11 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useLogoutMutation } from "@/features/auth/auth.api";
+import { useDispatch } from "react-redux";
+import { clearUser } from "@/features/auth/auth.slice";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const sidebarLinks = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -30,6 +35,21 @@ const sidebarLinks = [
 export function AdminSidebar() {
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
+    const [logout] = useLogoutMutation();
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await logout().unwrap();
+            dispatch(clearUser());
+            toast.success("Successfully logged out");
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout error:", error);
+            toast.error("Logout failed. Please try again.");
+        }
+    };
 
     return (
         <aside 
@@ -87,6 +107,7 @@ export function AdminSidebar() {
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-200 dark:border-slate-800 gap-2 flex flex-col">
                     <button 
+                        onClick={handleLogout}
                         className={cn(
                             "flex items-center gap-3 px-3 py-2 w-full text-slate-600 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors group"
                         )}
@@ -94,7 +115,6 @@ export function AdminSidebar() {
                         <LogOut className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
                         {!collapsed && <span className="font-medium">Logout</span>}
                     </button>
-                    {/* Removed Upgrade to Pro section */}
                 </div>
             </div>
         </aside>

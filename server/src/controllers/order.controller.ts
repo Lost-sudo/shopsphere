@@ -3,6 +3,7 @@ import { asyncHandler } from "../middlewares/async.middleware";
 import { IOrderService } from "../interfaces/order.interface";
 import { OrderInput, UpdateOrderInput } from "../schemas/order.schema";
 import { JwtPayload } from "../types";
+import { orderService } from "@/services/order.service";
 
 export class OrderController {
   constructor(private readonly orderService: IOrderService) {}
@@ -10,7 +11,9 @@ export class OrderController {
   createOrder = asyncHandler(async (req: Request, res: Response) => {
     const orderInput = req.body as OrderInput;
     const authenticatedUser: JwtPayload = req.user!;
-    const idempotencyKey = req.headers["x-idempotency-key"] as string | undefined;
+    const idempotencyKey = req.headers["x-idempotency-key"] as
+      | string
+      | undefined;
 
     const order = await this.orderService.createOrder(
       { ...orderInput, idempotencyKey },
@@ -85,3 +88,5 @@ export class OrderController {
     });
   });
 }
+
+export const orderController = new OrderController(orderService);

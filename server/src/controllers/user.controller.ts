@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
 import { IUserService } from "../interfaces/user.interface";
+import { userService } from "@/services/user.service";
 
 export class UserController {
   constructor(private userService: IUserService) {}
@@ -77,3 +78,5 @@ export class UserController {
     });
   });
 }
+
+export const userController = new UserController(userService);

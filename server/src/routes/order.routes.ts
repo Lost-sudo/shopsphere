@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { validate } from "../middlewares/zodValidate.middleware";
 import { orderSchema, updateOrderSchema } from "../schemas/order.schema";
-import { orderController } from "../config/container";
 import { authenticated } from "../middlewares/auth.middleware";
 import { authorized } from "../middlewares/auth.middleware";
+import { orderController } from "@/controllers/order.controller";
 
 const router = Router();
 

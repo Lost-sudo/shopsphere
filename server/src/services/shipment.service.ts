@@ -3,6 +3,7 @@ import { IShipmentRepository } from "../interfaces/shipment.interface";
 import { Shipment } from "../generated/client";
 import { CreateShipmentInput } from "../schemas/shipment.schema";
 import { CarrierFactory } from "../factory/carrier.factory";
+import { shipmentRepository } from "../repositories/shipment.repository";
 
 export class ShipmentService implements IShipmentService {
   constructor(private readonly shipmentRepository: IShipmentRepository) {}
@@ -26,3 +27,5 @@ export class ShipmentService implements IShipmentService {
     return shipment;
   }
 }
+
+export const shipmentService = new ShipmentService(shipmentRepository);

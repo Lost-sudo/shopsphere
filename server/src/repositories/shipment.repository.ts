@@ -19,3 +19,5 @@ export class ShipmentRepository implements IShipmentRepository {
     });
   }
 }
+
+export const shipmentRepository = new ShipmentRepository();

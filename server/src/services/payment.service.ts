@@ -1,16 +1,24 @@
-import { IPaymentService, IPaymentRepository } from "../interfaces/payment.interface";
+import {
+  IPaymentService,
+  IPaymentRepository,
+} from "../interfaces/payment.interface";
 import { IOrderRepository } from "../interfaces/order.interface";
 import { Payment, PaymentStatus } from "../types/payment.types";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { paymentRepository } from "../repositories/payment.repository";
+import { orderRepository } from "../repositories/order.repository";
 
 export class PaymentService implements IPaymentService {
   constructor(
     private readonly paymentRepository: IPaymentRepository,
-    private readonly orderRepository: IOrderRepository
+    private readonly orderRepository: IOrderRepository,
   ) {}
 
-  async processPayment(orderId: string, paymentMethod: string): Promise<Payment> {
+  async processPayment(
+    orderId: string,
+    paymentMethod: string,
+  ): Promise<Payment> {
     const order = await this.orderRepository.getOrderById(orderId);
     if (!order) {
       throw new NotFoundError("Order not found.");
@@ -49,3 +57,8 @@ export class PaymentService implements IPaymentService {
     return payment;
   }
 }
+
+export const paymentService = new PaymentService(
+  paymentRepository,
+  orderRepository,
+);

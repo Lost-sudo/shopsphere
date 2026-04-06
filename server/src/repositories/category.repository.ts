@@ -43,3 +43,5 @@ export class CategoryRepository implements ICategoryRepository {
         return true;
     }
 }
+
+export const categoryRepository = new CategoryRepository();

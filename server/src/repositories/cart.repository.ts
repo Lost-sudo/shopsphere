@@ -138,3 +138,5 @@ export class CartRepository implements ICartRepository {
     };
   }
 }
+
+export const cartRepository = new CartRepository();

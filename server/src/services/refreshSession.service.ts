@@ -65,3 +65,5 @@ export class RefreshSessionService implements IRefreshSessionService {
         return newJti;
     }
 }
+
+export const refreshSessionService = new RefreshSessionService();

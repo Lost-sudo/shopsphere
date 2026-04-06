@@ -6,6 +6,8 @@ import { NotFoundError } from "../utils/errors/notFoundError";
 import { IShipmentService } from "../interfaces/shipment.interface";
 import { Carrier, ShipmentStatus } from "../schemas/shipment.schema";
 import { Shipment } from "../generated/client";
+import { orderRepository } from "../repositories/order.repository";
+import { shipmentService } from "./shipment.service";
 
 export class OrderService implements IOrderService {
   constructor(
@@ -20,7 +22,9 @@ export class OrderService implements IOrderService {
       throw new BadRequestError("Order must contain at least one item.");
 
     if (input.idempotencyKey) {
-      const existingOrder = await this.orderRepository.getOrderByIdempotencyKey(input.idempotencyKey);
+      const existingOrder = await this.orderRepository.getOrderByIdempotencyKey(
+        input.idempotencyKey,
+      );
       if (existingOrder) {
         return existingOrder;
       }
@@ -109,3 +113,5 @@ export class OrderService implements IOrderService {
     return shipment;
   }
 }
+
+export const orderService = new OrderService(orderRepository, shipmentService);

@@ -46,3 +46,5 @@ export class UserRepository implements IUserRepository {
         });
     }
 }
+
+export const userRepository = new UserRepository();

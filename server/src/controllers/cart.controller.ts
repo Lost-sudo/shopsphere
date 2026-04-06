@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async.middleware";
 import { ICartService } from "../interfaces/cart.interface";
 import { JwtPayload } from "../types";
+import { cartService } from "@/services/cart.service";
 
 export class CartController {
   constructor(private readonly cartService: ICartService) {}
@@ -33,7 +34,11 @@ export class CartController {
     const itemId = req.params.itemId as string;
     const { quantity } = req.body;
 
-    const item = await this.cartService.updateItem(authenticatedUser.id, itemId, quantity);
+    const item = await this.cartService.updateItem(
+      authenticatedUser.id,
+      itemId,
+      quantity,
+    );
 
     res.status(200).json({
       success: true,
@@ -65,3 +70,5 @@ export class CartController {
     });
   });
 }
+
+export const cartController = new CartController(cartService);

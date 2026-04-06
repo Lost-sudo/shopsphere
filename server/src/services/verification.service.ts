@@ -3,6 +3,8 @@ import { IUserRepository } from "../interfaces/user.interface";
 import { VerificationUtil } from "../utils/verification.util";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { verificationRepository } from "../repositories/verification.repository";
+import { userRepository } from "../repositories/user.repository";
 
 export class VerificationService {
   constructor(
@@ -65,3 +67,8 @@ export class VerificationService {
     await this.verificationRepository.deleteVerificationToken(userId);
   }
 }
+
+export const verificationService = new VerificationService(
+  verificationRepository,
+  userRepository,
+);

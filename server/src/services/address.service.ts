@@ -4,6 +4,7 @@ import { Address } from "../types/address.types";
 import { AppError } from "../utils/errors/appError";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { addressRepository } from "../repositories/address.repository";
 
 export class AddressService implements IAddressService {
     constructor(private addressRepository: IAddressRepository) {}
@@ -89,3 +90,5 @@ export class AddressService implements IAddressService {
         return await this.addressRepository.deleteAddress(addressId);
     }
 }
+
+export const addressService = new AddressService(addressRepository);

@@ -48,3 +48,5 @@ export class AddressRepository implements IAddressRepository {
         return true;
     }
 }
+
+export const addressRepository = new AddressRepository();

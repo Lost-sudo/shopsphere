@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { verificationController } from "../config/container";
+import { verificationController } from "@/controllers/verification.controller";
 
 const router = Router();
 

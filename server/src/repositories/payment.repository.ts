@@ -51,3 +51,5 @@ export class PaymentRepository implements IPaymentRepository {
     return this.mapPrismaPaymentToPayment(payment);
   }
 }
+
+export const paymentRepository = new PaymentRepository();

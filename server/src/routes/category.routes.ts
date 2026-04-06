@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { categoryController } from "../config/container";
 import { validate } from "../middlewares/zodValidate.middleware";
 import {
   categorySchema,
   updateCategorySchema,
 } from "../schemas/category.schema";
 import { authenticated, authorized } from "../middlewares/auth.middleware";
+import { categoryController } from "@/controllers/category.controller";
 
 const router = Router();
 

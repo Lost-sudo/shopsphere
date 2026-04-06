@@ -17,10 +17,10 @@ const app: Express = express();
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(
-    cors({
-        origin: process.env.FRONTEND_URL,
-        credentials: true,
-    }),
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  }),
 );
 app.use(express.json());
 app.use(cookieParser());
@@ -28,10 +28,10 @@ app.use("/public", express.static(path.join(process.cwd(), "public")));
 
 // Routes
 app.get("/health", (req: Request, res: Response) => {
-    res.status(200).json({
-        status: "OK",
-        message: "ShopSphere API is running",
-    });
+  res.status(200).json({
+    status: "OK",
+    message: "ShopSphere API is running",
+  });
 });
 
 app.use("/api/v1", routes);

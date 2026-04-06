@@ -4,6 +4,8 @@ import { ProductInput, UpdateProductInput, ProductQuery, ProductVariantInput, Up
 import { Product, ProductListResponse, ProductVariant } from "../types/product.types";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { productRepository } from "../repositories/product.repository";
+import { categoryRepository } from "../repositories/category.repository";
 
 export class ProductService implements IProductService {
     constructor(
@@ -117,3 +119,5 @@ export class ProductService implements IProductService {
         return true;
     }
 }
+
+export const productService = new ProductService(productRepository, categoryRepository);
