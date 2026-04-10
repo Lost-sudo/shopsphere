@@ -32,13 +32,15 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Package, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useCreateProductMutation } from "@/features/product/product.api";
 
 const productSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters").max(255),
     description: z.string().min(10, "Description must be at least 10 characters"),
     price: z.number().min(0, "Price must be positive"),
     stock: z.number().int().min(0, "Stock cannot be negative"),
+    weight: z.number().min(0, "Weight must be positive"),
     categoryId: z.string().uuid("Invalid category"),
     isActive: z.boolean(),
 });
@@ -59,6 +61,13 @@ const mockCategories = [
 
 export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const [createProduct] = useCreateProductMutation();
+    const [images, setImages] = useState<File[]>([]);
+
+    const imageHelp = useMemo(() => {
+        if (images.length === 0) return "PNG/JPG/WebP up to 5MB each (max 5).";
+        return `${images.length} image${images.length === 1 ? "" : "s"} selected.`;
+    }, [images.length]);
 
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
@@ -67,6 +76,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
             description: "",
             price: 0,
             stock: 0,
+            weight: 0,
             categoryId: "",
             isActive: true,
         },
@@ -75,11 +85,20 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
     async function onSubmit(values: ProductFormValues) {
         setIsLoading(true);
         try {
-            console.log("Submitting product:", values);
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await createProduct({
+                name: values.name,
+                description: values.description,
+                price: values.price,
+                stock: values.stock,
+                weight: values.weight,
+                categoryId: values.categoryId,
+                isActive: values.isActive,
+                images,
+            }).unwrap();
             
             toast.success("Product created successfully!");
             form.reset();
+            setImages([]);
             onOpenChange(false);
         } catch (error) {
             toast.error("Failed to create product. Please try again.");
@@ -194,6 +213,44 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                     </FormItem>
                                 )}
                             />
+
+                            <FormField<ProductFormValues>
+                                control={form.control}
+                                name="weight"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Weight</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                placeholder="0"
+                                                className="h-11 border-slate-200 dark:border-slate-800 rounded-lg"
+                                                {...field}
+                                                value={field.value as number}
+                                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormItem className="md:col-span-2">
+                                <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Images</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        className="h-11 border-slate-200 dark:border-slate-800 rounded-lg file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-700 dark:file:bg-slate-800 dark:file:text-slate-200"
+                                        onChange={(e) => {
+                                            const files = Array.from(e.target.files ?? []);
+                                            setImages(files.slice(0, 5));
+                                        }}
+                                    />
+                                </FormControl>
+                                <p className="text-xs text-slate-500 mt-2">{imageHelp}</p>
+                            </FormItem>
 
                             <FormField<ProductFormValues>
                                 control={form.control}

@@ -17,7 +17,6 @@ const rawBaseQuery = fetchBaseQuery({
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
         }
-        headers.set("Content-Type", "application/json");
         return headers;
     },
 });
@@ -54,6 +53,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const baseApi = createApi({
     reducerPath: "baseApi",
     baseQuery: baseQueryWithReauth,
-    tagTypes: ["Users"],
+    tagTypes: ["Users", "Products", "ProductVariants"],
     endpoints: () => ({}),
 });
