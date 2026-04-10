@@ -23,12 +23,12 @@ export enum ShipmentStatus {
 export const shipmentSchema = z.object({
   orderId: z.uuid(),
   trackingNumber: z.string().min(1).max(100),
-  carrier: z.enum(Carrier),
-  status: z.enum(ShipmentStatus).default(ShipmentStatus.PENDING),
-  shipping_fee: z.number().min(0),
-  sender: z.any(),
-  recipient: z.any(),
-  weight: z.number().min(0),
+  carrier: z.nativeEnum(Carrier),
+  status: z.nativeEnum(ShipmentStatus).default(ShipmentStatus.PENDING),
+  shipping_fee: z.coerce.number().min(0),
+  sender: addressSchema.or(z.any()),
+  recipient: addressSchema.or(z.any()),
+  weight: z.coerce.number().min(0),
 });
 
 export const createShipmentSchema = shipmentSchema.omit({

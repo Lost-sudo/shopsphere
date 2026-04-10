@@ -1,4 +1,4 @@
-import { AddCartItemInput, UpdateCartItemInput } from "../schemas/cart.schema";
+import { AddCartItemInput } from "../schemas/cart.schema";
 import { Cart, CartItem } from "../types/cart.types";
 
 export interface ICartRepository {

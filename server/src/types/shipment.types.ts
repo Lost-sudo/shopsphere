@@ -1,3 +1,5 @@
+import { Carrier, ShipmentStatus } from "../schemas/shipment.schema";
+
 export type Sender = {
   name: string;
   phoneNumber: string;
@@ -13,8 +15,8 @@ export type Recipient = {
 export type Shipment = {
   orderId: string;
   trackingNumber: string;
-  carrier: string;
-  status: string;
+  carrier: Carrier;
+  status: ShipmentStatus;
   shipping_fee: number;
   sender: Sender;
   recipient: Recipient;
