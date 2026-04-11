@@ -66,7 +66,7 @@ export const authApi = baseApi.injectEndpoints({
           const { data } = await queryFulfilled;
           dispatch(setAuthUser(data));
         } catch (error) {
-          console.log("Please log in.");
+          console.log("Please log in: ", error);
         }
       },
     }),
