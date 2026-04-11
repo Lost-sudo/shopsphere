@@ -1,5 +1,4 @@
 export type Address = {
-    map(arg0: (a: any) => { type: "Addresses"; id: any; }): unknown;
     id: string;
     userId: string;
     firstName: string;
@@ -40,7 +39,7 @@ export type CreateAddressRequest = {
 }
 
 export type CreateAddressResponse = ApiEnvelope<{address: Address }>;
-export type UpdateAddressRequest = Partial<CreateAddressRequest>;
+export type UpdateAddressRequest = Partial<CreateAddressRequest> & { id: string };
 export type UpdateAddressResponse = ApiEnvelope<{ address: Address }>;
 export type DeleteAddressResponse = {
     success: boolean;
