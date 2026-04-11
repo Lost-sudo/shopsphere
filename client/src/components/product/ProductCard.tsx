@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Star, ShoppingCart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAddItemMutation } from "@/features/cart/cart.api";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
     id: string;
@@ -29,11 +32,34 @@ export function ProductCard({
     discount,
     isFlashSale,
 }: ProductCardProps) {
+    const router = useRouter();
+    const [addItem, { isLoading: isAdding }] = useAddItemMutation();
+
     const formatPrice = (amount: number) => {
-        return new Intl.NumberFormat("en-SG", {
+        return new Intl.NumberFormat("en-PH", {
             style: "currency",
-            currency: "SGD",
+            currency: "PHP",
         }).format(amount);
+    };
+
+    const handleAddToCart = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            await addItem({ productId: id, quantity: 1 }).unwrap();
+            toast.success("Added to cart!", {
+                description: `${name} has been added to your cart.`,
+            });
+        } catch (err: unknown) {
+            const error = err as { status?: number; data?: { message?: string } };
+            if (error.status === 401) {
+                toast.error("Please login first");
+                router.push("/login");
+            } else {
+                toast.error("Failed to add to cart");
+            }
+        }
     };
 
     return (
@@ -50,6 +76,7 @@ export function ProductCard({
                         src={image}
                         alt={name}
                         fill
+                        unoptimized
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {isFlashSale && (
@@ -93,10 +120,8 @@ export function ProductCard({
                             size="icon"
                             variant="ghost"
                             className="h-7 w-7 rounded-full text-shopee hover:bg-shopee/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // Add to cart logic
-                            }}
+                            onClick={handleAddToCart}
+                            disabled={isAdding}
                         >
                             <ShoppingCart size={14} />
                         </Button>

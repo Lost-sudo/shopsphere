@@ -14,18 +14,19 @@ export class CartController {
     res.status(200).json({
       success: true,
       message: "Cart fetched successfully",
-      cart,
+      data: { cart },
     });
   });
 
   addItem = asyncHandler(async (req: Request, res: Response) => {
     const authenticatedUser = req.user as JwtPayload;
-    const item = await this.cartService.addItem(authenticatedUser.id, req.body);
+    await this.cartService.addItem(authenticatedUser.id, req.body);
+    const cart = await this.cartService.getCart(authenticatedUser.id);
 
     res.status(201).json({
       success: true,
       message: "Item added to cart",
-      item,
+      data: { cart },
     });
   });
 
@@ -34,16 +35,17 @@ export class CartController {
     const itemId = req.params.itemId as string;
     const { quantity } = req.body;
 
-    const item = await this.cartService.updateItem(
+    await this.cartService.updateItem(
       authenticatedUser.id,
       itemId,
       quantity,
     );
+    const cart = await this.cartService.getCart(authenticatedUser.id);
 
     res.status(200).json({
       success: true,
       message: "Cart item updated",
-      item,
+      data: { cart },
     });
   });
 
@@ -56,6 +58,7 @@ export class CartController {
     res.status(200).json({
       success: true,
       message: "Item removed from cart",
+      data: { success: true }
     });
   });
 

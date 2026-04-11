@@ -13,9 +13,9 @@ const router = Router();
 router.use(authenticated);
 
 router.get("/", cartController.getCart);
-router.post("/items", validate(addCartItemSchema), cartController.addItem);
+router.post("/add-item", validate(addCartItemSchema), cartController.addItem);
 router.put(
-  "/items/:itemId",
+  "/update-item/:itemId",
   validate(cartItemIdParamSchema, "params"),
   validate(updateCartItemSchema),
   cartController.updateItem,

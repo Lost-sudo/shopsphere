@@ -20,12 +20,16 @@ import { RootState } from "@/lib/store";
 import { useLogoutMutation } from "@/features/auth/auth.api";
 import { clearUser } from "@/features/auth/auth.slice";
 import { useRouter } from "next/navigation";
+import { useGetCartQuery } from "@/features/cart/cart.api";
 
 export function Header() {
     const dispatch = useDispatch();
     const router = useRouter();
     const user = useSelector((state: RootState) => state.auth.user);
     const [logout] = useLogoutMutation();
+    const { data: cartData } = useGetCartQuery(undefined, {
+        skip: !user,
+    });
 
     const handleLogout = async () => {
         try {
@@ -193,9 +197,11 @@ export function Header() {
                         className="relative p-2 group transition-transform active:scale-95"
                     >
                         <ShoppingCart size={28} />
-                        <span className="absolute -top-0.5 -right-0.5 bg-white text-shopee text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-shopee shadow-sm">
-                            0
-                        </span>
+                        {(cartData?.data?.cart?.items?.length || 0) > 0 && (
+                            <span className="absolute -top-0.5 -right-0.5 bg-white text-shopee text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-shopee shadow-sm">
+                                {cartData?.data?.cart?.items?.length}
+                            </span>
+                        )}
                     </Link>
                 </div>
             </div>

@@ -35,11 +35,12 @@ export function CategoryBar() {
                     Categories
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-4">
-                    {categories.map((category) => (
+                    {categories.map((category, index) => (
                         <Link
                             key={category.name}
                             href={`/category/${category.name.toLowerCase()}`}
-                            className="flex flex-col items-center gap-3 group"
+                            className="flex flex-col items-center gap-3 group animate-fade-up opacity-0 [animation-fill-mode:forwards]"
+                            style={{ animationDelay: `${index * 50}ms` }}
                         >
                             <div
                                 className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg ${category.color}`}
