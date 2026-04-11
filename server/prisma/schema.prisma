@@ -96,7 +96,7 @@ model Product {
   stock       Int      @default(0)
   images      String[]
   isActive    Boolean  @default(true)
-  weight      Decimal  @db.Decimal(10, 2)
+  weight      Decimal  @db.Decimal(10, 2) // In grams
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])

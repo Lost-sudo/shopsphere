@@ -14,7 +14,11 @@ import routes from "./routes";
 const app: Express = express();
 
 // Global Middlewares
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  }),
+);
 app.use(morgan("dev"));
 app.use(
   cors({

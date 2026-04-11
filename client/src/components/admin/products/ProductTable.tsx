@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { Product } from "@/features/product/product.types";
 import Image from "next/image";
 import { ProductRowActions } from "./ProductRowActions";
+import { Package } from "lucide-react";
 
 const getStatusColor = (status: "In Stock" | "Low Stock" | "Out of Stock") => {
   switch (status) {
@@ -28,10 +29,13 @@ function deriveStockStatus(stock: number): "In Stock" | "Low Stock" | "Out of St
 type Props = {
   products: Product[];
   onDelete: (id: string) => void;
+  onEdit: (product: Product) => void;
+  onDuplicate: (product: Product) => void;
+  onToggleActive: (id: string, currentStatus: boolean) => void;
   deletingId?: string | null;
 };
 
-export function ProductTable({ products, onDelete, deletingId }: Props) {
+export function ProductTable({ products, onDelete, onEdit, onDuplicate, onToggleActive, deletingId }: Props) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm text-left">
@@ -64,9 +68,14 @@ export function ProductTable({ products, onDelete, deletingId }: Props) {
                           src={imageUrl}
                           alt={product.name}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
-                      ) : null}
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="w-5 h-5 text-slate-400" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-col">
                       <span className="font-bold text-slate-900 dark:text-white">
@@ -85,7 +94,7 @@ export function ProductTable({ products, onDelete, deletingId }: Props) {
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right font-bold text-slate-900 dark:text-white">
-                  ${product.price.toFixed(2)}
+                  ₱{product.price.toFixed(2)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span
@@ -111,7 +120,11 @@ export function ProductTable({ products, onDelete, deletingId }: Props) {
                 </td>
                 <td className="px-6 py-4 text-right">
                   <ProductRowActions
+                    onEdit={() => onEdit(product)}
                     onDelete={() => onDelete(product.id)}
+                    onDuplicate={() => onDuplicate(product)}
+                    onToggleActive={() => onToggleActive(product.id, product.isActive)}
+                    isActive={product.isActive}
                     disableDelete={Boolean(deletingId) && deletingId !== product.id}
                   />
                 </td>

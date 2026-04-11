@@ -6,9 +6,16 @@ import { Package } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ProductToolbar } from "./products/ProductToolbar";
 import { ProductTable } from "./products/ProductTable";
-import { useDeleteProductMutation, useGetProductsQuery } from "@/features/product/product.api";
+import { 
+  useDeleteProductMutation, 
+  useGetProductsQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation 
+} from "@/features/product/product.api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { EditProductModal } from "./EditProductModal";
+import type { Product } from "@/features/product/product.types";
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
   const [debounced, setDebounced] = useState(value);
@@ -23,6 +30,8 @@ export function ProductManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebouncedValue(searchTerm, 300);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const queryArgs = useMemo(
@@ -37,6 +46,8 @@ export function ProductManagement() {
 
   const { data, isLoading, isFetching, isError } = useGetProductsQuery(queryArgs);
   const [deleteProduct] = useDeleteProductMutation();
+  const [createProduct] = useCreateProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
 
   const products = data?.data?.products ?? [];
 
@@ -49,6 +60,38 @@ export function ProductManagement() {
       toast.error("Failed to delete product");
     } finally {
       setDeletingId(null);
+    }
+  }
+
+  function onEdit(product: Product) {
+    setEditingProduct(product);
+    setIsEditModalOpen(true);
+  }
+
+  async function onDuplicate(product: Product) {
+    try {
+      // Create a shallow copy without images for now, or prefix name
+      await createProduct({
+        name: `${product.name} (Copy)`,
+        description: product.description,
+        price: product.price,
+        stock: product.stock,
+        weight: Number(product.weight),
+        categoryId: product.categoryId,
+        isActive: product.isActive,
+      }).unwrap();
+      toast.success("Product duplicated successfully!");
+    } catch {
+      toast.error("Failed to duplicate product");
+    }
+  }
+
+  async function onToggleActive(id: string, currentStatus: boolean) {
+    try {
+      await updateProduct({ id, isActive: !currentStatus }).unwrap();
+      toast.success(`Product ${currentStatus ? "deactivated" : "activated"}`);
+    } catch {
+      toast.error("Failed to update status");
     }
   }
 
@@ -86,12 +129,27 @@ export function ProductManagement() {
               No products found.
             </div>
           ) : (
-            <ProductTable products={products} onDelete={onDelete} deletingId={deletingId} />
+            <ProductTable 
+                products={products} 
+                onDelete={onDelete} 
+                onEdit={onEdit}
+                onDuplicate={onDuplicate}
+                onToggleActive={onToggleActive}
+                deletingId={deletingId} 
+            />
           )}
         </CardContent>
       </Card>
 
       <AddProductModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
+      <EditProductModal 
+        product={editingProduct} 
+        open={isEditModalOpen} 
+        onOpenChange={(open) => {
+            setIsEditModalOpen(open);
+            if (!open) setEditingProduct(null);
+        }} 
+      />
     </div>
   );
 }
