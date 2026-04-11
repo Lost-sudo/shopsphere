@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Form,
@@ -278,10 +279,12 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                                 key={i}
                                                 className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 shadow-sm"
                                             >
-                                                <img
+                                                <Image
                                                     src={img}
                                                     alt={`Product ${i + 1}`}
-                                                    className="w-full h-full object-cover"
+                                                    fill
+                                                    unoptimized
+                                                    className="object-cover"
                                                 />
                                             </div>
                                         ))}
