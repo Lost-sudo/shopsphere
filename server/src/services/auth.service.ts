@@ -119,7 +119,7 @@ export class AuthService implements IAuthService {
         const safeUser = this.safeUser(existingUser);
         return safeUser;
     }
-    async refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens> {
+    async refresh(refreshToken: string): Promise<AuthTokens> {
         let payload: JwtRefreshPayload;
 
         try {
@@ -132,12 +132,18 @@ export class AuthService implements IAuthService {
             throw new BadRequestError("Invalid token type");
         }
 
-        const newSession = await this.refreshSessionService.rotateSession(
+        const rotatedSession = await this.refreshSessionService.rotateSession(
             payload.jti,
         );
 
-        if (!newSession) {
+        if (!rotatedSession) {
             throw new BadRequestError("Invalid or expired refresh token");
+        }
+
+        const user = await this.userRepository.getUserById(rotatedSession.userId);
+
+        if (!user) {
+            throw new NotFoundError("User associated with this session not found");
         }
 
         const newAccessToken = JwtUtil.generateAccessToken({
@@ -146,7 +152,7 @@ export class AuthService implements IAuthService {
             role: user.role,
         });
 
-        const newRefreshToken = JwtUtil.generateRefreshToken(newSession);
+        const newRefreshToken = JwtUtil.generateRefreshToken(rotatedSession.newJti);
 
         return {
             accessToken: newAccessToken,

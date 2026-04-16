@@ -21,7 +21,7 @@ export interface IRefreshSessionService {
     createSession(jti: string, userId: string): Promise<string>;
     verifySession(jti: string): Promise<{ userId: string }>;
     revokeSession(jti: string): Promise<void>;
-    rotateSession(jti: string): Promise<string | null>;
+    rotateSession(jti: string): Promise<{ newJti: string; userId: string } | null>;
 }
 
 export interface IAuthService {
@@ -29,7 +29,7 @@ export interface IAuthService {
     login(data: UserLoginInput): Promise<UserWithTokens>;
     logout(refreshToken: string): Promise<void>;
     getMe(user: JwtPayload): Promise<SafeUser>;
-    refresh(refreshToken: string, user: JwtPayload): Promise<AuthTokens>;
+    refresh(refreshToken: string): Promise<AuthTokens>;
     verifyVerificationToken(token: string): Promise<void>;
     requestVerificationEmail(email: string): Promise<void>;
 }

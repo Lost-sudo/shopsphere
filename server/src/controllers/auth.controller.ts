@@ -68,12 +68,8 @@ export class AuthController {
   });
   refresh = asyncHandler(async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    const authenticatedUser: JwtPayload = req.user!;
 
-    const result = await this.authService.refresh(
-      refreshToken,
-      authenticatedUser,
-    );
+    const result = await this.authService.refresh(refreshToken);
 
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
