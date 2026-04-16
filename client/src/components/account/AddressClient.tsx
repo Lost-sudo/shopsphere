@@ -2,29 +2,22 @@
 
 import React, { useState } from "react";
 import { Plus, MapPin } from "lucide-react";
-import { 
-    useSetDefaultAddressMutation, 
-    useDeleteAddressMutation 
-} from "@/features/address/address.api";
+import { useGetAddressesQuery, useSetDefaultAddressMutation, useDeleteAddressMutation } from "@/features/address/address.api";
 import { AddressCard } from "@/components/account/AddressCard";
 import { Button } from "@/components/ui/button";
 import { AddressDialog } from "@/components/account/AddressDialog";
 import { toast } from "sonner";
 import { Address } from "@/features/address/address.types";
 
-interface AddressClientProps {
-    initialAddresses: Address[];
-}
-
-export function AddressClient({ initialAddresses }: AddressClientProps) {
+export function AddressClient() {
     const [setDefault] = useSetDefaultAddressMutation();
     const [deleteAddress] = useDeleteAddressMutation();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
     
-    const { data } = useGetAddressesQuery();
-    const addresses = data?.addresses || initialAddresses;
+    const { data, isLoading } = useGetAddressesQuery();
+    const addresses = data?.addresses || [];
 
     const handleSetDefault = async (id: string) => {
         try {
@@ -72,7 +65,13 @@ export function AddressClient({ initialAddresses }: AddressClientProps) {
             </div>
 
             <div className="flex-1">
-                {addresses.length > 0 ? (
+                {isLoading ? (
+                    <div className="p-6 space-y-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-32 bg-gray-50 animate-pulse rounded-sm" />
+                        ))}
+                    </div>
+                ) : addresses.length > 0 ? (
                     <div className="divide-y divide-gray-100">
                         {addresses.map((address) => (
                             <AddressCard 
@@ -109,6 +108,3 @@ export function AddressClient({ initialAddresses }: AddressClientProps) {
         </div>
     );
 }
-
-// Ensure useGetAddressesQuery is imported
-import { useGetAddressesQuery } from "@/features/address/address.api";
