@@ -1,13 +1,25 @@
 "use client";
 
 import { useGetCartQuery } from "@/features/cart/cart.api";
+import { useGetAddressesQuery } from "@/features/address/address.api";
 import { CartItem } from "@/features/cart/cart.types";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, ArrowLeft, ShieldCheck, Truck, Clock, CheckCircle2 } from "lucide-react";
+import { 
+    ShoppingBag, 
+    ArrowLeft, 
+    ShieldCheck, 
+    Truck, 
+    Clock, 
+    CheckCircle2, 
+    MapPin, 
+    ChevronRight,
+    AlertCircle
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { AddressSelectionDialog } from "./AddressSelectionDialog";
 
 const CARRIERS = [
     { id: "JNT", name: "J&T Express", eta: "2-3 days", price: 50, color: "text-red-600", bg: "bg-red-50" },
@@ -17,14 +29,18 @@ const CARRIERS = [
 ];
 
 export default function CheckoutClient() {
-    const { data: cartData, isLoading, isError } = useGetCartQuery();
-    const [selectedCarrier, setSelectedCarrier] = useState(CARRIERS[0].id);
+    const { data: cartData, isLoading: isCartLoading, isError: isCartError } = useGetCartQuery();
+    const { data: addressData, isLoading: isAddressLoading } = useGetAddressesQuery();
     
-    // In a real scenario, we might want to pass the IDs of selected items via URL or state
-    // But for this "display items" phase, we'll just show all items in the cart
-    // or we could filter them if we had that state. Since we are redirected from Cart
-    // where the user selected items, we'll assume for now we show what's in the cart.
-    // Actually, CartClient has 'excludedItems' state. We might need to handle that.
+    const [selectedCarrier, setSelectedCarrier] = useState(CARRIERS[0].id);
+    const [overrideAddressId, setOverrideAddressId] = useState<string | null>(null);
+    const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+
+    const addresses = addressData?.addresses || [];
+    
+    const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+    const selectedAddressId = overrideAddressId ?? defaultAddress?.id;
+    const selectedAddress = addresses.find(a => a.id === selectedAddressId);
     
     const cart = cartData?.data?.cart;
     const items = cart?.items || [];
@@ -44,6 +60,8 @@ export default function CheckoutClient() {
     const shippingFee = items.length > 0 ? currentCarrier.price : 0;
     const total = subtotal + shippingFee;
 
+    const isLoading = isCartLoading || isAddressLoading;
+
     if (isLoading) {
         return (
             <div className="container mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-500">
@@ -60,7 +78,7 @@ export default function CheckoutClient() {
         );
     }
 
-    if (isError || items.length === 0) {
+    if (isCartError || items.length === 0) {
         return (
             <div className="container mx-auto px-4 py-24 text-center animate-in zoom-in duration-500">
                 <div className="max-w-md mx-auto space-y-6">
@@ -91,8 +109,70 @@ export default function CheckoutClient() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                {/* Items List */}
                 <div className="lg:col-span-2 space-y-6">
+                    {/* Delivery Address Section */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative">
+                        {/* Shaded Top Accent */}
+                        <div className="h-1 bg-[repeating-linear-gradient(45deg,#ee4d2d,#ee4d2d_10px,#fff_10px,#fff_20px,#2673dd_20px,#2673dd_30px,#fff_30px,#fff_40px)]" />
+                        
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <MapPin size={20} className="text-shopee" />
+                                    Delivery Address
+                                </h2 >
+                                {selectedAddress ? (
+                                    <button 
+                                        onClick={() => setIsAddressDialogOpen(true)}
+                                        className="text-shopee hover:text-shopee-dark text-sm font-medium flex items-center gap-1 group"
+                                    >
+                                        Change
+                                        <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                                    </button>
+                                ) : (
+                                    <Link 
+                                        href="/user/address" 
+                                        className="text-shopee hover:text-shopee-dark text-sm font-medium flex items-center gap-1 group"
+                                    >
+                                        Add Address
+                                        <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                                    </Link>
+                                )}
+                            </div>
+
+                            {selectedAddress ? (
+                                <div className="animate-in fade-in slide-in-from-top-2 duration-500">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                        <span className="font-bold text-gray-900">
+                                            {selectedAddress.firstName} {selectedAddress.lastName}
+                                        </span>
+                                        <span className="text-gray-500 hidden sm:block">|</span>
+                                        <span className="text-gray-600 font-medium">{selectedAddress.phoneNumber}</span>
+                                        {selectedAddress.isDefault && (
+                                            <span className="text-[10px] font-bold text-shopee bg-shopee/5 px-2 py-0.5 rounded border border-shopee/20 uppercase ml-2">
+                                                Default
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-gray-500 leading-relaxed">
+                                        {selectedAddress.street}, {selectedAddress.barangay}, {selectedAddress.city}, {selectedAddress.province}, {selectedAddress.region}, {selectedAddress.postalCode}, {selectedAddress.country}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-4 text-center">
+                                    <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-3">
+                                        <AlertCircle size={24} />
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-4">No shipping address found in your account.</p>
+                                    <Button asChild size="sm" className="bg-shopee hover:bg-shopee-dark">
+                                        <Link href="/user/address">Add New Address</Link>
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Items List */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                             <h2 className="text-lg font-bold text-gray-900">Review Items ({items.length})</h2>
@@ -208,7 +288,8 @@ export default function CheckoutClient() {
                         </div>
 
                         <Button 
-                            className="w-full h-14 bg-shopee hover:bg-shopee-dark text-lg font-bold shadow-lg shadow-shopee/20 transition-all"
+                            disabled={!selectedAddress}
+                            className="w-full h-14 bg-shopee hover:bg-shopee-dark text-lg font-bold shadow-lg shadow-shopee/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Place Order
                         </Button>
@@ -219,6 +300,14 @@ export default function CheckoutClient() {
                     </div>
                 </div>
             </div>
+
+            <AddressSelectionDialog 
+                open={isAddressDialogOpen}
+                onOpenChange={setIsAddressDialogOpen}
+                addresses={addresses}
+                selectedId={selectedAddressId || null}
+                onSelect={setOverrideAddressId}
+            />
         </div>
     );
 }
