@@ -269,11 +269,14 @@ export default function CartClient() {
                             </div>
 
                             <Button 
+                                asChild
                                 disabled={selectedCartItems.length === 0}
                                 className="w-full h-14 bg-shopee hover:bg-shopee-dark text-lg font-bold shadow-lg shadow-shopee/20 transition-all group disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
                             >
-                                Checkout ({selectedCartItems.length})
-                                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                                <Link href="/checkout">
+                                    Checkout ({selectedCartItems.length})
+                                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                                </Link>
                             </Button>
 
                             {/* Extra Perks */}

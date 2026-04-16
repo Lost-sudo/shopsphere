@@ -6,7 +6,7 @@ export type Cart = {
     updatedAt: string;
 }
 
-type CartItem = {
+export type CartItem = {
     id: string;
     cartId: string;
     productId: string;
