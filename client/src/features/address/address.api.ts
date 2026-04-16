@@ -13,12 +13,12 @@ export const addressApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         getAddresses: builder.query<GetAddressesResponse, void>({
             query: () => ({
-                url: "/address/get-all-addresses",
+                url: "/addresses/get-user-addresses",
                 method: "GET",
             }),
-            providesTags: (result) => result?.data?.addresses ? [
+            providesTags: (result) => result?.addresses ? [
                 {type: "Addresses" as const, id: "LIST"},
-                ...result.data.addresses.map((a) => ({ 
+                ...result.addresses.map((a) => ({ 
                     type: "Addresses" as const, id: a.id
                 }))
             ] : [{ type: "Addresses" as const, id: "LIST" }],
@@ -26,7 +26,7 @@ export const addressApi = baseApi.injectEndpoints({
 
         getAddress: builder.query<GetAddressResponse, string>({
             query: (id) => ({
-                url: `/address/get-address/${id}`,
+                url: `/addresses/get-address/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Addresses", id}],
@@ -34,7 +34,7 @@ export const addressApi = baseApi.injectEndpoints({
 
         createAddress: builder.mutation<CreateAddressResponse, CreateAddressRequest>({
             query: (body) => ({
-                url: "/address/create-address",
+                url: "/addresses/create-address",
                 method: "POST",
                 body,
             }),
@@ -43,7 +43,7 @@ export const addressApi = baseApi.injectEndpoints({
 
         updateAddress: builder.mutation<UpdateAddressResponse, UpdateAddressRequest>({
             query: ({ id, ...body }) => ({
-                url: `/address/update-address/${id}`,
+                url: `/addresses/update-address/${id}`,
                 method: "PUT",
                 body,
             }),
@@ -55,8 +55,8 @@ export const addressApi = baseApi.injectEndpoints({
 
         setDefaultAddress: builder.mutation<UpdateAddressResponse, string>({
             query: (id) => ({
-                url: `/address/set-default/${id}`,
-                method: "POST",
+                url: `/addresses/set-default-address/${id}`,
+                method: "PUT",
             }),
             invalidatesTags: (_result, _error, id) => [
                 { type: "Addresses", id: "LIST"},
@@ -66,7 +66,7 @@ export const addressApi = baseApi.injectEndpoints({
 
         deleteAddress: builder.mutation<DeleteAddressResponse, string>({
             query: (id) => ({
-                url: `/address/delete-address/${id}`,
+                url: `/addresses/delete-address/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: (_result, _error, id) => [
@@ -76,3 +76,12 @@ export const addressApi = baseApi.injectEndpoints({
         })
     })
 })
+
+export const {
+    useGetAddressesQuery,
+    useGetAddressQuery,
+    useCreateAddressMutation,
+    useUpdateAddressMutation,
+    useSetDefaultAddressMutation,
+    useDeleteAddressMutation,
+} = addressApi;

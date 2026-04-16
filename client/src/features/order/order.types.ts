@@ -29,23 +29,17 @@ export interface Order {
 export interface CreateOrderResponse {
     success: boolean;
     message: string;
-    data: {
-        order: Order;
-    };
+    order: Order;
 }
 
 export interface GetOrdersResponse {
     success: boolean;
     message: string;
-    data: {
-        orders: Order[];
-    };
+    orders: Order[];
 }
 
 export interface GetOrderResponse {
     success: boolean;
     message: string;
-    data: {
-        order: Order;
-    };
+    order: Order;
 }

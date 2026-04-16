@@ -16,14 +16,18 @@ export type Address = {
     updatedAt: string;
 }
 
-export type ApiEnvelope<TData> = {
+export type GetAddressesResponse = { 
     success: boolean;
     message?: string;
-    data: TData;
-}
+    addresses: Address[];
+};
 
-export type GetAddressesResponse = ApiEnvelope<{ addresses: Address[] }>;
-export type GetAddressResponse = ApiEnvelope<{ address: Address }>;
+export type GetAddressResponse = {
+    success: boolean;
+    message?: string;
+    address: Address;
+};
+
 export type CreateAddressRequest = {
     firstName: string;
     lastName: string;
@@ -35,12 +39,22 @@ export type CreateAddressRequest = {
     region: string;
     country: string;
     postalCode: string;
-    isDefault?: false | boolean;
+    isDefault?: boolean;
 }
 
-export type CreateAddressResponse = ApiEnvelope<{address: Address }>;
+export type CreateAddressResponse = {
+    success: boolean;
+    message?: string;
+    address: Address;
+};
+
 export type UpdateAddressRequest = Partial<CreateAddressRequest> & { id: string };
-export type UpdateAddressResponse = ApiEnvelope<{ address: Address }>;
+
+export type UpdateAddressResponse = {
+    success: boolean;
+    message?: string;
+    address: Address;
+};
 export type DeleteAddressResponse = {
     success: boolean;
     message?: string;

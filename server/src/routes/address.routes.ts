@@ -10,7 +10,7 @@ const router = Router();
 router.post(
   "/create-address",
   authenticated,
-  authorized(["CUSTOMER"]),
+  authorized(["CUSTOMER", "ADMIN", "SUPER_ADMIN"]),
   validate(addressSchema),
   addressController.createAddress,
 );
@@ -29,14 +29,14 @@ router.get(
 router.put(
   "/update-address/:id",
   authenticated,
-  authorized(["CUSTOMER"]),
+  authorized(["CUSTOMER", "ADMIN", "SUPER_ADMIN"]),
   validate(updateAddressSchema),
   addressController.updateAddress,
 );
 router.put(
   "/set-default-address/:id",
   authenticated,
-  authorized(["CUSTOMER"]),
+  authorized(["CUSTOMER", "ADMIN", "SUPER_ADMIN"]),
   addressController.setDefaultAddress,
 );
 router.delete(

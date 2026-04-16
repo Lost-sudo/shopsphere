@@ -10,7 +10,7 @@ const router = Router();
 router.post(
   "/create-order",
   authenticated,
-  authorized(["CUSTOMER"]),
+  authorized(["CUSTOMER", "ADMIN", "SUPER_ADMIN"]),
   validate(orderSchema),
   orderController.createOrder,
 );
@@ -29,7 +29,7 @@ router.get(
 router.put(
   "/update-order/:id",
   authenticated,
-  authorized(["CUSTOMER"]),
+  authorized(["CUSTOMER", "ADMIN", "SUPER_ADMIN"]),
   validate(updateOrderSchema),
   orderController.updateOrder,
 );
