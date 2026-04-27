@@ -10,7 +10,7 @@ import { CarrierFactory } from "../factory/carrier.factory";
 import { shipmentRepository } from "../repositories/shipment.repository";
 
 export class ShipmentService implements IShipmentService {
-  constructor(private readonly shipmentRepository: IShipmentRepository) {}
+  constructor(private readonly shipmentRepository: IShipmentRepository) { }
 
   async createShipment(data: CreateShipmentInput): Promise<Shipment> {
     const carrier = CarrierFactory.getCarrier(data.carrier);

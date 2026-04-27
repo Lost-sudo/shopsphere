@@ -16,6 +16,12 @@
     --color-shopee-light: #ff5722;
     --color-shopee-dark: #d73211;
 
+    --color-luxury-charcoal: #1a1a1a;
+    --color-luxury-charcoal-light: #2c2c2c;
+    --color-luxury-gold: #c5a059;
+    --color-luxury-gold-light: #dfb974;
+    --color-luxury-glass: rgba(255, 255, 255, 0.15);
+
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
 

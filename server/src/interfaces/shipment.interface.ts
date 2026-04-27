@@ -7,4 +7,11 @@ export interface IShipmentRepository {
 
 export interface IShipmentService {
   createShipment(data: CreateShipmentInput): Promise<Shipment>;
+  // calculateShippingFee();
+  // trackShipment();
+  // cancelShipment();
+  // getShipment();
+  // getShipmentHistory();
+  // getShipmentByTrackingNumber();
+  // updateShipment();
 }

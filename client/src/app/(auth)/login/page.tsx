@@ -61,41 +61,40 @@ export default function LoginPage() {
     return (
         <div className="relative min-h-[calc(100vh-200px)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
             {/* Background Animated Blobs */}
-            <div className="absolute top-0 -left-4 w-72 h-72 bg-shopee/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" />
-            <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob [animation-delay:2000ms]" />
-            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob [animation-delay:4000ms]" />
+            <div className="absolute top-0 -left-4 w-72 h-72 bg-luxury-gold/10 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" />
+            <div className="absolute top-0 -right-4 w-72 h-72 bg-neutral-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob [animation-delay:2000ms]" />
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-stone-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob [animation-delay:4000ms]" />
 
             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center gap-12 max-w-6xl mx-auto w-full">
                 {/* Illustration Section */}
                 <div className="hidden lg:flex flex-col items-center justify-center text-gray-800 max-w-md text-center animate-fade-up">
-                    <div className="relative w-full aspect-square mb-6 scale-110 drop-shadow-2xl animate-float">
+                    <div className="relative w-full aspect-[4/5] mb-8 drop-shadow-2xl animate-float overflow-hidden rounded-2xl ring-1 ring-white/20">
                         <Image
-                            src="/images/auth/illustration.png"
-                            alt="Secure Login Illustration"
+                            src="/images/auth/fashion_illustration.png"
+                            alt="Premium Fashion Login"
                             fill
-                            className="object-contain"
+                            className="object-cover"
                             priority
                         />
                     </div>
                     <div className="space-y-4">
-                        <h2 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
-                            The World&apos;s <span className="text-shopee">Premium</span> Marketplace
+                        <h2 className="text-4xl font-light tracking-tight text-luxury-charcoal sm:text-5xl">
+                            The World&apos;s <span className="font-serif italic text-luxury-gold">Premium</span> Marketplace
                         </h2>
-                        <p className="text-lg text-gray-600 font-medium leading-relaxed max-w-sm mx-auto">
-                            Join millions of users and experience the best shopping
-                            experience in ShopSphere.
+                        <p className="text-base text-neutral-500 font-normal leading-relaxed max-w-sm mx-auto">
+                            Curated fashion for the modern individual. Experience shopping reimagined.
                         </p>
                     </div>
                 </div>
 
                 {/* Login Card */}
-                <Card className="w-full max-w-[440px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-none bg-white/80 backdrop-blur-xl animate-fade-up [animation-delay:200ms]">
+                <Card className="w-full max-w-[440px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] border border-white/40 bg-white/60 backdrop-blur-2xl animate-fade-up [animation-delay:200ms] rounded-2xl">
                     <CardContent className="p-8 sm:p-10">
                         <div className="mb-10 text-center lg:text-left">
-                            <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
+                            <h2 className="text-2xl font-semibold text-luxury-charcoal mb-2 tracking-tight">
                                 Welcome Back
                             </h2>
-                            <p className="text-gray-500 font-medium tracking-tight">
+                            <p className="text-sm text-neutral-500 tracking-wide">
                                 Please enter your details to sign in
                             </p>
                         </div>
@@ -111,13 +110,13 @@ export default function LoginPage() {
                                         name="email"
                                         render={({ field }) => (
                                             <FormItem className="animate-fade-up [animation-delay:300ms]">
-                                                <FormLabel className="text-xs font-bold uppercase text-gray-500 tracking-widest">
+                                                <FormLabel className="text-[10px] font-bold uppercase text-neutral-400 tracking-widest">
                                                     Email Address
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         placeholder="name@company.com"
-                                                        className="h-13 bg-gray-50/50 border-gray-200 focus-visible:ring-shopee focus-visible:bg-white transition-all duration-300"
+                                                        className="h-12 bg-white/50 border-white/60 focus-visible:ring-luxury-gold focus-visible:bg-white/80 transition-all duration-300 rounded-xl"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -131,12 +130,12 @@ export default function LoginPage() {
                                         render={({ field }) => (
                                             <FormItem className="animate-fade-up [animation-delay:400ms]">
                                                 <div className="flex justify-between items-center">
-                                                    <FormLabel className="text-xs font-bold uppercase text-gray-500 tracking-widest">
+                                                    <FormLabel className="text-[10px] font-bold uppercase text-neutral-400 tracking-widest">
                                                         Password
                                                     </FormLabel>
                                                     <Link
                                                         href="/forgot-password"
-                                                        className="text-xs text-shopee hover:text-shopee-dark transition-colors font-bold"
+                                                        className="text-[11px] text-luxury-charcoal hover:text-luxury-gold transition-colors font-semibold uppercase tracking-wider"
                                                     >
                                                         Forgot password?
                                                     </Link>
@@ -150,7 +149,7 @@ export default function LoginPage() {
                                                                     : "password"
                                                             }
                                                             placeholder="••••••••"
-                                                            className="h-13 bg-gray-50/50 border-gray-200 focus-visible:ring-shopee focus-visible:bg-white transition-all duration-300 pr-12"
+                                                            className="h-12 bg-white/50 border-white/60 focus-visible:ring-luxury-gold focus-visible:bg-white/80 transition-all duration-300 pr-12 rounded-xl"
                                                             {...field}
                                                         />
                                                         <button
@@ -177,10 +176,10 @@ export default function LoginPage() {
                                 </div>
 
                                 <div className="flex items-center space-x-2 animate-fade-up [animation-delay:500ms]">
-                                    <Checkbox id="remember" className="border-gray-300 data-[state=checked]:bg-shopee data-[state=checked]:border-shopee" />
+                                    <Checkbox id="remember" className="border-neutral-300 data-[state=checked]:bg-luxury-charcoal data-[state=checked]:border-luxury-charcoal rounded-sm" />
                                     <label
                                         htmlFor="remember"
-                                        className="text-sm text-gray-600 font-medium cursor-pointer select-none"
+                                        className="text-xs text-neutral-500 font-medium cursor-pointer select-none"
                                     >
                                         Keep me logged in
                                     </label>
@@ -189,7 +188,7 @@ export default function LoginPage() {
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full h-13 bg-shopee hover:bg-shopee-dark text-white font-bold text-base shadow-xl shadow-shopee/20 uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] animate-fade-up [animation-delay:600ms]"
+                                    className="w-full h-12 bg-luxury-charcoal hover:bg-luxury-charcoal-light text-white font-medium text-sm shadow-xl shadow-black/5 uppercase tracking-[0.15em] transition-all duration-300 active:scale-[0.98] animate-fade-up [animation-delay:600ms] rounded-xl"
                                 >
                                     {isLoading ? (
                                         <div className="flex items-center gap-2">
@@ -203,12 +202,12 @@ export default function LoginPage() {
                             </form>
                         </Form>
 
-                        <div className="mt-10 pt-8 border-t border-gray-100 text-center animate-fade-up [animation-delay:700ms]">
-                            <p className="text-sm text-gray-500 font-medium">
+                        <div className="mt-10 pt-8 border-t border-black/5 text-center animate-fade-up [animation-delay:700ms]">
+                            <p className="text-xs text-neutral-500 font-medium tracking-wide">
                                 Don&apos;t have an account?{" "}
                                 <Link
                                     href="/register"
-                                    className="text-shopee hover:underline font-bold transition-all"
+                                    className="text-luxury-charcoal hover:text-luxury-gold font-semibold transition-all uppercase tracking-wider ml-1"
                                 >
                                     Create one now
                                 </Link>

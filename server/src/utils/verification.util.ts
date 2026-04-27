@@ -5,21 +5,60 @@ import crypto from "crypto";
 dotenv.config();
 
 export class VerificationUtil {
-    static async sendVerificationEmail(email: string, token: string) {
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: Number(process.env.SMTP_PORT),
-            secure: false,
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        });
+    private static createTransporter() {
+        const smtpHost = process.env.SMTP_HOST;
+        const smtpUser = process.env.SMTP_USER;
+        const smtpPass = process.env.SMTP_PASS;
+        const smtpPort = Number(process.env.SMTP_PORT ?? 587);
+        const smtpSecure =
+            process.env.SMTP_SECURE === "true" || smtpPort === 465;
 
-        const verificationUrl = `${process.env.BASE_URL}/api/v1/auth/verify?token=${token}`;
+        if (smtpHost && smtpUser && smtpPass) {
+            return nodemailer.createTransport({
+                host: smtpHost,
+                port: smtpPort,
+                secure: smtpSecure,
+                auth: {
+                    user: smtpUser,
+                    pass: smtpPass,
+                },
+            });
+        }
+
+        if (process.env.NODE_ENV === "development") {
+            console.warn(
+                "[VerificationUtil] SMTP env vars are missing. Using json transport in development mode.",
+            );
+
+            return nodemailer.createTransport({
+                jsonTransport: true,
+            });
+        }
+
+        throw new Error(
+            "SMTP configuration is missing. Set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS.",
+        );
+    }
+
+    private static getVerificationBaseUrl() {
+        if (process.env.BASE_URL) {
+            return process.env.BASE_URL;
+        }
+
+        const backendPort = process.env.PORT || "5000";
+
+        return `http://localhost:${backendPort}`;
+    }
+
+    static async sendVerificationEmail(email: string, token: string) {
+        const transporter = this.createTransporter();
+
+        const verificationUrl = `${this.getVerificationBaseUrl()}/api/v1/auth/verify?token=${token}`;
+        const fromAddress =
+            process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@shopsphere.local";
 
         await transporter.sendMail({
-            from: `"ShopSphere" <${process.env.SMTP_USER}>`,
+            from: `"ShopSphere" <${fromAddress}>`,
             to: email,
             subject: "Email Verification - ShopSphere",
             html: `
