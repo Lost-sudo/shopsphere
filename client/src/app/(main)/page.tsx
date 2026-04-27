@@ -1,39 +1,33 @@
-import { HeroSection } from "@/components/home/HeroSection";
-import { CategoryBar } from "@/components/home/CategoryBar";
-import { FlashSale } from "@/components/home/FlashSale";
-import { RecommendationGrid } from "@/components/home/RecommendationGrid";
+import { HeroLookbook } from "@/components/home/HeroLookbook";
+import { TrendingCollections } from "@/components/home/TrendingCollections";
+import { FeaturedProductsGrid } from "@/components/home/FeaturedProductsGrid";
+import { StyleStories } from "@/components/home/StyleStories";
 
 export default function Home() {
     return (
-        <div className="bg-gray-50 min-h-screen pb-20 overflow-hidden">
-            <div className="animate-fade-up">
-                <HeroSection />
+        <div className="bg-neutral-50 min-h-screen pb-0 overflow-hidden relative selection:bg-luxury-gold/20">
+            {/* Ambient Background Glow for the entire page */}
+            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-luxury-gold/5 blur-[120px]" />
+                <div className="absolute bottom-[10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-neutral-200/50 blur-[100px]" />
             </div>
 
-            <div className="animate-fade-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
-                <CategoryBar />
-            </div>
-
-            <div className="animate-fade-up [animation-delay:400ms] opacity-0 [animation-fill-mode:forwards]">
-                <FlashSale />
-            </div>
-
-            {/* Promotional Banner Placeholder */}
-            <div className="container mx-auto px-4 py-8 animate-fade-up [animation-delay:600ms] opacity-0 [animation-fill-mode:forwards]">
-                <div className="w-full h-24 bg-shopee/5 rounded-sm border border-shopee/10 flex items-center justify-center group overflow-hidden relative">
-                    {/* Animated background element */}
-                    <div className="absolute inset-0 bg-linear-to-r from-shopee/0 via-shopee/10 to-shopee/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    <span className="text-shopee font-bold tracking-wide relative z-10 flex items-center gap-2">
-                        <span className="animate-pulse">✨</span>
-                        Limited Time Offer: Get 10% cash back on all tech products!
-                        <span className="animate-pulse">✨</span>
-                    </span>
+            <div className="relative z-10">
+                <HeroLookbook />
+                
+                <div className="animate-fade-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
+                    <TrendingCollections />
                 </div>
-            </div>
 
-            <div className="animate-fade-up [animation-delay:800ms] opacity-0 [animation-fill-mode:forwards]">
-                <RecommendationGrid />
+                <div className="animate-fade-up [animation-delay:400ms] opacity-0 [animation-fill-mode:forwards]">
+                    <FeaturedProductsGrid />
+                </div>
+
+                <div className="animate-fade-up [animation-delay:600ms] opacity-0 [animation-fill-mode:forwards]">
+                    <StyleStories />
+                </div>
             </div>
         </div>
     );
 }
+
