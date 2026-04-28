@@ -103,13 +103,17 @@ export function ProductManagement() {
         onOpenAdd={() => setIsAddModalOpen(true)}
       />
 
-      <Card className="border-none shadow-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 dark:border-slate-800">
-          <CardTitle className="text-lg font-bold flex items-center gap-2">
-            <Package className="w-5 h-5 text-primary" />
-            All Products
+      <Card className="border-white/40 bg-white/60 backdrop-blur-2xl shadow-xl shadow-black/5 rounded-[2.5rem] overflow-hidden mt-8">
+        <CardHeader className="border-b border-black/5 p-8 pb-6">
+          <CardTitle className="text-xl font-light tracking-tight text-luxury-charcoal flex items-center gap-3">
+            <div className="w-10 h-10 bg-luxury-charcoal rounded-xl flex items-center justify-center shadow-lg shadow-black/10 shrink-0">
+                <Package className="w-5 h-5 text-white" />
+            </div>
+            <span>
+                All <span className="font-serif italic text-luxury-gold">Products</span>
+            </span>
             {isFetching ? (
-              <span className="text-xs font-semibold text-slate-400">(updating)</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 ml-2 animate-pulse">(updating)</span>
             ) : null}
           </CardTitle>
         </CardHeader>

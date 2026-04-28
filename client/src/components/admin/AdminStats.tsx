@@ -18,8 +18,8 @@ const stats = [
         diff: "+20.1%",
         trend: "up",
         icon: DollarSign,
-        color: "text-emerald-600 dark:text-emerald-400",
-        bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+        color: "text-luxury-gold",
+        bgColor: "bg-luxury-gold/10",
     },
     {
         title: "Total Orders",
@@ -27,8 +27,8 @@ const stats = [
         diff: "+180.1%",
         trend: "up",
         icon: ShoppingCart,
-        color: "text-blue-600 dark:text-blue-400",
-        bgColor: "bg-blue-50 dark:bg-blue-950/30",
+        color: "text-luxury-charcoal",
+        bgColor: "bg-luxury-charcoal/10",
     },
     {
         title: "Total Customers",
@@ -36,45 +36,45 @@ const stats = [
         diff: "+19%",
         trend: "up",
         icon: Users,
-        color: "text-primary",
-        bgColor: "bg-primary/10 dark:bg-primary/20",
+        color: "text-luxury-gold",
+        bgColor: "bg-luxury-gold/10",
     },
     {
-        title: "Growth",
+        title: "Growth Rate",
         value: "+12.2%",
         diff: "-2.4%",
         trend: "down",
         icon: TrendingUp,
-        color: "text-purple-600 dark:text-purple-400",
-        bgColor: "bg-purple-50 dark:bg-purple-950/30",
+        color: "text-luxury-charcoal",
+        bgColor: "bg-luxury-charcoal/10",
     },
 ];
 
 export function AdminStats() {
     return (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, i) => {
                 const Icon = stat.icon;
                 return (
-                    <Card key={i} className="border-none shadow-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm overflow-hidden group">
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <div className={cn("p-2 rounded-lg transition-transform group-hover:scale-110", stat.bgColor)}>
-                                    <Icon className={cn("w-5 h-5", stat.color)} />
+                    <Card key={i} className="border-white/40 bg-white/60 backdrop-blur-2xl shadow-xl shadow-black/5 rounded-3xl overflow-hidden group hover:scale-[1.02] transition-all duration-300">
+                        <CardContent className="p-8">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300 shadow-lg shadow-black/5", stat.bgColor)}>
+                                    <Icon className={cn("w-6 h-6", stat.color)} />
                                 </div>
                                 <div className={cn(
-                                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold",
+                                    "flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm",
                                     stat.trend === "up" 
-                                        ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400" 
-                                        : "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400"
+                                        ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
+                                        : "bg-red-50 text-red-600 border border-red-100"
                                 )}>
                                     {stat.diff}
                                     {stat.trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                                 </div>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.title}</h3>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 uppercase tracking-tight">{stat.value}</p>
+                                <h3 className="text-[10px] font-bold uppercase text-neutral-400 tracking-[0.2em]">{stat.title}</h3>
+                                <p className="text-3xl font-serif italic text-luxury-charcoal mt-2 tracking-tight">{stat.value}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -83,3 +83,4 @@ export function AdminStats() {
         </div>
     );
 }
+

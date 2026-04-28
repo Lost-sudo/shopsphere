@@ -10,13 +10,13 @@ import { Package } from "lucide-react";
 const getStatusColor = (status: "In Stock" | "Low Stock" | "Out of Stock") => {
   switch (status) {
     case "In Stock":
-      return "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400";
+      return "bg-emerald-50 text-emerald-600 border-emerald-100";
     case "Low Stock":
-      return "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400";
+      return "bg-amber-50 text-amber-600 border-amber-100";
     case "Out of Stock":
-      return "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400";
+      return "bg-red-50 text-red-600 border-red-100";
     default:
-      return "bg-slate-50 text-slate-600";
+      return "bg-neutral-50 text-neutral-500 border-neutral-100";
   }
 };
 
@@ -38,18 +38,18 @@ type Props = {
 export function ProductTable({ products, onDelete, onEdit, onDuplicate, onToggleActive, deletingId }: Props) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm text-left">
-        <thead className="text-xs uppercase text-slate-500 font-semibold border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
-          <tr>
-            <th className="px-6 py-4">Product</th>
-            <th className="px-6 py-4">Category</th>
-            <th className="px-6 py-4 text-right">Price</th>
-            <th className="px-6 py-4 text-center">Stock</th>
-            <th className="px-6 py-4">Status</th>
-            <th className="px-6 py-4 text-right">Actions</th>
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="border-b border-black/5 bg-black/[0.02]">
+            <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-400">Product</th>
+            <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-400">Category</th>
+            <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-400 text-right">Price</th>
+            <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-400 text-center">Stock</th>
+            <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-400">Status</th>
+            <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-400 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+        <tbody className="divide-y divide-black/5">
           {products.map((product) => {
             const imageUrl = product.images?.[0];
             const categoryName = product.category?.name ?? "—";
@@ -58,67 +58,67 @@ export function ProductTable({ products, onDelete, onEdit, onDuplicate, onToggle
             return (
               <tr
                 key={product.id}
-                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors"
+                className="hover:bg-white/40 transition-colors group"
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-800">
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-luxury-gold/5 flex items-center justify-center shrink-0 border border-white/60 shadow-sm">
                       {imageUrl ? (
                         <Image
                           src={imageUrl}
                           alt={product.name}
                           fill
                           unoptimized
-                          className="object-cover"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-5 h-5 text-slate-400" />
-                        </div>
+                        <Package className="w-5 h-5 text-luxury-gold/40" />
                       )}
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-bold text-slate-900 dark:text-white">
+                      <span className="font-medium text-luxury-charcoal">
                         {product.name}
                       </span>
-                      <span className="text-xs text-slate-500">{product.id}</span>
+                      <span className="text-[10px] font-light text-neutral-400 mt-0.5">#{product.id.split("-")[0]}</span>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-8 py-6 whitespace-nowrap">
                   <Badge
                     variant="outline"
-                    className="font-medium bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800"
+                    className="font-bold text-[10px] uppercase tracking-widest bg-white/40 border-white/60 text-luxury-charcoal shadow-sm px-3 py-1"
                   >
                     {categoryName}
                   </Badge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right font-bold text-slate-900 dark:text-white">
-                  ₱{product.price.toFixed(2)}
+                <td className="px-8 py-6 whitespace-nowrap text-right">
+                  <span className="text-sm font-serif italic text-luxury-gold font-bold">
+                    ₱{product.price.toFixed(2)}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
+                <td className="px-8 py-6 whitespace-nowrap text-center">
                   <span
                     className={cn(
-                      "font-semibold",
+                      "text-xs font-bold",
                       product.stock <= 10
                         ? "text-amber-500"
-                        : "text-slate-600 dark:text-slate-400",
+                        : "text-luxury-charcoal",
                     )}
                   >
                     {product.stock}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-8 py-6 whitespace-nowrap">
                   <Badge
                     className={cn(
-                      "border-none shadow-none font-bold px-2.5 py-1 rounded-full",
+                      "border shadow-none font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full",
                       getStatusColor(status),
                     )}
                   >
                     {status}
                   </Badge>
                 </td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-8 py-6 text-right">
                   <ProductRowActions
                     onEdit={() => onEdit(product)}
                     onDelete={() => onDelete(product.id)}
@@ -136,4 +136,5 @@ export function ProductTable({ products, onDelete, onEdit, onDuplicate, onToggle
     </div>
   );
 }
+
 

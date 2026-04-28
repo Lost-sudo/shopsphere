@@ -113,15 +113,17 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px] border-none shadow-2xl bg-white dark:bg-slate-950 backdrop-blur-xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-500">
+            <DialogContent className="sm:max-w-[600px] border border-white/60 shadow-2xl bg-white/80 backdrop-blur-3xl rounded-[2rem] max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="space-y-3 pb-4 border-b border-black/5">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-2xl bg-luxury-gold/10 text-luxury-gold shadow-lg shadow-black/10 border border-luxury-gold/20 shrink-0">
                             <Package className="w-6 h-6" />
                         </div>
                         <div>
-                            <DialogTitle className="text-2xl font-bold tracking-tight">Edit Product</DialogTitle>
-                            <DialogDescription className="text-slate-500 dark:text-slate-400">
+                            <DialogTitle className="text-2xl font-light tracking-tight text-luxury-charcoal">
+                                Edit <span className="font-serif italic text-luxury-gold font-bold">Product</span>
+                            </DialogTitle>
+                            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">
                                 Modify product details and status.
                             </DialogDescription>
                         </div>
@@ -136,11 +138,11 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem className="col-span-full">
-                                        <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Product Name</FormLabel>
+                                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Product Name</FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder="e.g. Wireless ANC Headphones"
-                                                className="h-11 border-slate-200 dark:border-slate-800 focus:ring-primary rounded-lg"
+                                                className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal placeholder:text-neutral-400"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -155,12 +157,12 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                 render={({ field }) => (
                                     <FormItem className="md:col-span-2">
                                         <div className="flex items-center justify-between mb-1">
-                                            <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Category</FormLabel>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Category</FormLabel>
                                             <Button
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-7 px-2 text-xs text-primary hover:text-primary/80 flex items-center gap-1"
+                                                className="h-7 px-2 text-[10px] font-bold uppercase tracking-widest text-luxury-gold hover:text-luxury-charcoal hover:bg-white/40 rounded-lg flex items-center gap-1 transition-colors"
                                                 onClick={() => setIsCategoryModalOpen(true)}
                                             >
                                                 <Plus className="w-3 h-3" />
@@ -173,13 +175,13 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                             disabled={isCategoriesLoading}
                                         >
                                             <FormControl>
-                                                <SelectTrigger className="h-11 border-slate-200 dark:border-slate-800 rounded-lg">
+                                                <SelectTrigger className="h-12 border-white/60 bg-white/40 focus:ring-luxury-gold focus:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal">
                                                     <SelectValue placeholder={isCategoriesLoading ? "Loading..." : "Select a category"} />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-[110]">
+                                            <SelectContent className="border border-white/60 bg-white/80 backdrop-blur-2xl rounded-xl shadow-xl z-[110]">
                                                 {categories.map((category) => (
-                                                    <SelectItem key={category.id} value={category.id}>
+                                                    <SelectItem key={category.id} value={category.id} className="rounded-lg focus:bg-white/60 focus:text-luxury-charcoal">
                                                         {category.name}
                                                     </SelectItem>
                                                 ))}
@@ -195,12 +197,12 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                 name="price"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Price (₱)</FormLabel>
+                                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Price (₱)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
                                                 placeholder="0.00"
-                                                className="h-11 border-slate-200 dark:border-slate-800 rounded-lg"
+                                                className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-serif italic font-bold"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                             />
@@ -215,12 +217,12 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                 name="stock"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Stock Count</FormLabel>
+                                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Stock Count</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
                                                 placeholder="1"
-                                                className="h-11 border-slate-200 dark:border-slate-800 rounded-lg"
+                                                className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                                             />
@@ -235,12 +237,12 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                 name="weight"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Weight (grams)</FormLabel>
+                                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Weight (grams)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
                                                 placeholder="0"
-                                                className="h-11 border-slate-200 dark:border-slate-800 rounded-lg"
+                                                className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                             />
@@ -255,11 +257,11 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                 name="description"
                                 render={({ field }) => (
                                     <FormItem className="col-span-full">
-                                        <FormLabel className="font-bold text-slate-700 dark:text-slate-300">Description</FormLabel>
+                                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Description</FormLabel>
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Tell us about the product..."
-                                                className="min-h-[120px] border-slate-200 dark:border-slate-800 rounded-lg resize-none"
+                                                className="min-h-[120px] border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal resize-none"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -270,14 +272,14 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
 
                             {product?.images && product.images.length > 0 && (
                                 <div className="col-span-full space-y-3">
-                                    <FormLabel className="font-bold text-slate-700 dark:text-slate-300">
+                                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
                                         Current Images
                                     </FormLabel>
-                                    <div className="flex flex-wrap gap-3">
+                                    <div className="flex flex-wrap gap-4">
                                         {product.images.map((img, i) => (
                                             <div
                                                 key={i}
-                                                className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 shadow-sm"
+                                                className="relative w-24 h-24 rounded-2xl overflow-hidden border border-white/60 bg-white/40 shadow-sm"
                                             >
                                                 <Image
                                                     src={img}
@@ -289,8 +291,8 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                             </div>
                                         ))}
                                     </div>
-                                    <p className="text-[10px] text-slate-400">
-                                        Current product images stored on the server.
+                                    <p className="text-[10px] font-light text-neutral-400">
+                                        Current product images stored on the server. To change images, you must delete this product and create a new one.
                                     </p>
                                 </div>
                             )}
@@ -299,18 +301,19 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                 control={form.control}
                                 name="isActive"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-xl border border-slate-100 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900/50 col-span-full">
+                                    <FormItem className="flex flex-row items-center space-x-4 space-y-0 rounded-2xl border border-white/60 p-5 bg-white/40 shadow-sm col-span-full">
                                         <FormControl>
                                             <Checkbox
                                                 checked={field.value}
                                                 onCheckedChange={field.onChange}
+                                                className="border-white/60 data-[state=checked]:bg-luxury-gold data-[state=checked]:text-white rounded-md w-5 h-5"
                                             />
                                         </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel className="font-bold text-slate-700 dark:text-slate-300">
+                                        <div className="space-y-1.5 leading-none">
+                                            <FormLabel className="font-bold text-luxury-charcoal">
                                                 Active Status
                                             </FormLabel>
-                                            <p className="text-xs text-slate-500">
+                                            <p className="text-[10px] font-light text-neutral-500">
                                                 Enable or disable this product from the customer view.
                                             </p>
                                         </div>
@@ -319,19 +322,19 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                             />
                         </div>
 
-                        <DialogFooter className="gap-3 sm:gap-0 pt-6">
+                        <DialogFooter className="gap-3 sm:gap-0 pt-6 border-t border-black/5">
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => onOpenChange(false)}
-                                className="h-11 px-6 border-slate-200 dark:border-slate-800 font-semibold"
+                                className="h-12 px-6 border-white/60 bg-white/40 hover:bg-white/60 text-luxury-charcoal rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isLoading}
-                                className="h-11 px-8 bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-lg shadow-amber-500/20 dark:shadow-none min-w-[140px]"
+                                className="h-12 px-8 bg-luxury-gold hover:bg-luxury-gold/90 text-white rounded-xl shadow-lg shadow-luxury-gold/20 uppercase tracking-widest text-[10px] font-bold transition-all active:scale-95 min-w-[160px]"
                             >
                                 {isLoading ? (
                                     <>

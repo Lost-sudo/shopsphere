@@ -11,7 +11,7 @@ import {
     Package, 
     LogOut,
     Menu,
-    X,
+    ChevronLeft,
     Store
 } from "lucide-react";
 import { useState } from "react";
@@ -54,31 +54,38 @@ export function AdminSidebar() {
     return (
         <aside 
             className={cn(
-                "sticky top-0 h-screen transition-all duration-300 ease-in-out border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-50",
-                collapsed ? "w-20" : "w-64"
+                "sticky top-0 h-screen transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-50",
+                collapsed ? "w-24" : "w-72"
             )}
         >
-            <div className="flex flex-col h-full">
+            <div className="relative flex flex-col h-full m-4 bg-white/60 backdrop-blur-2xl border border-white/40 rounded-[2.5rem] shadow-2xl shadow-black/5">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 h-16 border-b border-slate-200 dark:border-slate-800">
-                    {!collapsed && (
-                        <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-primary">
-                            <Store className="w-8 h-8" />
-                            <span>ShopSphere</span>
-                        </Link>
-                    )}
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => setCollapsed(!collapsed)}
-                        className="ml-auto"
-                    >
-                        {collapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
-                    </Button>
+                <div className="flex items-center justify-center p-6 h-24 border-b border-black/5">
+                    <Link href="/" className={cn(
+                        "flex items-center gap-3 group transition-all duration-500",
+                        collapsed ? "justify-center" : "justify-start w-full"
+                    )}>
+                        <div className="w-10 h-10 bg-luxury-charcoal rounded-xl flex items-center justify-center shadow-lg shadow-black/10 transition-transform group-hover:scale-110 shrink-0">
+                            <Store className="w-6 h-6 text-white" />
+                        </div>
+                        {!collapsed && (
+                            <span className="font-serif italic text-xl text-luxury-charcoal tracking-tight whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-500">
+                                Shop<span className="text-luxury-gold">Sphere</span>
+                            </span>
+                        )}
+                    </Link>
                 </div>
 
+                {/* Collapse Toggle */}
+                <button 
+                    onClick={() => setCollapsed(!collapsed)}
+                    className="absolute -right-3 top-20 w-8 h-8 bg-luxury-charcoal text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all z-50 border-4 border-white/40"
+                >
+                    {collapsed ? <Menu size={14} /> : <ChevronLeft size={14} />}
+                </button>
+
                 {/* Links */}
-                <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                <nav className="flex-1 p-3 space-y-3 overflow-y-auto scrollbar-hide mt-4">
                     {sidebarLinks.map((link) => {
                         const Icon = link.icon;
                         const isActive = pathname === link.href;
@@ -87,36 +94,51 @@ export function AdminSidebar() {
                             <Link
                                 key={link.href}
                                 href={link.href}
+                                title={collapsed ? link.name : ""}
                                 className={cn(
-                                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group",
+                                    "flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group relative",
+                                    collapsed ? "justify-center" : "justify-start",
                                     isActive 
-                                        ? "bg-primary/10 dark:bg-primary/20 text-primary" 
-                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                        ? "bg-luxury-charcoal text-white shadow-xl shadow-black/10" 
+                                        : "text-neutral-500 hover:text-luxury-charcoal hover:bg-white/40"
                                 )}
                             >
                                 <Icon className={cn(
-                                    "w-5 h-5 shrink-0 transition-transform group-hover:scale-110",
-                                    isActive && "text-primary"
+                                    "w-5 h-5 shrink-0 transition-all duration-300",
+                                    isActive ? "text-luxury-gold scale-110" : "group-hover:text-luxury-gold group-hover:scale-110"
                                 )} />
-                                {!collapsed && <span className="font-medium">{link.name}</span>}
+                                {!collapsed && (
+                                    <span className={cn(
+                                        "text-[10px] font-bold uppercase tracking-widest transition-all",
+                                        isActive ? "translate-x-1" : "group-hover:translate-x-1"
+                                    )}>
+                                        {link.name}
+                                    </span>
+                                )}
+                                {isActive && !collapsed && (
+                                    <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-luxury-gold animate-pulse" />
+                                )}
                             </Link>
                         );
                     })}
                 </nav>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-200 dark:border-slate-800 gap-2 flex flex-col">
+                <div className="p-3 border-t border-black/5">
                     <button 
                         onClick={handleLogout}
                         className={cn(
-                            "flex items-center gap-3 px-3 py-2 w-full text-slate-600 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors group"
+                            "flex items-center gap-4 p-4 w-full rounded-2xl transition-all duration-300 group text-neutral-500 hover:text-red-500 hover:bg-red-50/50",
+                            collapsed ? "justify-center" : "justify-start"
                         )}
                     >
                         <LogOut className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
-                        {!collapsed && <span className="font-medium">Logout</span>}
+                        {!collapsed && <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>}
                     </button>
                 </div>
             </div>
         </aside>
     );
 }
+
+

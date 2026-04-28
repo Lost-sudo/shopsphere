@@ -35,13 +35,13 @@ export function ProductRowActions({
         variant="ghost"
         size="icon"
         title={isActive ? "Deactivate" : "Activate"}
-        className="w-8 h-8 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 group"
+        className="w-8 h-8 rounded-xl hover:bg-white/60 transition-colors group"
         onClick={onToggleActive}
       >
         {isActive ? (
-          <Eye className="w-4 h-4 text-emerald-500" />
+          <Eye className="w-4 h-4 text-neutral-400 group-hover:text-luxury-charcoal transition-colors" />
         ) : (
-          <EyeOff className="w-4 h-4 text-slate-400" />
+          <EyeOff className="w-4 h-4 text-neutral-300 transition-colors" />
         )}
       </Button>
 
@@ -49,31 +49,31 @@ export function ProductRowActions({
         variant="ghost"
         size="icon"
         title="Edit Product"
-        className="w-8 h-8 hover:bg-amber-50 dark:hover:bg-amber-950/30 group"
+        className="w-8 h-8 rounded-xl hover:bg-white/60 transition-colors group"
         onClick={onEdit}
       >
-        <Edit className="w-4 h-4 text-amber-500" />
+        <Edit className="w-4 h-4 text-neutral-400 group-hover:text-luxury-charcoal transition-colors" />
       </Button>
 
       <Button
         variant="ghost"
         size="icon"
         title="Duplicate Product"
-        className="w-8 h-8 hover:bg-blue-50 dark:hover:bg-blue-950/30 group"
+        className="w-8 h-8 rounded-xl hover:bg-white/60 transition-colors group"
         onClick={onDuplicate}
       >
-        <Copy className="w-4 h-4 text-blue-500" />
+        <Copy className="w-4 h-4 text-neutral-400 group-hover:text-luxury-charcoal transition-colors" />
       </Button>
 
       <Button
         variant="ghost"
         size="icon"
         title="Delete Product"
-        className="w-8 h-8 hover:bg-red-50 dark:hover:bg-red-950/30 group"
+        className="w-8 h-8 rounded-xl hover:bg-red-50 transition-colors group"
         onClick={onDelete}
         disabled={disableDelete}
       >
-        <Trash2 className="w-4 h-4 text-red-500" />
+        <Trash2 className="w-4 h-4 text-neutral-400 group-hover:text-red-500 transition-colors" />
       </Button>
     </div>
   );
