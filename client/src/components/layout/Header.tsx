@@ -4,23 +4,20 @@ import Link from "next/link";
 import {
     Search,
     ShoppingCart,
-    Bell,
-    HelpCircle,
     User,
-    ChevronDown,
     LogOut,
     UserCircle,
     LayoutDashboard,
     Package,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/lib/store";
 import { useLogoutMutation } from "@/features/auth/auth.api";
 import { clearUser } from "@/features/auth/auth.slice";
 import { useRouter } from "next/navigation";
 import { useGetCartQuery } from "@/features/cart/cart.api";
+import { useEffect, useState } from "react";
 
 export function Header() {
     const dispatch = useDispatch();
@@ -30,6 +27,16 @@ export function Header() {
     const { data: cartData } = useGetCartQuery(undefined, {
         skip: !user,
     });
+    
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -42,163 +49,73 @@ export function Header() {
     };
 
     const displayName = user?.name || user?.email?.split("@")[0] || "User";
+    
     return (
-        <header className="w-full bg-shopee text-white">
-            {/* Top Bar */}
-            <div className="container mx-auto px-4 py-1.5 flex justify-between items-center text-xs font-medium">
-                <div className="flex gap-4">
-                    <Link
-                        href="/seller"
-                        className="hover:text-white/80 transition-colors"
-                    >
-                        Seller Centre
-                    </Link>
-                    <Link
-                        href="/download"
-                        className="hover:text-white/80 transition-colors"
-                    >
-                        Download
-                    </Link>
-                    <div className="flex gap-2 items-center">
-                        <span>Follow us on</span>
-                        {/* Social Icons would go here */}
+        <header className={`sticky top-0 w-full z-50 transition-all duration-500 bg-white/80 backdrop-blur-2xl border-b border-black/5 ${scrolled ? "py-3 shadow-sm" : "py-5"}`}>
+            <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between gap-8">
+                
+                {/* Left: Logo */}
+                <Link href="/" className="flex items-center shrink-0">
+                    <span className="text-2xl font-light tracking-widest uppercase text-luxury-charcoal font-serif italic hover:opacity-80 transition-opacity">
+                        ShopSphere
+                    </span>
+                </Link>
+
+                {/* Center: Search */}
+                <div className="hidden md:flex flex-1 max-w-lg mx-auto relative group">
+                    <div className="flex items-center w-full rounded-full overflow-hidden border bg-white/50 border-black/10 focus-within:bg-white focus-within:border-luxury-gold/50 focus-within:shadow-sm transition-all duration-300">
+                        <div className="pl-5 pr-2 text-neutral-400 group-focus-within:text-luxury-gold transition-colors">
+                            <Search size={16} />
+                        </div>
+                        <Input
+                            placeholder="Discover the collection..."
+                            className="flex-1 border-none focus-visible:ring-0 h-11 bg-transparent text-sm font-medium text-luxury-charcoal placeholder:text-neutral-400"
+                        />
                     </div>
                 </div>
-                <div className="flex gap-4 items-center">
-                    <Link
-                        href="/notifications"
-                        className="flex items-center gap-1 hover:text-white/80 transition-colors"
-                    >
-                        <Bell size={14} />
-                        Notifications
-                    </Link>
-                    <Link
-                        href="/help"
-                        className="flex items-center gap-1 hover:text-white/80 transition-colors"
-                    >
-                        <HelpCircle size={14} />
-                        Help
-                    </Link>
+
+                {/* Right: Actions */}
+                <div className="flex items-center gap-6 shrink-0 text-luxury-charcoal">
                     {user ? (
                         <div className="relative group">
-                            <button className="flex items-center gap-2 hover:text-white/80 transition-colors cursor-pointer py-1">
-                                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/30">
-                                    <User size={14} />
-                                </div>
-                                <span className="max-w-[100px] truncate">
+                            <button className="flex items-center gap-2 hover:text-luxury-gold transition-colors cursor-pointer">
+                                <span className="text-xs font-semibold tracking-widest uppercase hidden sm:block">
                                     {displayName}
                                 </span>
-                                <ChevronDown
-                                    size={12}
-                                    className="group-hover:rotate-180 transition-transform duration-200"
-                                />
+                                <User size={20} strokeWidth={1.5} />
                             </button>
 
                             {/* Dropdown Menu */}
-                            <div className="absolute right-0 top-full pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 translate-y-2 group-hover:translate-y-0">
-                                <div className="bg-white text-gray-800 rounded-sm shadow-xl border border-gray-100 py-1 min-w-[160px] overflow-hidden">
-                                    <Link
-                                        href="/user/profile"
-                                        className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm"
-                                    >
-                                        <UserCircle size={16} />
-                                        My Account
+                            <div className="absolute right-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 translate-y-2 group-hover:translate-y-0">
+                                <div className="bg-white/95 backdrop-blur-xl text-luxury-charcoal rounded-xl shadow-xl border border-black/5 py-2 min-w-[200px] overflow-hidden">
+                                    <Link href="/user/profile" className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider">
+                                        <UserCircle size={16} /> My Account
                                     </Link>
-                                    <Link
-                                        href="/admin"
-                                        className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm"
-                                    >
-                                        <LayoutDashboard size={16} />
-                                        Admin Dashboard
+                                    <Link href="/admin" className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider">
+                                        <LayoutDashboard size={16} /> Admin Dashboard
                                     </Link>
-                                    <Link
-                                        href="/user/purchase"
-                                        className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm"
-                                    >
-                                        <Package size={16} />
-                                        My Purchase
+                                    <Link href="/user/purchase" className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider">
+                                        <Package size={16} /> My Purchases
                                     </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 hover:text-shopee transition-colors text-sm text-left border-t border-gray-100"
-                                    >
-                                        <LogOut size={16} />
-                                        Logout
+                                    <div className="h-px bg-black/5 my-1" />
+                                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider text-left">
+                                        <LogOut size={16} /> Logout
                                     </button>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="flex gap-3 font-medium">
-                            <Link
-                                href="/register"
-                                className="hover:text-white/80 transition-colors border-r border-white/20 pr-3"
-                            >
-                                Sign Up
-                            </Link>
-                            <Link
-                                href="/login"
-                                className="hover:text-white/80 transition-colors"
-                            >
-                                Login
+                        <div className="flex items-center gap-4 text-xs font-semibold uppercase tracking-widest">
+                            <Link href="/login" className="hover:text-luxury-gold transition-colors">
+                                Sign In
                             </Link>
                         </div>
                     )}
-                </div>
-            </div>
-
-            {/* Main Header */}
-            <div className="container mx-auto px-4 pt-4 pb-7 flex items-center justify-between gap-4 md:gap-8">
-                {/* Logo - Stable sizing */}
-                <Link
-                    href="/"
-                    className="flex items-center gap-2 shrink-0 min-w-[120px] md:min-w-[150px]"
-                >
-                    <div className="bg-white p-1 rounded-sm shadow-sm ring-1 ring-black/5">
-                        <ShoppingCart className="text-shopee" size={24} />
-                    </div>
-                    <span className="text-xl md:text-2xl font-bold tracking-tight">
-                        ShopSphere
-                    </span>
-                </Link>
-
-                {/* Search Bar - Flexible and Centered */}
-                <div className="flex-1 max-w-2xl relative">
-                    <div className="flex bg-white rounded-sm overflow-hidden p-1 shadow-md ring-1 ring-black/5">
-                        <Input
-                            placeholder="Search for products, brands and shops"
-                            className="flex-1 border-none focus-visible:ring-0 text-gray-900 h-10 placeholder:text-gray-400 placeholder:text-sm bg-transparent"
-                        />
-                        <Button className="bg-shopee hover:bg-shopee-dark h-10 px-6 rounded-sm shrink-0">
-                            <Search size={18} />
-                        </Button>
-                    </div>
-                    {/* Popular Search Terms */}
-                    <div className="absolute -bottom-6 left-1 flex gap-3 text-xs font-light opacity-90 overflow-hidden whitespace-nowrap">
-                        <span className="hover:text-white/80 cursor-pointer">
-                            Powerbank
-                        </span>
-                        <span className="hover:text-white/80 cursor-pointer">
-                            Wireless Earbuds
-                        </span>
-                        <span className="hover:text-white/80 cursor-pointer">
-                            Gaming Mouse
-                        </span>
-                        <span className="hover:text-white/80 cursor-pointer">
-                            iPhone 15 Case
-                        </span>
-                    </div>
-                </div>
-
-                {/* Cart Area - Right Aligned */}
-                <div className="flex items-center justify-end shrink-0 min-w-[60px]">
-                    <Link
-                        href="/cart"
-                        className="relative p-2 group transition-transform active:scale-95"
-                    >
-                        <ShoppingCart size={28} />
+                    
+                    <Link href="/cart" className="relative group hover:text-luxury-gold transition-colors flex items-center">
+                        <ShoppingCart size={20} strokeWidth={1.5} />
                         {(cartData?.data?.cart?.items?.length || 0) > 0 && (
-                            <span className="absolute -top-0.5 -right-0.5 bg-white text-shopee text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-shopee shadow-sm">
+                            <span className="absolute -top-2 -right-2.5 bg-luxury-gold text-white text-[9px] font-bold w-[18px] h-[18px] flex items-center justify-center rounded-full shadow-sm">
                                 {cartData?.data?.cart?.items?.length}
                             </span>
                         )}

@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
+import { MapPin, Phone, User, Edit2, Trash2 } from "lucide-react";
 import { Address } from "@/features/address/address.types";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface AddressCardProps {
     address: Address;
@@ -17,55 +18,78 @@ export function AddressCard({ address, onSetDefault, onEdit, onDelete }: Address
     const displayAddress = `${address.street}, ${address.barangay}, ${address.city}, ${address.province}, ${address.region}, ${address.postalCode}, ${address.country}`;
 
     return (
-        <div className="bg-white p-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
-            <div className="flex justify-between gap-4">
-                <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3">
-                        <span className="font-semibold text-gray-900 border-r border-gray-200 pr-3">{fullName}</span>
-                        <span className="text-sm text-gray-500">{address.phoneNumber}</span>
-                    </div>
-                    
-                    <div className="text-sm text-gray-600 space-y-1">
-                        <p>{displayAddress}</p>
+        <Card className="border-white/40 bg-white/60 backdrop-blur-2xl shadow-xl shadow-black/5 rounded-3xl overflow-hidden transition-all hover:shadow-2xl hover:shadow-black/10 group">
+            <CardContent className="p-6 sm:p-8">
+                <div className="flex justify-between items-start gap-4">
+                    <div className="space-y-4 flex-1">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-center gap-2 px-3 py-1 bg-luxury-charcoal text-white rounded-full text-xs font-medium">
+                                <User size={12} />
+                                {fullName}
+                            </div>
+                            <div className="flex items-center gap-2 px-3 py-1 bg-white/80 border border-white/60 text-neutral-600 rounded-full text-xs">
+                                <Phone size={12} className="text-luxury-gold" />
+                                {address.phoneNumber}
+                            </div>
+                            {address.isDefault && (
+                                <Badge className="bg-luxury-gold/10 text-luxury-gold border-luxury-gold/20 hover:bg-luxury-gold/20 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-none">
+                                    Default
+                                </Badge>
+                            )}
+                        </div>
+                        
+                        <div className="flex gap-3 text-neutral-600">
+                            <MapPin size={18} className="text-luxury-gold shrink-0 mt-0.5" />
+                            <p className="text-sm leading-relaxed font-light">
+                                {displayAddress}
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="flex gap-2 mt-2">
-                        {address.isDefault && (
-                            <Badge variant="outline" className="text-shopee border-shopee bg-shopee/5 rounded-sm px-2 py-0 text-[10px] font-medium">
-                                Default
-                            </Badge>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onEdit?.(address.id)}
+                            className="h-9 w-9 rounded-full bg-white/50 border border-white/60 hover:bg-white/80 text-luxury-charcoal transition-all"
+                        >
+                            <Edit2 size={14} />
+                        </Button>
+                        {!address.isDefault && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => onDelete?.(address.id)}
+                                className="h-9 w-9 rounded-full bg-white/50 border border-white/60 hover:bg-red-50 hover:text-red-500 text-luxury-charcoal transition-all"
+                            >
+                                <Trash2 size={14} />
+                            </Button>
                         )}
                     </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-2 shrink-0">
-                    <div className="flex gap-4">
-                        <button 
-                            onClick={() => onEdit?.(address.id)}
-                            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                <div className="mt-8 flex justify-end items-center gap-4 border-t border-black/5 pt-6">
+                    {!address.isDefault && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onSetDefault?.(address.id)}
+                            className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 hover:text-luxury-gold transition-colors"
                         >
-                            Edit
-                        </button>
-                        {!address.isDefault && (
-                            <button 
-                                onClick={() => onDelete?.(address.id)}
-                                className="text-sm text-red-500 hover:text-red-600 font-medium"
-                            >
-                                Delete
-                            </button>
-                        )}
-                    </div>
+                            Set as Default
+                        </Button>
+                    )}
                     <Button
                         variant="outline"
                         size="sm"
-                        disabled={address.isDefault}
-                        onClick={() => onSetDefault?.(address.id)}
-                        className={address.isDefault ? "opacity-50 cursor-not-allowed" : "border-gray-200 text-gray-700 hover:bg-white hover:border-gray-400"}
+                        onClick={() => onEdit?.(address.id)}
+                        className="bg-white/40 border-white/60 text-luxury-charcoal hover:bg-white/60 hover:border-white/80 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all px-6 shadow-none h-10"
                     >
-                        Set as Default
+                        Edit Details
                     </Button>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 }
+

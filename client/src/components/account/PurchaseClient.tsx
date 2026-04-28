@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, ShoppingBag } from "lucide-react";
 import { useGetUserOrdersQuery } from "@/features/order/order.api";
 import { OrderCard } from "@/components/account/OrderCard";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -23,68 +22,83 @@ export function PurchaseClient() {
 
     const orders = data?.orders || [];
     
-    // Filter orders based on status
     const filteredOrders = activeTab === "ALL" 
         ? orders 
         : orders.filter(order => order.status.toUpperCase() === activeTab);
 
     return (
-        <div className="flex flex-col min-h-full">
-            {/* Tabs */}
-            <div className="bg-white sticky top-0 z-10 border-b border-gray-100 flex overflow-x-auto scrollbar-hide">
-                {tabs.map((tab) => (
-                    <button
-                        key={tab.value}
-                        onClick={() => setActiveTab(tab.value)}
-                        className={cn(
-                            "flex-1 min-w-[100px] py-4 text-sm transition-colors relative whitespace-nowrap",
-                            activeTab === tab.value 
-                                ? "text-shopee font-medium" 
-                                : "text-gray-700 hover:text-shopee"
-                        )}
-                    >
-                        {tab.label}
-                        {activeTab === tab.value && (
-                            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-shopee" />
-                        )}
-                    </button>
-                ))}
-            </div>
-
-            {/* Search */}
-            <div className="p-4 bg-gray-50/50">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <Input 
-                        placeholder="You can search by Order ID or Product Name" 
-                        className="pl-10 h-10 bg-white border-gray-200 focus-visible:ring-shopee"
-                    />
+        <div className="p-8 sm:p-12 space-y-10">
+            {/* Header Section */}
+            <div className="animate-fade-up">
+                    <h1 className="text-4xl font-light tracking-tight text-luxury-charcoal">
+                        My <span className="font-serif italic text-luxury-gold">Purchases</span>
+                    </h1>
+                    <p className="text-neutral-500 mt-2 font-light">
+                        Track your orders and view your shopping history
+                    </p>
                 </div>
-            </div>
 
-            {/* Orders List */}
-            <div className="p-4 flex-1">
-                {isLoading ? (
-                    <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                            <Skeleton key={i} className="h-48 w-full rounded-sm" />
+                {/* Tabs Navigation */}
+                <div className="animate-fade-up [animation-delay:100ms]">
+                    <div className="bg-white/40 backdrop-blur-xl border border-white/60 p-2 rounded-2xl flex overflow-x-auto scrollbar-hide gap-2">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.value}
+                                onClick={() => setActiveTab(tab.value)}
+                                className={cn(
+                                    "flex-1 min-w-[100px] py-3 px-4 text-xs font-bold uppercase tracking-widest transition-all rounded-xl relative whitespace-nowrap",
+                                    activeTab === tab.value 
+                                        ? "bg-luxury-charcoal text-white shadow-lg" 
+                                        : "text-neutral-500 hover:text-luxury-charcoal hover:bg-white/40"
+                                )}
+                            >
+                                {tab.label}
+                            </button>
                         ))}
                     </div>
-                ) : filteredOrders.length > 0 ? (
-                    <div className="space-y-0">
-                        {filteredOrders.map((order) => (
-                            <OrderCard key={order.id} order={order} />
-                        ))}
+                </div>
+
+                {/* Search Bar */}
+                <div className="animate-fade-up [animation-delay:200ms]">
+                    <div className="relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-luxury-gold transition-colors" size={18} />
+                        <Input 
+                            placeholder="Search by Order ID or Product Name..." 
+                            className="pl-12 h-14 bg-white/60 backdrop-blur-xl border-white/60 focus-visible:ring-luxury-gold focus-visible:bg-white/80 transition-all rounded-2xl text-sm shadow-xl shadow-black/5"
+                        />
                     </div>
-                ) : (
-                    <div className="flex flex-col items-center justify-center py-20 px-4">
-                        <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                            <Search className="text-gray-300" size={40} />
+                </div>
+
+                {/* Orders List */}
+                <div className="space-y-6 animate-fade-up [animation-delay:300ms]">
+                    {isLoading ? (
+                        <div className="space-y-6">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="h-64 bg-white/40 backdrop-blur-xl border border-white/60 animate-pulse rounded-3xl" />
+                            ))}
                         </div>
-                        <p className="text-gray-600">No orders found</p>
-                    </div>
-                )}
+                    ) : filteredOrders.length > 0 ? (
+                        <div className="space-y-6">
+                            {filteredOrders.map((order) => (
+                                <OrderCard key={order.id} order={order} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-24 px-4 bg-white/60 backdrop-blur-2xl border border-white/40 rounded-3xl shadow-xl shadow-black/5">
+                            <div className="w-20 h-20 bg-luxury-gold/10 rounded-full flex items-center justify-center mb-6">
+                                <ShoppingBag className="text-luxury-gold" size={32} />
+                            </div>
+                            <p className="text-luxury-charcoal font-medium">No orders found</p>
+                            <p className="text-neutral-500 text-sm mt-1 text-center max-w-xs">
+                                It looks like you haven&apos;t placed any orders in this category yet.
+                            </p>
+                            <button className="mt-6 px-8 py-3 bg-luxury-charcoal text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-luxury-charcoal-light transition-all active:scale-95">
+                                Start Shopping
+                            </button>
+                        </div>
+                    )}
             </div>
         </div>
     );
 }
+
