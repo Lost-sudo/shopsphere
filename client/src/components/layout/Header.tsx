@@ -23,11 +23,12 @@ export function Header() {
     const dispatch = useDispatch();
     const router = useRouter();
     const user = useSelector((state: RootState) => state.auth.user);
+    console.log(user?.role);
     const [logout] = useLogoutMutation();
     const { data: cartData } = useGetCartQuery(undefined, {
         skip: !user,
     });
-    
+
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -49,11 +50,11 @@ export function Header() {
     };
 
     const displayName = user?.name || user?.email?.split("@")[0] || "User";
-    
+
     return (
         <header className={`sticky top-0 w-full z-50 transition-all duration-500 bg-white/80 backdrop-blur-2xl border-b border-black/5 ${scrolled ? "py-3 shadow-sm" : "py-5"}`}>
             <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between gap-8">
-                
+
                 {/* Left: Logo */}
                 <Link href="/" className="flex items-center shrink-0">
                     <span className="text-2xl font-light tracking-widest uppercase text-luxury-charcoal font-serif italic hover:opacity-80 transition-opacity">
@@ -91,9 +92,11 @@ export function Header() {
                                     <Link href="/user/profile" className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider">
                                         <UserCircle size={16} /> My Account
                                     </Link>
-                                    <Link href="/admin" className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider">
-                                        <LayoutDashboard size={16} /> Admin Dashboard
-                                    </Link>
+                                    {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+                                        <Link href="/admin" className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider">
+                                            <LayoutDashboard size={16} /> Admin Dashboard
+                                        </Link>
+                                    )}
                                     <Link href="/user/purchase" className="flex items-center gap-3 px-5 py-3 hover:bg-neutral-50 transition-colors text-xs font-semibold uppercase tracking-wider">
                                         <Package size={16} /> My Purchases
                                     </Link>
@@ -111,7 +114,7 @@ export function Header() {
                             </Link>
                         </div>
                     )}
-                    
+
                     <Link href="/cart" className="relative group hover:text-luxury-gold transition-colors flex items-center">
                         <ShoppingCart size={20} strokeWidth={1.5} />
                         {(cartData?.data?.cart?.items?.length || 0) > 0 && (

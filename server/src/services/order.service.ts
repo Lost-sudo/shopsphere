@@ -13,7 +13,7 @@ export class OrderService implements IOrderService {
   constructor(
     private readonly orderRepository: IOrderRepository,
     private readonly shipmentService: IShipmentService,
-  ) {}
+  ) { }
 
   async createOrder(input: OrderInput, userId: string): Promise<Order> {
     if (!userId) throw new BadRequestError("User ID is required.");

@@ -13,7 +13,7 @@ export class PaymentService implements IPaymentService {
   constructor(
     private readonly paymentRepository: IPaymentRepository,
     private readonly orderRepository: IOrderRepository,
-  ) {}
+  ) { }
 
   async processPayment(
     orderId: string,
