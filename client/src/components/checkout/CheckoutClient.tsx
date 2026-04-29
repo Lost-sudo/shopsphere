@@ -2,6 +2,7 @@
 
 import { useGetCartQuery } from "@/features/cart/cart.api";
 import { useGetAddressesQuery } from "@/features/address/address.api";
+import { useCreateOrderMutation } from "@/features/order/order.api";
 import { CartItem } from "@/features/cart/cart.types";
 import { Button } from "@/components/ui/button";
 import { 
@@ -17,14 +18,20 @@ import {
     CreditCard,
     Wallet,
     Banknote,
-    Check
+    Check,
+    PackageCheck,
+    Loader2
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { AddressSelectionDialog } from "./AddressSelectionDialog";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
+import { toast } from "sonner";
 
 const CARRIERS = [
     { id: "STANDARD", name: "Standard Delivery", eta: "3-5 Business Days", price: 50 },
@@ -47,12 +54,18 @@ const STEPS = [
 export default function CheckoutClient() {
     const { data: cartData, isLoading: isCartLoading, isError: isCartError } = useGetCartQuery();
     const { data: addressData, isLoading: isAddressLoading } = useGetAddressesQuery();
+    const [createOrder, { isLoading: isPlacingOrder }] = useCreateOrderMutation();
+    const user = useSelector((state: RootState) => state.auth.user);
+    const router = useRouter();
+    const searchParams = useSearchParams();
     
     const [currentStep, setCurrentStep] = useState(1);
     const [selectedCarrier, setSelectedCarrier] = useState(CARRIERS[0].id);
     const [selectedPayment, setSelectedPayment] = useState(PAYMENT_METHODS[0].id);
     const [overrideAddressId, setOverrideAddressId] = useState<string | null>(null);
     const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+    const [orderSuccess, setOrderSuccess] = useState(false);
+    const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
 
     const addresses = addressData?.addresses || [];
     
@@ -61,7 +74,18 @@ export default function CheckoutClient() {
     const selectedAddress = addresses.find((a: any) => a.id === selectedAddressId);
     
     const cart = cartData?.data?.cart;
-    const items = cart?.items || [];
+    const allItems = cart?.items || [];
+
+    // Filter items to only selected ones from cart page
+    const selectedItemIds = useMemo(() => {
+        const param = searchParams.get("items");
+        return param ? param.split(",") : [];
+    }, [searchParams]);
+
+    const items = useMemo(() => {
+        if (selectedItemIds.length === 0) return allItems;
+        return allItems.filter(item => selectedItemIds.includes(item.id));
+    }, [allItems, selectedItemIds]);
 
     const formatPrice = (amount: number) => {
         return new Intl.NumberFormat("en-PH", {
@@ -71,14 +95,68 @@ export default function CheckoutClient() {
     };
 
     const subtotal = items.reduce((acc: number, item: CartItem) => {
-        return acc + (item.product?.price || 0) * item.quantity;
+        const price = item.variant?.price ?? item.product?.price ?? 0;
+        return acc + price * item.quantity;
     }, 0);
 
     const currentCarrier = CARRIERS.find(c => c.id === selectedCarrier) || CARRIERS[0];
     const shippingFee = items.length > 0 ? currentCarrier.price : 0;
     const total = subtotal + shippingFee;
 
+    const handlePlaceOrder = useCallback(async () => {
+        if (!user || !selectedAddress || items.length === 0) return;
+
+        const shippingAddr = `${selectedAddress.street}, ${selectedAddress.barangay}, ${selectedAddress.city}, ${selectedAddress.province} ${selectedAddress.postalCode}, ${selectedAddress.country}`;
+        const idempotencyKey = `order-${user.id}-${Date.now()}`;
+
+        try {
+            const result = await createOrder({
+                userId: user.id,
+                items: items.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    price: item.variant?.price ?? item.product?.price ?? 0,
+                })),
+                totalAmount: total,
+                shippingAddress: shippingAddr,
+                paymentMethod: selectedPayment,
+                idempotencyKey,
+            }).unwrap();
+
+            setPlacedOrderId(result.order.id);
+            setOrderSuccess(true);
+            toast.success("Order placed successfully!");
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to place order. Please try again.");
+        }
+    }, [user, selectedAddress, items, total, selectedPayment, createOrder]);
+
     const isLoading = isCartLoading || isAddressLoading;
+
+    if (orderSuccess) {
+        return (
+            <div className="container mx-auto px-4 py-32 text-center">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="max-w-lg mx-auto space-y-8"
+                >
+                    <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto shadow-xl shadow-green-100">
+                        <PackageCheck size={44} className="text-green-500" strokeWidth={1.5} />
+                    </div>
+                    <div>
+                        <h2 className="text-3xl font-light text-[#1a1a1a] font-serif mb-3">Order Confirmed</h2>
+                        <p className="text-gray-500 font-light">Your order has been placed successfully.<br/>Payment will be collected upon delivery.</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button asChild className="bg-[#1a1a1a] hover:bg-[#2c2c2c] text-white rounded-full px-8 h-12">
+                            <Link href="/shop">Continue Shopping</Link>
+                        </Button>
+                    </div>
+                </motion.div>
+            </div>
+        );
+    }
 
     const nextStep = () => setCurrentStep((p) => Math.min(p + 1, 4));
     const prevStep = () => setCurrentStep((p) => Math.max(p - 1, 1));
@@ -375,9 +453,17 @@ export default function CheckoutClient() {
                                 </div>
 
                                 <div className="flex justify-between pt-4">
-                                    <Button variant="ghost" onClick={prevStep} className="rounded-full px-6 font-medium">Back</Button>
-                                    <Button className="bg-[#1a1a1a] hover:bg-[#2c2c2c] text-[#c5a059] rounded-full px-12 h-12 text-lg transition-transform hover:scale-105 duration-300 shadow-xl">
-                                        Place Order
+                                    <Button variant="ghost" onClick={prevStep} className="rounded-full px-6 font-medium" disabled={isPlacingOrder}>Back</Button>
+                                    <Button 
+                                        onClick={handlePlaceOrder}
+                                        disabled={isPlacingOrder || !selectedAddress}
+                                        className="bg-[#1a1a1a] hover:bg-[#2c2c2c] text-[#c5a059] rounded-full px-12 h-12 text-lg transition-transform hover:scale-105 duration-300 shadow-xl disabled:opacity-50"
+                                    >
+                                        {isPlacingOrder ? (
+                                            <span className="flex items-center gap-2"><Loader2 className="animate-spin" size={18} /> Placing Order...</span>
+                                        ) : (
+                                            "Place Order"
+                                        )}
                                     </Button>
                                 </div>
                             </motion.div>

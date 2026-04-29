@@ -21,10 +21,10 @@ export class CartRepository implements ICartRepository {
         },
         variant: item.variant
           ? {
-              name: item.variant.name,
-              value: item.variant.value,
-              price: item.variant.price ? Number(item.variant.price) : null,
-            }
+            name: item.variant.name,
+            value: item.variant.value,
+            price: item.variant.price ? Number(item.variant.price) : null,
+          }
           : null,
       })),
       createdAt: prismaCart.createdAt,
@@ -92,10 +92,10 @@ export class CartRepository implements ICartRepository {
       },
       variant: item.variant
         ? {
-            name: item.variant.name,
-            value: item.variant.value,
-            price: item.variant.price ? Number(item.variant.price) : null,
-          }
+          name: item.variant.name,
+          value: item.variant.value,
+          price: item.variant.price ? Number(item.variant.price) : null,
+        }
         : null,
     };
   }
@@ -123,10 +123,10 @@ export class CartRepository implements ICartRepository {
       },
       variant: item.variant
         ? {
-            name: item.variant.name,
-            value: item.variant.value,
-            price: item.variant.price ? Number(item.variant.price) : null,
-          }
+          name: item.variant.name,
+          value: item.variant.value,
+          price: item.variant.price ? Number(item.variant.price) : null,
+        }
         : null,
     };
   }
@@ -170,6 +170,24 @@ export class CartRepository implements ICartRepository {
         images: item.product.images,
       },
     };
+  }
+
+  async removeItemsFromCart(userId: string, itemIds: string[]): Promise<boolean> {
+    await prisma.cart.update({
+      where: {
+        userId,
+      },
+      data: {
+        items: {
+          deleteMany: {
+            id: {
+              in: itemIds,
+            },
+          },
+        },
+      },
+    });
+    return true;
   }
 }
 

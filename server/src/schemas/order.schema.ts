@@ -5,6 +5,7 @@ export const orderItemSchema = z.object({
   productId: z.uuid(),
   quantity: z.number().int().min(1),
   price: z.number().min(0),
+  variantId: z.uuid().optional(),
 });
 
 export const orderSchema = z.object({
@@ -13,6 +14,7 @@ export const orderSchema = z.object({
   totalAmount: z.number().min(0),
   shippingAddress: z.string().min(1),
   paymentMethod: z.string().min(1),
+  shippingMethod: z.nativeEnum(ShippingMethod).optional().default(ShippingMethod.STANDARD),
   idempotencyKey: z.string().optional(),
   status: z.string().optional().default("pending"),
 });

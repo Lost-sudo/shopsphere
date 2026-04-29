@@ -5,7 +5,7 @@ import { NotFoundError } from "../utils/errors/notFoundError";
 import { cartRepository } from "../repositories/cart.repository";
 
 export class CartService implements ICartService {
-  constructor(private readonly cartRepository: ICartRepository) {}
+  constructor(private readonly cartRepository: ICartRepository) { }
 
   async getCart(userId: string): Promise<Cart> {
     let cart = await this.cartRepository.getCartByUserId(userId);
@@ -65,6 +65,10 @@ export class CartService implements ICartService {
   async clearCart(userId: string): Promise<boolean> {
     const cart = await this.getCart(userId);
     return await this.cartRepository.clearCart(cart.id);
+  }
+
+  async removeItemsFromCart(userId: string, productIds: string[]): Promise<boolean> {
+    return await this.cartRepository.removeItemsFromCart(userId, productIds);
   }
 }
 

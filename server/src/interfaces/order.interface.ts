@@ -1,6 +1,6 @@
 import { OrderInput, UpdateOrderInput } from "../schemas/order.schema";
 import { Order } from "../types/order.types";
-import { Carrier } from "../schemas/shipment.schema";
+import { ShippingMethod } from "../schemas/shipment.schema";
 import { Shipment } from "@/generated/client";
 
 export interface IOrderRepository {
@@ -25,5 +25,5 @@ export interface IOrderService {
   ): Promise<Order | null>;
   deleteOrder(orderId: string): Promise<boolean>;
   getOrderByIdempotencyKey(key: string): Promise<Order | null>;
-  processShipment(orderId: string, carrier: Carrier): Promise<Shipment>;
+  processShipment(orderId: string, method: ShippingMethod): Promise<Shipment>;
 }

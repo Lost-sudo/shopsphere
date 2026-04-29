@@ -1,9 +1,15 @@
 import z from "zod";
 
+export enum PaymentMethod {
+  CARD = "CARD",
+  GCASH = "GCASH",
+  COD = "COD",
+}
+
 export const paymentSchema = z.object({
   orderId: z.uuid(),
   amount: z.number().min(0),
-  paymentMethod: z.string().min(1),
+  paymentMethod: z.nativeEnum(PaymentMethod),
   status: z.string().optional().default("pending"),
 });
 

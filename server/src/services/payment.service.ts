@@ -8,6 +8,8 @@ import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
 import { paymentRepository } from "../repositories/payment.repository";
 import { orderRepository } from "../repositories/order.repository";
+import { PaymentMethodFactory } from "../factory/payment_method.factory";
+import { PaymentMethod } from "@/schemas/payment.schema";
 
 export class PaymentService implements IPaymentService {
   constructor(
@@ -15,36 +17,46 @@ export class PaymentService implements IPaymentService {
     private readonly orderRepository: IOrderRepository,
   ) { }
 
+
+
   async processPayment(
     orderId: string,
-    paymentMethod: string,
+    paymentMethod: PaymentMethod,
   ): Promise<Payment> {
     const order = await this.orderRepository.getOrderById(orderId);
     if (!order) {
       throw new NotFoundError("Order not found.");
     }
 
-    if (order.status === "paid") {
+    if (order.status.toUpperCase() === "PAID") {
       throw new BadRequestError("Order is already paid.");
     }
 
-    // Mock payment processing
-    // In a real scenario, this would involve Stripe/PayPal SDKs
-    const transactionId = `trans_${Math.random().toString(36).substr(2, 9)}`;
-    const amount = order.totalAmount;
+    const processor = PaymentMethodFactory.getPaymentMethod(paymentMethod);
+    const amount = Number(order.totalAmount);
+
+    const result = await processor.processPayment(orderId, amount);
 
     const payment = await this.paymentRepository.createPayment({
       orderId,
       amount,
       paymentMethod,
-      transactionId,
-      status: PaymentStatus.COMPLETED,
+      transactionId: result.transactionId,
+      status: result.status,
     });
 
-    // Update order status to PAID
-    await this.orderRepository.updateOrder(orderId, {
-      status: "PAID",
-    });
+    if (result.status === "COMPLETED") {
+      // Update order status to PAID
+      await this.orderRepository.updateOrder(orderId, {
+        status: "PAID",
+      });
+    } else if (result.method === "COD") {
+      // For COD we can just transition order to PROCESSING or leave it as PENDING
+      // Let's update it to PROCESSING since the order is confirmed
+      await this.orderRepository.updateOrder(orderId, {
+        status: "PROCESSING",
+      });
+    }
 
     return payment;
   }

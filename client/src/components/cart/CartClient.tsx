@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, ShoppingBag, Plus, Minus, ArrowRight, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +15,7 @@ export default function CartClient() {
     const { data: cartData, isLoading, isError } = useGetCartQuery();
     const [updateItem, { isLoading: isUpdating }] = useUpdateItemMutation();
     const [removeItem, { isLoading: isRemoving }] = useRemoveItemMutation();
+    const router = useRouter();
     
     // We track items the user UNCHECKED (excluded)
     const [excludedItems, setExcludedItems] = useState<string[]>([]);
@@ -81,6 +83,12 @@ export default function CartClient() {
 
     const shippingFee = selectedCartItems.length > 0 ? 50 : 0;
     const total = subtotal + shippingFee;
+
+    const handleCheckout = () => {
+        if (selectedCartItems.length === 0) return;
+        const selectedIds = selectedCartItems.map(item => item.id).join(",");
+        router.push(`/checkout?items=${encodeURIComponent(selectedIds)}`);
+    };
 
     if (isLoading) {
         return (
@@ -306,14 +314,14 @@ export default function CartClient() {
 
                             <div className="space-y-4">
                                 <Button 
-                                    asChild
+                                    onClick={handleCheckout}
                                     disabled={selectedCartItems.length === 0}
                                     className="w-full h-16 bg-white hover:bg-neutral-100 text-luxury-charcoal text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all group disabled:bg-neutral-800 disabled:text-neutral-600"
                                 >
-                                    <Link href="/checkout" className="flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         Begin Checkout ({selectedCartItems.length})
                                         <ArrowRight className="group-hover:translate-x-1 transition-transform" size={16} strokeWidth={3} />
-                                    </Link>
+                                    </span>
                                 </Button>
                                 
                                 <div className="flex items-center justify-center gap-2 pt-2">

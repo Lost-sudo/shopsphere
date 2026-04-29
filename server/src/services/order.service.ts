@@ -8,12 +8,21 @@ import { ShippingMethod, ShipmentStatus } from "../schemas/shipment.schema";
 import { Shipment } from "../generated/client";
 import { orderRepository } from "../repositories/order.repository";
 import { shipmentService } from "./shipment.service";
+import { IPaymentService } from "@/interfaces/payment.interface";
+import { paymentService } from "./payment.service";
+import { ICartService } from "@/interfaces/cart.interface";
+import { cartService } from "./cart.service";
+import { IProductService } from "@/interfaces/product.interface";
+import { productService } from "./product.service";
 
 export class OrderService implements IOrderService {
   constructor(
     private readonly orderRepository: IOrderRepository,
     private readonly shipmentService: IShipmentService,
-  ) { }
+    private readonly paymentService: IPaymentService,
+    private readonly cartService: ICartService,
+    private readonly productService: IProductService,
+  ) {}
 
   async createOrder(input: OrderInput, userId: string): Promise<Order> {
     if (!userId) throw new BadRequestError("User ID is required.");
@@ -29,8 +38,14 @@ export class OrderService implements IOrderService {
         return existingOrder;
       }
     }
+    await this.cartService.removeItemsFromCart(
+      userId,
+      input.items.map((item) => item.productId),
+    );
 
     const order = await this.orderRepository.createOrder(input, userId);
+    await this.paymentService.processPayment(order.id, input.paymentMethod);
+
     return order;
   }
 
@@ -66,7 +81,10 @@ export class OrderService implements IOrderService {
     return true;
   }
 
-  async processShipment(orderId: string, method: ShippingMethod): Promise<Shipment> {
+  async processShipment(
+    orderId: string,
+    method: ShippingMethod,
+  ): Promise<Shipment> {
     const order = await this.orderRepository.getOrderById(orderId);
     if (!order) {
       throw new NotFoundError("Order not found.");
@@ -114,4 +132,10 @@ export class OrderService implements IOrderService {
   }
 }
 
-export const orderService = new OrderService(orderRepository, shipmentService);
+export const orderService = new OrderService(
+  orderRepository,
+  shipmentService,
+  paymentService,
+  cartService,
+  productService,
+);
