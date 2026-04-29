@@ -39,8 +39,25 @@ export default function ProductPage({ params }: ProductPageProps) {
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const [isWishlisted, setIsWishlisted] = useState(false);
+    const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
 
     const product = data?.data?.product;
+    const variants = product?.variants || [];
+    
+    // Group variants by name (e.g., "Size", "Color")
+    const variantGroups = variants.reduce((acc, variant) => {
+        if (!acc[variant.name]) {
+            acc[variant.name] = [];
+        }
+        acc[variant.name].push(variant);
+        return acc;
+    }, {} as Record<string, typeof variants>);
+
+    const selectedVariant = variants.find(v => v.id === selectedVariantId);
+    
+    const displayPrice = selectedVariant?.price ?? product?.price ?? 0;
+    const displayStock = selectedVariant?.stock ?? product?.stock ?? 0;
+    
     const images = product?.images || [];
     const mainImage = images[selectedImage] || "/images/placeholder.png";
 
@@ -54,9 +71,14 @@ export default function ProductPage({ params }: ProductPageProps) {
     const handleAddToCart = async () => {
         if (!product) return;
         try {
-            await addItem({ productId: product.id, quantity }).unwrap();
+            await addItem({ 
+                productId: product.id, 
+                variantId: selectedVariantId || undefined,
+                quantity 
+            }).unwrap();
+            
             toast.success("Added to cart!", {
-                description: `${quantity}x ${product.name} added to your cart.`,
+                description: `${quantity}x ${product.name}${selectedVariant ? ` (${selectedVariant.value})` : ""} added to your cart.`,
             });
         } catch (err: unknown) {
             const error = err as { status?: number; data?: { message?: string } };
@@ -225,11 +247,11 @@ export default function ProductPage({ params }: ProductPageProps) {
                             
                             <div className="flex items-baseline gap-6">
                                 <span className="text-3xl font-serif italic text-luxury-charcoal">
-                                    {formatPrice(product.price)}
+                                    {formatPrice(displayPrice)}
                                 </span>
-                                {product.price && (
+                                {displayPrice < (product?.price ?? 0) * 1.25 && (
                                     <span className="text-sm text-neutral-400 line-through font-medium">
-                                        {formatPrice(product.price * 1.25)}
+                                        {formatPrice(displayPrice * 1.25)}
                                     </span>
                                 )}
                             </div>
@@ -241,28 +263,37 @@ export default function ProductPage({ params }: ProductPageProps) {
                             </div>
                         </div>
 
-                        {/* Size/Variant Selector Placeholder (as per design doc) */}
-                        <div className="space-y-4 pt-6 border-t border-black/5">
-                            <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-luxury-charcoal">Select Size</span>
-                                <button className="text-[9px] font-bold text-luxury-gold uppercase tracking-widest hover:underline underline-offset-4 transition-all">Size Guide</button>
-                            </div>
-                            <div className="grid grid-cols-4 gap-3">
-                                {['XS', 'S', 'M', 'L'].map((size) => (
-                                    <button 
-                                        key={size}
-                                        className={cn(
-                                            "h-12 rounded-2xl border flex items-center justify-center text-xs font-bold transition-all",
-                                            size === 'M' 
-                                                ? "bg-luxury-charcoal text-white border-luxury-charcoal" 
-                                                : "border-black/5 text-neutral-400 hover:border-black/20 hover:text-luxury-charcoal"
-                                        )}
-                                    >
-                                        {size}
-                                    </button>
+                        {/* Variant Selectors */}
+                        {Object.entries(variantGroups).length > 0 && (
+                            <div className="space-y-8 pt-6 border-t border-black/5">
+                                {Object.entries(variantGroups).map(([groupName, groupVariants]) => (
+                                    <div key={groupName} className="space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-luxury-charcoal">Select {groupName}</span>
+                                            {groupName.toLowerCase() === "size" && (
+                                                <button className="text-[9px] font-bold text-luxury-gold uppercase tracking-widest hover:underline underline-offset-4 transition-all">Size Guide</button>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-wrap gap-3">
+                                            {groupVariants.map((variant) => (
+                                                <button 
+                                                    key={variant.id}
+                                                    onClick={() => setSelectedVariantId(variant.id)}
+                                                    className={cn(
+                                                        "h-12 px-6 rounded-2xl border flex items-center justify-center text-xs font-bold transition-all min-w-[60px]",
+                                                        selectedVariantId === variant.id 
+                                                            ? "bg-luxury-charcoal text-white border-luxury-charcoal shadow-lg shadow-black/10 scale-105" 
+                                                            : "bg-white/40 border-black/5 text-neutral-400 hover:border-black/20 hover:text-luxury-charcoal"
+                                                    )}
+                                                >
+                                                    {variant.value}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
-                        </div>
+                        )}
 
                         {/* Actions Glass Panel */}
                         <div className="bg-white/60 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-black/5 shadow-xl space-y-6">
@@ -284,7 +315,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mb-1">Total</p>
-                                    <p className="text-lg font-serif italic text-luxury-charcoal">{formatPrice(product.price * quantity)}</p>
+                                    <p className="text-lg font-serif italic text-luxury-charcoal">{formatPrice(displayPrice * quantity)}</p>
                                 </div>
                             </div>
 
@@ -299,9 +330,9 @@ export default function ProductPage({ params }: ProductPageProps) {
                                 </Button>
                                 
                                 <p className="text-center text-[9px] font-medium text-neutral-400 uppercase tracking-widest mt-2">
-                                    {product.stock > 0 ? (
+                                    {displayStock > 0 ? (
                                         <span className="text-green-600 flex items-center justify-center gap-1.5">
-                                            <Check size={10} strokeWidth={3} /> {product.stock} items available in boutique
+                                            <Check size={10} strokeWidth={3} /> {displayStock} items available in boutique
                                         </span>
                                     ) : (
                                         <span className="text-red-500">Currently out of stock</span>

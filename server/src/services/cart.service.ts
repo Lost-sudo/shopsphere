@@ -22,6 +22,7 @@ export class CartService implements ICartService {
     const existingItem = await this.cartRepository.getCartItem(
       cart.id,
       input.productId,
+      input.variantId,
     );
 
     if (existingItem) {

@@ -32,8 +32,9 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Package, Loader2, Plus } from "lucide-react";
+import { Package, Loader2, Plus, Trash2, Layers } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useFieldArray } from "react-hook-form";
 import { useUpdateProductMutation } from "@/features/product/product.api";
 import { useGetCategoriesQuery } from "@/features/category/category.api";
 import { CreateCategoryModal } from "./CreateCategoryModal";
@@ -47,6 +48,13 @@ const productSchema = z.object({
     weight: z.number().min(0, "Weight must be positive"),
     categoryId: z.string().uuid("Invalid category"),
     isActive: z.boolean(),
+    variants: z.array(z.object({
+        name: z.string().min(1, "Name is required"),
+        value: z.string().min(1, "Value is required"),
+        sku: z.string().min(3, "SKU must be at least 3 characters"),
+        stock: z.number().int().min(0, "Stock cannot be negative"),
+        price: z.number().min(0).nullable().optional(),
+    })).optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -75,7 +83,13 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
             weight: 0,
             categoryId: "",
             isActive: true,
+            variants: [],
         },
+    });
+
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "variants",
     });
 
     useEffect(() => {
@@ -88,6 +102,7 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                 weight: Number(product.weight),
                 categoryId: product.categoryId,
                 isActive: product.isActive,
+                variants: product.variants || [],
             });
         }
     }, [product, open, form]);
@@ -269,57 +284,200 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                     </FormItem>
                                 )}
                             />
+                        </div>
 
-                            {product?.images && product.images.length > 0 && (
-                                <div className="col-span-full space-y-3">
-                                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                                        Current Images
-                                    </FormLabel>
-                                    <div className="flex flex-wrap gap-4">
-                                        {product.images.map((img, i) => (
-                                            <div
-                                                key={i}
-                                                className="relative w-24 h-24 rounded-2xl overflow-hidden border border-white/60 bg-white/40 shadow-sm"
-                                            >
-                                                <Image
-                                                    src={img}
-                                                    alt={`Product ${i + 1}`}
-                                                    fill
-                                                    unoptimized
-                                                    className="object-cover"
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <p className="text-[10px] font-light text-neutral-400">
-                                        Current product images stored on the server. To change images, you must delete this product and create a new one.
-                                    </p>
-                                </div>
-                            )}
-
-                            <FormField<ProductFormValues, "isActive">
-                                control={form.control}
-                                name="isActive"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center space-x-4 space-y-0 rounded-2xl border border-white/60 p-5 bg-white/40 shadow-sm col-span-full">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                className="border-white/60 data-[state=checked]:bg-luxury-gold data-[state=checked]:text-white rounded-md w-5 h-5"
+                        {product?.images && product.images.length > 0 && (
+                            <div className="col-span-full space-y-3">
+                                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                                    Current Images
+                                </FormLabel>
+                                <div className="flex flex-wrap gap-4">
+                                    {product.images.map((img, i) => (
+                                        <div
+                                            key={i}
+                                            className="relative w-24 h-24 rounded-2xl overflow-hidden border border-white/60 bg-white/40 shadow-sm"
+                                        >
+                                            <Image
+                                                src={img}
+                                                alt={`Product ${i + 1}`}
+                                                fill
+                                                unoptimized
+                                                className="object-cover"
                                             />
-                                        </FormControl>
-                                        <div className="space-y-1.5 leading-none">
-                                            <FormLabel className="font-bold text-luxury-charcoal">
-                                                Active Status
-                                            </FormLabel>
-                                            <p className="text-[10px] font-light text-neutral-500">
-                                                Enable or disable this product from the customer view.
-                                            </p>
                                         </div>
-                                    </FormItem>
+                                    ))}
+                                </div>
+                                <p className="text-[10px] font-light text-neutral-400">
+                                    Current product images stored on the server. To change images, you must delete this product and create a new one.
+                                </p>
+                            </div>
+                        )}
+
+                        <FormField<ProductFormValues, "isActive">
+                            control={form.control}
+                            name="isActive"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center space-x-4 space-y-0 rounded-2xl border border-white/60 p-5 bg-white/40 shadow-sm col-span-full">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                            className="border-white/60 data-[state=checked]:bg-luxury-gold data-[state=checked]:text-white rounded-md w-5 h-5"
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1.5 leading-none">
+                                        <FormLabel className="font-bold text-luxury-charcoal">
+                                            Active Status
+                                        </FormLabel>
+                                        <p className="text-[10px] font-light text-neutral-500">
+                                            Enable or disable this product from the customer view.
+                                        </p>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Variants Section */}
+                        <div className="col-span-full space-y-6 pt-6 border-t border-black/5">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-xl bg-luxury-gold/10 text-luxury-gold">
+                                        <Layers className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-luxury-charcoal tracking-tight">Product Variants</h3>
+                                        <p className="text-[10px] text-neutral-400 font-medium uppercase tracking-widest mt-0.5">Sizes, Colors, and Overrides</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-9 px-4 rounded-xl border-luxury-gold/30 text-luxury-gold hover:bg-luxury-gold hover:text-white transition-all text-[10px] font-bold uppercase tracking-widest gap-2 shadow-sm"
+                                    onClick={() => append({ name: "", value: "", sku: "", stock: 0, price: null })}
+                                >
+                                    <Plus className="w-3 h-3" />
+                                    Add Variant
+                                </Button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {fields.map((field, index) => (
+                                    <div
+                                        key={field.id}
+                                        className="group relative p-6 rounded-[2rem] border border-white/60 bg-white/40 backdrop-blur-md shadow-sm transition-all hover:shadow-md hover:bg-white/60"
+                                    >
+                                        <button
+                                            type="button"
+                                            onClick={() => remove(index)}
+                                            className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-50 text-red-500 border border-red-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shadow-lg"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name={`variants.${index}.name`}
+                                                render={({ field }) => (
+                                                    <FormItem className="md:col-span-1">
+                                                        <FormLabel className="text-[9px] font-black uppercase tracking-widest text-neutral-400">Variant Name</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="e.g. Size"
+                                                                className="h-10 text-xs border-white bg-white focus:bg-white"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name={`variants.${index}.value`}
+                                                render={({ field }) => (
+                                                    <FormItem className="md:col-span-1">
+                                                        <FormLabel className="text-[9px] font-black uppercase tracking-widest text-neutral-400">Value</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="e.g. M"
+                                                                className="h-10 text-xs border-white bg-white focus:bg-white"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name={`variants.${index}.sku`}
+                                                render={({ field }) => (
+                                                    <FormItem className="md:col-span-1">
+                                                        <FormLabel className="text-[9px] font-black uppercase tracking-widest text-neutral-400">SKU</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="SKU-001"
+                                                                className="h-10 text-xs border-white bg-white focus:bg-white"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name={`variants.${index}.stock`}
+                                                render={({ field }) => (
+                                                    <FormItem className="md:col-span-1">
+                                                        <FormLabel className="text-[9px] font-black uppercase tracking-widest text-neutral-400">Stock</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                className="h-10 text-xs border-white bg-white focus:bg-white"
+                                                                {...field}
+                                                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name={`variants.${index}.price`}
+                                                render={({ field }) => (
+                                                    <FormItem className="md:col-span-1">
+                                                        <FormLabel className="text-[9px] font-black uppercase tracking-widest text-neutral-400">Price (Opt)</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Override"
+                                                                className="h-10 text-xs border-white bg-white focus:bg-white font-serif italic"
+                                                                {...field}
+                                                                value={field.value || ""}
+                                                                onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {fields.length === 0 && (
+                                    <div className="py-8 border-2 border-dashed border-black/5 rounded-[2.5rem] text-center space-y-3">
+                                        <div className="w-10 h-10 bg-neutral-50 rounded-full flex items-center justify-center mx-auto">
+                                            <Layers size={16} className="text-neutral-300" />
+                                        </div>
+                                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">No variants added yet</p>
+                                    </div>
                                 )}
-                            />
+                            </div>
                         </div>
 
                         <DialogFooter className="gap-3 sm:gap-0 pt-6 border-t border-black/5">

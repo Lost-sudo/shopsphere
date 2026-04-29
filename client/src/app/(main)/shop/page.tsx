@@ -2,13 +2,15 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { 
-    Search, 
-    SlidersHorizontal, 
-    ChevronRight, 
+import {
+    Search,
+    SlidersHorizontal,
+    ChevronRight,
     X,
     Filter,
-    ArrowUpDown
+    ArrowUpDown,
+    LayoutGrid,
+    List
 } from "lucide-react";
 import { useGetProductsQuery } from "@/features/product/product.api";
 import { useGetCategoriesQuery } from "@/features/category/category.api";
@@ -28,7 +30,7 @@ import { Badge } from "@/components/ui/badge";
 export default function ShopPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    
+
     const categoryId = searchParams.get("category") || undefined;
     const initialSearch = searchParams.get("search") || "";
     const sort = (searchParams.get("sort") as any) || "newest";
@@ -93,11 +95,11 @@ export default function ShopPage() {
                                 <X size={20} />
                             </button>
                         </div>
-                        
+
                         <div className="space-y-4">
                             <h3 className="text-xs font-bold uppercase tracking-widest text-luxury-charcoal">Categories</h3>
                             <div className="flex flex-wrap gap-2">
-                                <Badge 
+                                <Badge
                                     variant={!categoryId ? "default" : "outline"}
                                     className={`cursor-pointer px-4 py-1.5 rounded-full ${!categoryId ? "bg-luxury-charcoal" : ""}`}
                                     onClick={() => { handleCategoryChange(null); setIsMobileFilterOpen(false); }}
@@ -105,7 +107,7 @@ export default function ShopPage() {
                                     All
                                 </Badge>
                                 {categories.map(c => (
-                                    <Badge 
+                                    <Badge
                                         key={c.id}
                                         variant={categoryId === c.id ? "default" : "outline"}
                                         className={`cursor-pointer px-4 py-1.5 rounded-full ${categoryId === c.id ? "bg-luxury-charcoal" : ""}`}
@@ -130,9 +132,9 @@ export default function ShopPage() {
                         </div>
 
                         <div className="mt-auto">
-                            <Button 
+                            <Button
                                 onClick={clearFilters}
-                                variant="outline" 
+                                variant="outline"
                                 className="w-full rounded-full border-black/10 text-[10px] font-bold uppercase tracking-widest"
                             >
                                 Reset All
@@ -158,7 +160,7 @@ export default function ShopPage() {
 
             <div className="container mx-auto max-w-7xl px-4 py-12">
                 <div className="flex flex-col lg:flex-row gap-12">
-                    
+
                     {/* Desktop Sidebar */}
                     <aside className="hidden lg:block w-64 shrink-0 space-y-10">
                         <div>
@@ -167,7 +169,7 @@ export default function ShopPage() {
                             </h3>
                             <ul className="space-y-4">
                                 <li>
-                                    <button 
+                                    <button
                                         onClick={() => handleCategoryChange(null)}
                                         className={`text-sm transition-colors hover:text-luxury-gold flex items-center justify-between w-full group ${!categoryId ? "text-luxury-gold font-semibold" : "text-neutral-500"}`}
                                     >
@@ -182,7 +184,7 @@ export default function ShopPage() {
                                 ) : (
                                     categories.map((category) => (
                                         <li key={category.id}>
-                                            <button 
+                                            <button
                                                 onClick={() => handleCategoryChange(category.id)}
                                                 className={`text-sm transition-colors hover:text-luxury-gold flex items-center justify-between w-full group ${categoryId === category.id ? "text-luxury-gold font-semibold" : "text-neutral-500"}`}
                                             >
@@ -229,9 +231,9 @@ export default function ShopPage() {
                         {/* Toolbar */}
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-black/5 shadow-sm">
                             <div className="flex items-center gap-4 w-full sm:w-auto">
-                                <Button 
-                                    variant="outline" 
-                                    size="sm" 
+                                <Button
+                                    variant="outline"
+                                    size="sm"
                                     className="lg:hidden flex items-center gap-2 rounded-full border-black/10"
                                     onClick={() => setIsMobileFilterOpen(true)}
                                 >
@@ -241,14 +243,14 @@ export default function ShopPage() {
 
                                 <div className="relative flex-1 sm:w-64">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={14} />
-                                    <Input 
-                                        placeholder="Search pieces..." 
+                                    <Input
+                                        placeholder="Search pieces..."
                                         className="pl-9 h-10 rounded-full border-black/10 bg-white/50 focus:bg-white transition-all text-sm"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
                                     {searchTerm && (
-                                        <button 
+                                        <button
                                             onClick={() => setSearchTerm("")}
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-luxury-charcoal"
                                         >
@@ -296,7 +298,7 @@ export default function ShopPage() {
                                         <X size={12} className="cursor-pointer" onClick={() => setSearchTerm("")} />
                                     </Badge>
                                 )}
-                                <button 
+                                <button
                                     onClick={clearFilters}
                                     className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 hover:text-luxury-charcoal transition-colors ml-2 underline underline-offset-4"
                                 >
@@ -321,14 +323,14 @@ export default function ShopPage() {
                                 {products.map((product) => (
                                     <div key={product.id} className="group relative">
                                         <div className="aspect-[4/5] relative overflow-hidden rounded-[2rem] bg-neutral-100 border border-black/5">
-                                            <img 
-                                                src={product.images[0] || "/placeholder.png"} 
+                                            <img
+                                                src={product.images[0] || "/placeholder.png"}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                             />
                                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center p-6">
                                                 <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500 w-full">
-                                                    <Button 
+                                                    <Button
                                                         asChild
                                                         className="w-full bg-white text-luxury-charcoal hover:bg-luxury-gold hover:text-white rounded-full h-12 text-xs font-bold uppercase tracking-widest"
                                                     >
@@ -376,9 +378,9 @@ export default function ShopPage() {
                                         We couldn't find any products matching your current filters. Try broadening your search.
                                     </p>
                                 </div>
-                                <Button 
+                                <Button
                                     onClick={clearFilters}
-                                    variant="outline" 
+                                    variant="outline"
                                     className="rounded-full px-8 border-black/10 text-xs font-bold uppercase tracking-widest"
                                 >
                                     Reset All Filters
@@ -393,7 +395,7 @@ export default function ShopPage() {
                                     <ChevronRight className="rotate-180" size={16} />
                                 </Button>
                                 {Array.from({ length: productsData.data.totalPages }).map((_, i) => (
-                                    <Button 
+                                    <Button
                                         key={i}
                                         variant={productsData.data.page === i + 1 ? "default" : "ghost"}
                                         className={`rounded-full w-10 h-10 p-0 text-xs font-bold ${productsData.data.page === i + 1 ? "bg-luxury-charcoal" : ""}`}

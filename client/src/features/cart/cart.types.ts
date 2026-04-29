@@ -10,12 +10,18 @@ export type CartItem = {
     id: string;
     cartId: string;
     productId: string;
+    variantId?: string | null;
     quantity: number;
     product?: {
         name: string;
         price: number;
         images: string[];
     }
+    variant?: {
+        name: string;
+        value: string;
+        price: number | null;
+    } | null;
 }
 
 export type ApiEnvelope<TData> = {
@@ -27,6 +33,7 @@ export type ApiEnvelope<TData> = {
 export type GetCartResponse = ApiEnvelope<{ cart: Cart }>;
 export type AddItemRequest = {
     productId: string;
+    variantId?: string;
     quantity: number;
 }
 export type AddItemResponse = ApiEnvelope<{ cart: Cart }>;

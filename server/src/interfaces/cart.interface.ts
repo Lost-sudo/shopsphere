@@ -8,7 +8,7 @@ export interface ICartRepository {
   updateItemQuantity(itemId: string, quantity: number): Promise<CartItem>;
   removeItemFromCart(itemId: string): Promise<boolean>;
   clearCart(cartId: string): Promise<boolean>;
-  getCartItem(cartId: string, productId: string): Promise<CartItem | null>;
+  getCartItem(cartId: string, productId: string, variantId?: string): Promise<CartItem | null>;
 }
 
 export interface ICartService {

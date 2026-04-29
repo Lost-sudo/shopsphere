@@ -12,12 +12,20 @@ export class CartRepository implements ICartRepository {
         id: item.id,
         cartId: item.cartId,
         productId: item.productId,
+        variantId: item.variantId,
         quantity: item.quantity,
         product: {
           name: item.product.name,
           price: Number(item.product.price),
           images: item.product.images,
         },
+        variant: item.variant
+          ? {
+              name: item.variant.name,
+              value: item.variant.value,
+              price: item.variant.price ? Number(item.variant.price) : null,
+            }
+          : null,
       })),
       createdAt: prismaCart.createdAt,
       updatedAt: prismaCart.updatedAt,
@@ -31,6 +39,7 @@ export class CartRepository implements ICartRepository {
         items: {
           include: {
             product: true,
+            variant: true,
           },
         },
       },
@@ -47,6 +56,7 @@ export class CartRepository implements ICartRepository {
         items: {
           include: {
             product: true,
+            variant: true,
           },
         },
       },
@@ -60,10 +70,12 @@ export class CartRepository implements ICartRepository {
       data: {
         cartId,
         productId: input.productId,
+        variantId: input.variantId,
         quantity: input.quantity,
       },
       include: {
         product: true,
+        variant: true,
       },
     });
 
@@ -71,12 +83,20 @@ export class CartRepository implements ICartRepository {
       id: item.id,
       cartId: item.cartId,
       productId: item.productId,
+      variantId: item.variantId,
       quantity: item.quantity,
       product: {
         name: item.product.name,
         price: Number(item.product.price),
         images: item.product.images,
       },
+      variant: item.variant
+        ? {
+            name: item.variant.name,
+            value: item.variant.value,
+            price: item.variant.price ? Number(item.variant.price) : null,
+          }
+        : null,
     };
   }
 
@@ -86,6 +106,7 @@ export class CartRepository implements ICartRepository {
       data: { quantity },
       include: {
         product: true,
+        variant: true,
       },
     });
 
@@ -93,12 +114,20 @@ export class CartRepository implements ICartRepository {
       id: item.id,
       cartId: item.cartId,
       productId: item.productId,
+      variantId: item.variantId,
       quantity: item.quantity,
       product: {
         name: item.product.name,
         price: Number(item.product.price),
         images: item.product.images,
       },
+      variant: item.variant
+        ? {
+            name: item.variant.name,
+            value: item.variant.value,
+            price: item.variant.price ? Number(item.variant.price) : null,
+          }
+        : null,
     };
   }
 
@@ -116,11 +145,16 @@ export class CartRepository implements ICartRepository {
     return true;
   }
 
-  async getCartItem(cartId: string, productId: string): Promise<CartItem | null> {
+  async getCartItem(
+    cartId: string,
+    productId: string,
+    variantId?: string,
+  ): Promise<CartItem | null> {
     const item = await prisma.cartItem.findFirst({
-      where: { cartId, productId },
+      where: { cartId, productId, variantId: variantId || null },
       include: {
         product: true,
+        variant: true,
       },
     });
 

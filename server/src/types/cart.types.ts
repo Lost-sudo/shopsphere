@@ -10,10 +10,16 @@ export type CartItem = {
   id: string;
   cartId: string;
   productId: string;
+  variantId?: string | null;
   quantity: number;
   product?: {
     name: string;
     price: number;
     images: string[];
   };
+  variant?: {
+    name: string;
+    value: string;
+    price?: number | null;
+  } | null;
 };
