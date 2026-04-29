@@ -42,7 +42,7 @@ const productSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters").max(255),
     description: z.string().min(10, "Description must be at least 10 characters"),
     price: z.number().min(0, "Price must be positive"),
-    stock: z.number().int().min(0, "Stock cannot be negative"),
+    stock: z.number().int().min(0, "Stock cannot be negative").optional(),
     weight: z.number().min(0, "Weight must be positive"),
     categoryId: z.string().uuid("Invalid category"),
     isActive: z.boolean(),
@@ -145,7 +145,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <FormField<ProductFormValues>
+                            <FormField<ProductFormValues, "name">
                                 control={form.control}
                                 name="name"
                                 render={({ field }) => (
@@ -164,7 +164,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 )}
                             />
 
-                            <FormField<ProductFormValues>
+                            <FormField<ProductFormValues, "categoryId">
                                 control={form.control}
                                 name="categoryId"
                                 render={({ field }) => (
@@ -210,7 +210,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 )}
                             />
 
-                            <FormField<ProductFormValues>
+                            <FormField<ProductFormValues, "price">
                                 control={form.control}
                                 name="price"
                                 render={({ field }) => (
@@ -231,28 +231,36 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 )}
                             />
 
-                            <FormField<ProductFormValues>
+                            <FormField<ProductFormValues, "stock">
                                 control={form.control}
                                 name="stock"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Initial Stock</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                placeholder="0"
-                                                className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold"
-                                                {...field}
-                                                value={field.value as number}
-                                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                render={({ field }) => {
+                                    const variantStock = fields.reduce((acc, f, i) => acc + (form.watch(`variants.${i}.stock`) || 0), 0);
+                                    const displayValue = fields.length > 0 ? variantStock : (field.value || 0);
+                                    
+                                    return (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                                                {fields.length > 0 ? "Total Stock (Calculated)" : "Initial Stock"}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder={fields.length > 0 ? "Based on variants" : "0"}
+                                                    disabled={fields.length > 0}
+                                                    className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold disabled:opacity-50"
+                                                    {...field}
+                                                    value={displayValue}
+                                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
                             />
 
-                            <FormField<ProductFormValues>
+                            <FormField<ProductFormValues, "weight">
                                 control={form.control}
                                 name="weight"
                                 render={({ field }) => (
@@ -290,7 +298,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 <p className="text-[10px] font-light text-neutral-400 mt-2">{imageHelp}</p>
                             </FormItem>
 
-                            <FormField<ProductFormValues>
+                            <FormField<ProductFormValues, "description">
                                 control={form.control}
                                 name="description"
                                 render={({ field }) => (
@@ -309,7 +317,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 )}
                             />
 
-                            <FormField<ProductFormValues>
+                            <FormField<ProductFormValues, "isActive">
                                 control={form.control}
                                 name="isActive"
                                 render={({ field }) => (

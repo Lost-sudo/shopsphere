@@ -69,8 +69,10 @@ export class ProductController {
   deleteProduct = asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
     await this.productService.deleteProduct(id);
-    res.status(204).json({
+
+    res.status(200).json({
       status: "success",
+      message: "Product deleted successfully",
     });
   });
 
@@ -125,8 +127,9 @@ export class ProductController {
     const productId = req.params.id as string;
     const variantId = req.params.variantId as string;
     await this.productService.removeVariant(productId, variantId);
-    res.status(204).json({
+    res.status(200).json({
       status: "success",
+      message: "Variant deleted successfully",
     });
   });
 }

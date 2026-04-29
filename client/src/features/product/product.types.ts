@@ -60,15 +60,15 @@ export type GetProductsResponse = ApiEnvelope<ProductListData>;
 export type GetProductResponse = ApiEnvelope<{ product: Product }>;
 export type CreateProductResponse = ApiEnvelope<{ product: Product }>;
 export type UpdateProductResponse = ApiEnvelope<{ product: Product }>;
-// Server returns 204 No Content on delete.
-export type DeleteProductResponse = void;
+// Server returns success envelope on delete.
+export type DeleteProductResponse = ApiEnvelope<{ message: string }>;
 
 export type CreateVariantResponse = ApiEnvelope<{ variant: ProductVariant }>;
 export type GetVariantsResponse = ApiEnvelope<{ variants: ProductVariant[] }>;
 export type GetVariantResponse = ApiEnvelope<{ variant: ProductVariant }>;
 export type UpdateVariantResponse = ApiEnvelope<{ variant: ProductVariant }>;
-// Server returns 204 No Content on delete.
-export type DeleteVariantResponse = void;
+// Server returns success envelope on delete.
+export type DeleteVariantResponse = ApiEnvelope<{ message: string }>;
 
 export type ProductVariantInput = {
   name: string;

@@ -44,7 +44,7 @@ const productSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters").max(255),
     description: z.string().min(10, "Description must be at least 10 characters"),
     price: z.number().min(0, "Price must be positive"),
-    stock: z.number().int().min(0, "Stock cannot be negative"),
+    stock: z.number().int().min(0, "Stock cannot be negative").optional(),
     weight: z.number().min(0, "Weight must be positive"),
     categoryId: z.string().uuid("Invalid category"),
     isActive: z.boolean(),
@@ -230,21 +230,30 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                             <FormField<ProductFormValues, "stock">
                                 control={form.control}
                                 name="stock"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Stock Count</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                placeholder="1"
-                                                className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                render={({ field }) => {
+                                    const variantStock = fields.reduce((acc, f, i) => acc + (form.watch(`variants.${i}.stock`) || 0), 0);
+                                    const displayValue = fields.length > 0 ? variantStock : (field.value || 0);
+
+                                    return (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                                                {fields.length > 0 ? "Total Stock (Calculated)" : "Stock Count"}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder={fields.length > 0 ? "Based on variants" : "1"}
+                                                    disabled={fields.length > 0}
+                                                    className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold disabled:opacity-50"
+                                                    {...field}
+                                                    value={displayValue}
+                                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
                             />
 
                             <FormField<ProductFormValues, "weight">

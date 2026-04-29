@@ -12,7 +12,7 @@ export const productSchema = z.object({
   name: z.string().min(3).max(255),
   description: z.string().min(10),
   price: z.coerce.number().min(0),
-  stock: z.coerce.number().int().min(0),
+  stock: z.coerce.number().int().min(0).optional().default(0),
   weight: z.coerce.number().min(0),
   images: z.array(z.string()).optional(),
   isActive: z

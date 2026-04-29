@@ -180,9 +180,12 @@ export class ProductRepository implements IProductRepository {
 
   async delete(id: string): Promise<boolean> {
     try {
-      await prisma.product.delete({ where: { id } });
+      await prisma.product.delete({
+        where: { id },
+      });
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Delete product error:", error);
       return false;
     }
   }
