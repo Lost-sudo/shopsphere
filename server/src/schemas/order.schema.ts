@@ -1,5 +1,5 @@
 import z from "zod";
-import { Carrier } from "./shipment.schema";
+import { ShippingMethod } from "./shipment.schema";
 
 export const orderItemSchema = z.object({
   productId: z.uuid(),
@@ -28,7 +28,7 @@ export const orderQuerySchema = z.object({
 });
 
 export const processShipmentSchema = z.object({
-  carrier: z.nativeEnum(Carrier),
+  carrier: z.nativeEnum(ShippingMethod),
 });
 
 export type OrderItemInput = z.infer<typeof orderItemSchema>;

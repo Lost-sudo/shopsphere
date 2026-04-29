@@ -1,12 +1,12 @@
 import { Shipment } from "../generated/client";
-import { ShipmentInput, CreateShipmentInput } from "../schemas/shipment.schema";
+import { CreateShippingInput } from "../schemas/shipment.schema";
 
 export interface IShipmentRepository {
-  createShipment(data: ShipmentInput): Promise<Shipment>;
+  createShipment(data: CreateShippingInput): Promise<Shipment>;
 }
 
 export interface IShipmentService {
-  createShipment(data: CreateShipmentInput): Promise<Shipment>;
+  createShipment(data: CreateShippingInput): Promise<Shipment>;
   // calculateShippingFee();
   // trackShipment();
   // cancelShipment();

@@ -1,12 +1,9 @@
 import z from "zod";
 import { addressSchema } from "./address.schema";
 
-export enum Carrier {
-  JNT = "JNT",
-  LBC = "LBC",
-  FLASH = "FLASH",
-  NINJAVAN = "NINJAVAN",
-  OTHER = "OTHER",
+export enum ShippingMethod {
+  STANDARD = "STANDARD",
+  EXPRESS = "EXPRESS",
 }
 
 export enum ShipmentStatus {
@@ -20,10 +17,10 @@ export enum ShipmentStatus {
   FAILED = "FAILED",
 }
 
-export const shipmentSchema = z.object({
+export const shippingMethodSchema = z.object({
   orderId: z.uuid(),
   trackingNumber: z.string().min(1).max(100),
-  carrier: z.nativeEnum(Carrier),
+  shippingMethod: z.nativeEnum(ShippingMethod),
   status: z.nativeEnum(ShipmentStatus).default(ShipmentStatus.PENDING),
   shipping_fee: z.coerce.number().min(0),
   sender: addressSchema.or(z.any()),
@@ -31,15 +28,10 @@ export const shipmentSchema = z.object({
   weight: z.coerce.number().min(0),
 });
 
-export const createShipmentSchema = shipmentSchema.omit({
-  shipping_fee: true,
-  trackingNumber: true,
+export const createShippingMethodSchema = shippingMethodSchema.extend({
+  shipping_fee: z.number().optional(),
+  trackingNumber: z.string().optional(),
 });
 
-export const updateShipmentSchema = shipmentSchema
-  .partial()
-  .omit({ orderId: true });
-
-export type ShipmentInput = z.infer<typeof shipmentSchema>;
-export type CreateShipmentInput = z.infer<typeof createShipmentSchema>;
-export type UpdateShipmentInput = z.infer<typeof updateShipmentSchema>;
+export type CreateShippingInput = z.infer<typeof createShippingMethodSchema>;
+export type UpdateShipmentInput = z.infer<typeof createShippingMethodSchema>;

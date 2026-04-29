@@ -4,7 +4,7 @@ import { OrderInput, UpdateOrderInput } from "../schemas/order.schema";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
 import { IShipmentService } from "../interfaces/shipment.interface";
-import { Carrier, ShipmentStatus } from "../schemas/shipment.schema";
+import { ShippingMethod, ShipmentStatus } from "../schemas/shipment.schema";
 import { Shipment } from "../generated/client";
 import { orderRepository } from "../repositories/order.repository";
 import { shipmentService } from "./shipment.service";
@@ -66,7 +66,7 @@ export class OrderService implements IOrderService {
     return true;
   }
 
-  async processShipment(orderId: string, carrier: Carrier): Promise<Shipment> {
+  async processShipment(orderId: string, method: ShippingMethod): Promise<Shipment> {
     const order = await this.orderRepository.getOrderById(orderId);
     if (!order) {
       throw new NotFoundError("Order not found.");
@@ -87,7 +87,7 @@ export class OrderService implements IOrderService {
     const sender = {
       name: "ShopSphere Warehouse",
       address: "123 Warehouse St, Manila, Philippines",
-      phone: "09123456789",
+      phoneNumber: "09123456789",
     };
 
     // Recipient info from order's shipping address
@@ -98,7 +98,7 @@ export class OrderService implements IOrderService {
 
     const shipment = await this.shipmentService.createShipment({
       orderId: order.id,
-      carrier,
+      shippingMethod: method,
       status: ShipmentStatus.PENDING,
       sender,
       recipient,

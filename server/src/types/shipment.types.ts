@@ -1,4 +1,4 @@
-import { Carrier, ShipmentStatus } from "../schemas/shipment.schema";
+import { ShipmentStatus, ShippingMethod } from "../schemas/shipment.schema";
 
 export type Sender = {
   name: string;
@@ -15,7 +15,7 @@ export type Recipient = {
 export type Shipment = {
   orderId: string;
   trackingNumber: string;
-  carrier: Carrier;
+  shippingMethod: ShippingMethod;
   status: ShipmentStatus;
   shipping_fee: number;
   sender: Sender;

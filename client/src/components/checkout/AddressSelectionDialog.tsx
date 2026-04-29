@@ -8,7 +8,7 @@ import {
     DialogTitle 
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MapPin, CheckCircle2, ChevronRight } from "lucide-react";
+import { MapPin, ChevronRight } from "lucide-react";
 import { Address } from "@/features/address/address.types";
 import Link from "next/link";
 
@@ -29,17 +29,16 @@ export function AddressSelectionDialog({
 }: AddressSelectionDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden gap-0">
-                <DialogHeader className="p-6 border-b border-gray-100">
-                    <DialogTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <MapPin size={22} className="text-shopee" />
+            <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden gap-0 rounded-3xl bg-white/80 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]">
+                <DialogHeader className="p-8 border-b border-gray-100/50 bg-white/40">
+                    <DialogTitle className="text-2xl font-light text-[#1a1a1a] flex items-center gap-3 font-serif">
                         Select Delivery Address
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="max-h-[60vh] overflow-y-auto">
+                <div className="max-h-[50vh] overflow-y-auto">
                     {addresses.length > 0 ? (
-                        <div className="divide-y divide-gray-100">
+                        <div className="p-4 space-y-3 bg-white/20">
                             {addresses.map((address) => (
                                 <button
                                     key={address.id}
@@ -47,59 +46,55 @@ export function AddressSelectionDialog({
                                         onSelect(address.id);
                                         onOpenChange(false);
                                     }}
-                                    className={`w-full p-6 text-left transition-all hover:bg-gray-50 flex items-start gap-4 relative group ${
-                                        selectedId === address.id ? "bg-shopee/[0.02]" : ""
+                                    className={`w-full p-6 text-left transition-all duration-300 rounded-2xl border flex items-start gap-4 relative overflow-hidden ${
+                                        selectedId === address.id 
+                                            ? "bg-white/90 border-[#c5a059] shadow-sm ring-1 ring-[#c5a059]/20" 
+                                            : "bg-white/50 border-transparent hover:bg-white/80 hover:border-gray-200"
                                     }`}
                                 >
-                                    <div className={`mt-1 shrink-0 ${selectedId === address.id ? "text-shopee" : "text-gray-300"}`}>
-                                        <CheckCircle2 size={20} fill={selectedId === address.id ? "currentColor" : "none"} />
+                                    <div className="mt-1 shrink-0 transition-colors">
+                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedId === address.id ? 'border-[#c5a059]' : 'border-gray-300'}`}>
+                                             {selectedId === address.id && <div className="w-2.5 h-2.5 rounded-full bg-[#c5a059]" />}
+                                        </div>
                                     </div>
                                     
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="font-bold text-gray-900 truncate">
+                                            <span className="font-medium text-[#1a1a1a] truncate text-lg">
                                                 {address.firstName} {address.lastName}
                                             </span>
-                                            <span className="text-gray-400 text-sm">|</span>
-                                            <span className="text-gray-600 text-sm">{address.phoneNumber}</span>
+                                            <span className="text-gray-300 text-sm font-light">|</span>
+                                            <span className="text-gray-500 text-sm font-light">{address.phoneNumber}</span>
                                         </div>
-                                        <p className="text-sm text-gray-500 leading-snug break-words">
+                                        <p className="text-sm text-gray-500 leading-relaxed font-light break-words">
                                             {address.street}, {address.barangay}, {address.city}, {address.province}, {address.postalCode}
                                         </p>
-                                        <div className="mt-2 flex gap-2">
+                                        <div className="mt-3 flex gap-2">
                                             {address.isDefault && (
-                                                <span className="text-[10px] font-bold text-shopee bg-shopee/5 px-1.5 py-0.5 rounded border border-shopee/20 uppercase">
+                                                <span className="text-[10px] uppercase tracking-widest bg-[#1a1a1a] text-white px-2 py-1 rounded-full">
                                                     Default
                                                 </span>
                                             )}
                                         </div>
                                     </div>
-
-                                    {selectedId === address.id && (
-                                        <div className="absolute top-0 right-0 p-1">
-                                            <div className="bg-shopee text-white text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg uppercase">
-                                                Active
-                                            </div>
-                                        </div>
-                                    )}
                                 </button>
                             ))}
                         </div>
                     ) : (
-                        <div className="p-12 text-center">
-                            <MapPin className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                            <p className="text-gray-500 mb-6">No addresses found.</p>
-                            <Button asChild className="bg-shopee hover:bg-shopee-dark">
+                        <div className="p-16 text-center bg-white/20">
+                            <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" strokeWidth={1} />
+                            <p className="text-gray-500 font-light mb-8">No addresses found in your profile.</p>
+                            <Button asChild className="bg-[#1a1a1a] hover:bg-[#2c2c2c] text-white rounded-full px-8 h-12 transition-transform hover:scale-105 duration-300">
                                 <Link href="/user/address">Add New Address</Link>
                             </Button>
                         </div>
                     )}
                 </div>
 
-                <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-center">
+                <div className="p-6 bg-white/40 border-t border-gray-100/50 flex justify-center">
                     <Link 
                         href="/user/address" 
-                        className="text-sm text-gray-600 hover:text-shopee flex items-center gap-1 font-medium underline underline-offset-4"
+                        className="text-sm text-gray-500 hover:text-[#1a1a1a] flex items-center gap-1 font-medium transition-colors"
                     >
                         Manage Addresses
                         <ChevronRight size={14} />

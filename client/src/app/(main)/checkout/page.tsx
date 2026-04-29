@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function CheckoutPage() {
     return (
-        <div className="bg-gray-50/50 min-h-screen py-10">
+        <div className="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 min-h-screen py-10">
             <CheckoutClient />
         </div>
     );
