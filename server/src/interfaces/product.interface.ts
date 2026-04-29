@@ -20,6 +20,8 @@ export interface IProductRepository {
     data: Partial<UpdateProductInput>,
   ): Promise<Product | null>;
   delete(id: string): Promise<boolean>;
+  reduceStock(id: string, quantity: number): Promise<void>;
+  reduceVariantStock(variantId: string, quantity: number): Promise<void>;
 
   // Variant operations
   createVariant(
@@ -44,6 +46,8 @@ export interface IProductService {
     input: Partial<UpdateProductInput>,
   ): Promise<Product | null>;
   deleteProduct(id: string): Promise<boolean>;
+  validateVariantSelection(productId: string, variantId?: string): Promise<void>;
+  reduceStock(productId: string, quantity: number, variantId?: string): Promise<void>;
 
   // Variant operations
   addVariant(

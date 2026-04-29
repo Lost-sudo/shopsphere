@@ -90,6 +90,24 @@ export class ProductService implements IProductService {
     return true;
   }
 
+  async validateVariantSelection(productId: string, variantId?: string): Promise<void> {
+    const product = await this.productRepository.findById(productId);
+    if (!product) throw new NotFoundError("Product not found");
+
+    if (product.variants && product.variants.length > 0 && !variantId) {
+      throw new BadRequestError(`Please select a variant for product: ${product.name}`);
+    }
+  }
+
+  async reduceStock(productId: string, quantity: number, variantId?: string): Promise<void> {
+    if (variantId) {
+      await this.productRepository.reduceVariantStock(variantId, quantity);
+      await this.syncProductStock(productId);
+    } else {
+      await this.productRepository.reduceStock(productId, quantity);
+    }
+  }
+
   private async assertProductExists(productId: string): Promise<void> {
     const product = await this.productRepository.findById(productId);
     if (!product) {

@@ -23,7 +23,6 @@ export function Header() {
     const dispatch = useDispatch();
     const router = useRouter();
     const user = useSelector((state: RootState) => state.auth.user);
-    console.log(user?.role);
     const [logout] = useLogoutMutation();
     const { data: cartData } = useGetCartQuery(undefined, {
         skip: !user,

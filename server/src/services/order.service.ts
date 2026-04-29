@@ -38,12 +38,36 @@ export class OrderService implements IOrderService {
         return existingOrder;
       }
     }
+    // 1. Validate variants
+    for (const item of input.items) {
+      await this.productService.validateVariantSelection(
+        item.productId,
+        item.variantId,
+      );
+    }
+
+    // 2. Remove from cart
     await this.cartService.removeItemsFromCart(
       userId,
-      input.items.map((item) => item.productId),
+      input.items.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+      })),
     );
 
+    // 3. Create Order
     const order = await this.orderRepository.createOrder(input, userId);
+
+    // 4. Reduce Stock
+    for (const item of input.items) {
+      await this.productService.reduceStock(
+        item.productId,
+        item.quantity,
+        item.variantId,
+      );
+    }
+
+    // 5. Process Payment
     await this.paymentService.processPayment(order.id, input.paymentMethod);
 
     return order;

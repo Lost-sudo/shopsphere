@@ -114,6 +114,7 @@ export default function CheckoutClient() {
                 userId: user.id,
                 items: items.map(item => ({
                     productId: item.productId,
+                    variantId: item.variantId,
                     quantity: item.quantity,
                     price: item.variant?.price ?? item.product?.price ?? 0,
                 })),
@@ -432,8 +433,13 @@ export default function CheckoutClient() {
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="font-medium text-[#1a1a1a] text-lg mb-1">{item.product?.name}</h3>
+                                                {item.variant && (
+                                                    <p className="text-xs text-[#c5a059] uppercase tracking-widest font-medium mb-1">
+                                                        {item.variant.name}: {item.variant.value}
+                                                    </p>
+                                                )}
                                                 <p className="text-sm text-gray-500 font-light mb-3">Qty: {item.quantity}</p>
-                                                <p className="font-medium text-[#1a1a1a]">{formatPrice(item.product?.price || 0)}</p>
+                                                <p className="font-medium text-[#1a1a1a]">{formatPrice(item.variant?.price ?? item.product?.price ?? 0)}</p>
                                             </div>
                                         </div>
                                     ))}

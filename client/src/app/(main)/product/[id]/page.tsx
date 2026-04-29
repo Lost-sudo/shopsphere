@@ -70,6 +70,15 @@ export default function ProductPage({ params }: ProductPageProps) {
 
     const handleAddToCart = async () => {
         if (!product) return;
+        
+        // Strict variant selection check
+        if (variants.length > 0 && !selectedVariantId) {
+            toast.error("Please select a variant", {
+                description: "You must choose an option (like Size or Color) to add this item to your bag.",
+            });
+            return;
+        }
+
         try {
             await addItem({ 
                 productId: product.id, 
@@ -326,7 +335,11 @@ export default function ProductPage({ params }: ProductPageProps) {
                                     disabled={isAdding}
                                 >
                                     <ShoppingCart size={16} className="mr-2" />
-                                    {isAdding ? "Adding to Collection..." : "Add to Bag"}
+                                    {isAdding 
+                                        ? "Adding to Collection..." 
+                                        : (variants.length > 0 && !selectedVariantId) 
+                                            ? "Select Variant" 
+                                            : "Add to Bag"}
                                 </Button>
                                 
                                 <p className="text-center text-[9px] font-medium text-neutral-400 uppercase tracking-widest mt-2">

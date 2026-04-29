@@ -9,7 +9,7 @@ export interface ICartRepository {
   removeItemFromCart(itemId: string): Promise<boolean>;
   clearCart(cartId: string): Promise<boolean>;
   getCartItem(cartId: string, productId: string, variantId?: string): Promise<CartItem | null>;
-  removeItemsFromCart(userId: string, productIds: string[]): Promise<boolean>;
+  removeItemsFromCart(userId: string, items: { productId: string; variantId?: string }[]): Promise<boolean>;
 }
 
 export interface ICartService {
@@ -18,5 +18,5 @@ export interface ICartService {
   updateItem(userId: string, itemId: string, quantity: number): Promise<CartItem>;
   removeItem(userId: string, itemId: string): Promise<boolean>;
   clearCart(userId: string): Promise<boolean>;
-  removeItemsFromCart(userId: string, productIds: string[]): Promise<boolean>;
+  removeItemsFromCart(userId: string, items: { productId: string; variantId?: string }[]): Promise<boolean>;
 }

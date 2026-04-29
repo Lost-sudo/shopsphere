@@ -209,6 +209,28 @@ export class ProductRepository implements IProductRepository {
     return variants.map((v) => this.mapToVariant(v));
   }
 
+  async reduceStock(id: string, quantity: number): Promise<void> {
+    await prisma.product.update({
+      where: { id },
+      data: {
+        stock: {
+          decrement: quantity,
+        },
+      },
+    });
+  }
+
+  async reduceVariantStock(variantId: string, quantity: number): Promise<void> {
+    await prisma.productVariant.update({
+      where: { id: variantId },
+      data: {
+        stock: {
+          decrement: quantity,
+        },
+      },
+    });
+  }
+
   async findVariantById(variantId: string): Promise<ProductVariant | null> {
     const variant = await prisma.productVariant.findUnique({
       where: { id: variantId },

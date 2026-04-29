@@ -3,9 +3,14 @@ import { Cart, CartItem } from "../types/cart.types";
 import { AddCartItemInput } from "../schemas/cart.schema";
 import { NotFoundError } from "../utils/errors/notFoundError";
 import { cartRepository } from "../repositories/cart.repository";
+import { IProductService } from "../interfaces/product.interface";
+import { productService } from "./product.service";
 
 export class CartService implements ICartService {
-  constructor(private readonly cartRepository: ICartRepository) { }
+  constructor(
+    private readonly cartRepository: ICartRepository,
+    private readonly productService: IProductService,
+  ) {}
 
   async getCart(userId: string): Promise<Cart> {
     let cart = await this.cartRepository.getCartByUserId(userId);
@@ -16,6 +21,7 @@ export class CartService implements ICartService {
   }
 
   async addItem(userId: string, input: AddCartItemInput): Promise<CartItem> {
+    await this.productService.validateVariantSelection(input.productId, input.variantId);
     const cart = await this.getCart(userId);
 
     // Check if item already exists in cart
@@ -67,9 +73,9 @@ export class CartService implements ICartService {
     return await this.cartRepository.clearCart(cart.id);
   }
 
-  async removeItemsFromCart(userId: string, productIds: string[]): Promise<boolean> {
-    return await this.cartRepository.removeItemsFromCart(userId, productIds);
+  async removeItemsFromCart(userId: string, items: { productId: string; variantId?: string }[]): Promise<boolean> {
+    return await this.cartRepository.removeItemsFromCart(userId, items);
   }
 }
 
-export const cartService = new CartService(cartRepository);
+export const cartService = new CartService(cartRepository, productService);

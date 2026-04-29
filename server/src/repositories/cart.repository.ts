@@ -172,21 +172,27 @@ export class CartRepository implements ICartRepository {
     };
   }
 
-  async removeItemsFromCart(userId: string, itemIds: string[]): Promise<boolean> {
-    await prisma.cart.update({
+  async removeItemsFromCart(
+    userId: string,
+    items: { productId: string; variantId?: string }[],
+  ): Promise<boolean> {
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!cart) return false;
+
+    await prisma.cartItem.deleteMany({
       where: {
-        userId,
-      },
-      data: {
-        items: {
-          deleteMany: {
-            id: {
-              in: itemIds,
-            },
-          },
-        },
+        cartId: cart.id,
+        OR: items.map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId || null,
+        })),
       },
     });
+
     return true;
   }
 }
