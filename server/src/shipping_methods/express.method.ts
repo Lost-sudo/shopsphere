@@ -4,8 +4,6 @@ import { IShippingMethod } from "@/interfaces/shipping_method.interface";
 
 export class ExpressShippingMethod implements IShippingMethod {
     async createShippingMethod(data: CreateShippingInput): Promise<Shipment> {
-        const baseFee = 150; // Per 500g
-        const rate = 30; // Per additional 500g (higher for express)
         const _30kgLimit = 30 * 1000; // 30kg in gram
 
         // Enforce weight limit
@@ -13,13 +11,8 @@ export class ExpressShippingMethod implements IShippingMethod {
             throw new Error("Express shipping does not support packages over 30kg.");
         }
 
-        // Calculate fee
-        let fee = baseFee;
-        if (data.weight > 500) {
-            const extraWeight = data.weight - 500;
-            const extraFee = Math.ceil(extraWeight / 500) * rate;
-            fee += extraFee;
-        }
+        // Calculate fee: 150 PHP for every 500g
+        const fee = Math.ceil(data.weight / 500) * 150;
 
         // Simulate tracking number
         const trackingNumber = `EXPRESS-${Date.now()}`;

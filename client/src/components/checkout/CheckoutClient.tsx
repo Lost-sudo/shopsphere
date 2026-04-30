@@ -33,9 +33,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { toast } from "sonner";
 
-const CARRIERS = [
-    { id: "STANDARD", name: "Standard Delivery", eta: "3-5 Business Days", price: 50 },
-    { id: "EXPRESS", name: "Premium Express", eta: "1-2 Business Days", price: 150 },
+const CARRIERS_BASE = [
+    { id: "STANDARD", name: "Standard Delivery", eta: "3-5 Business Days", basePrice: 50 },
+    { id: "EXPRESS", name: "Premium Express", eta: "1-2 Business Days", basePrice: 150 },
 ];
 
 const PAYMENT_METHODS = [
@@ -60,7 +60,7 @@ export default function CheckoutClient() {
     const searchParams = useSearchParams();
     
     const [currentStep, setCurrentStep] = useState(1);
-    const [selectedCarrier, setSelectedCarrier] = useState(CARRIERS[0].id);
+    const [selectedCarrier, setSelectedCarrier] = useState(CARRIERS_BASE[0].id);
     const [selectedPayment, setSelectedPayment] = useState(PAYMENT_METHODS[0].id);
     const [overrideAddressId, setOverrideAddressId] = useState<string | null>(null);
     const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
@@ -99,7 +99,20 @@ export default function CheckoutClient() {
         return acc + price * item.quantity;
     }, 0);
 
-    const currentCarrier = CARRIERS.find(c => c.id === selectedCarrier) || CARRIERS[0];
+    const totalWeight = useMemo(() => {
+        return items.reduce((acc: number, item: CartItem) => {
+            return acc + (item.product?.weight || 0) * item.quantity;
+        }, 0);
+    }, [items]);
+
+    const carriers = useMemo(() => {
+        return CARRIERS_BASE.map(carrier => ({
+            ...carrier,
+            price: Math.ceil(totalWeight / 500) * carrier.basePrice
+        }));
+    }, [totalWeight]);
+
+    const currentCarrier = carriers.find(c => c.id === selectedCarrier) || carriers[0];
     const shippingFee = items.length > 0 ? currentCarrier.price : 0;
     const total = subtotal + shippingFee;
 
@@ -323,7 +336,7 @@ export default function CheckoutClient() {
                                 <h2 className="text-2xl font-light text-[#1a1a1a] font-serif">Shipping Method</h2>
                                 
                                 <div className="space-y-4">
-                                    {CARRIERS.map((carrier) => (
+                                    {carriers.map((carrier) => (
                                         <div
                                             key={carrier.id}
                                             onClick={() => setSelectedCarrier(carrier.id)}
@@ -349,7 +362,10 @@ export default function CheckoutClient() {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <span className="font-medium text-[#1a1a1a]">{formatPrice(carrier.price)}</span>
+                                            <div className="text-right">
+                                                <span className="font-medium text-[#1a1a1a] block">{formatPrice(carrier.price)}</span>
+                                                <span className="text-[10px] text-gray-400 uppercase tracking-widest">{Math.ceil(totalWeight / 500)} units of 500g</span>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

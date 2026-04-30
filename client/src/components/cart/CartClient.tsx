@@ -81,7 +81,11 @@ export default function CartClient() {
         return acc + itemPrice * item.quantity;
     }, 0);
 
-    const shippingFee = selectedCartItems.length > 0 ? 50 : 0;
+    const totalWeight = selectedCartItems.reduce((acc, item) => {
+        return acc + (item.product?.weight || 0) * item.quantity;
+    }, 0);
+
+    const shippingFee = selectedCartItems.length > 0 ? Math.ceil(totalWeight / 500) * 50 : 0;
     const total = subtotal + shippingFee;
 
     const handleCheckout = () => {
@@ -295,10 +299,17 @@ export default function CartClient() {
                                     <span className="font-serif italic text-xl text-white">{formatPrice(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between items-start">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Boutique Delivery</span>
+                                    <div className="space-y-1">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Boutique Delivery</span>
+                                        {totalWeight > 0 && (
+                                            <p className="text-[8px] text-neutral-500 font-black uppercase tracking-widest italic opacity-60">
+                                                Est. Weight: {totalWeight}g ({Math.ceil(totalWeight / 500)} units)
+                                            </p>
+                                        )}
+                                    </div>
                                     <div className="text-right space-y-1">
                                         <span className="font-serif italic text-xl text-white">{formatPrice(shippingFee)}</span>
-                                        <p className="text-[8px] text-luxury-gold font-black uppercase tracking-widest italic opacity-60">Complimentary above ₱1,000</p>
+                                        <p className="text-[8px] text-luxury-gold font-black uppercase tracking-widest italic opacity-60">Standard Shipping Estimate</p>
                                     </div>
                                 </div>
                                 

@@ -18,6 +18,7 @@ export class CartRepository implements ICartRepository {
           name: item.product.name,
           price: Number(item.product.price),
           images: item.product.images,
+          weight: Number(item.product.weight),
         },
         variant: item.variant
           ? {
@@ -89,6 +90,7 @@ export class CartRepository implements ICartRepository {
         name: item.product.name,
         price: Number(item.product.price),
         images: item.product.images,
+        weight: Number(item.product.weight),
       },
       variant: item.variant
         ? {
@@ -120,6 +122,7 @@ export class CartRepository implements ICartRepository {
         name: item.product.name,
         price: Number(item.product.price),
         images: item.product.images,
+        weight: Number(item.product.weight),
       },
       variant: item.variant
         ? {
@@ -168,6 +171,7 @@ export class CartRepository implements ICartRepository {
         name: item.product.name,
         price: Number(item.product.price),
         images: item.product.images,
+        weight: Number(item.product.weight),
       },
     };
   }

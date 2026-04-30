@@ -16,6 +16,7 @@ export type CartItem = {
     name: string;
     price: number;
     images: string[];
+    weight: number;
   };
   variant?: {
     name: string;
