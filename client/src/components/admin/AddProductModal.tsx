@@ -222,8 +222,8 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                                 placeholder="0.00"
                                                 className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-serif italic font-bold"
                                                 {...field}
-                                                value={field.value as number}
-                                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                                value={field.value === 0 ? "" : field.value}
+                                                onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -250,8 +250,8 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                                     disabled={fields.length > 0}
                                                     className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold disabled:opacity-50"
                                                     {...field}
-                                                    value={displayValue}
-                                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                                    value={displayValue === 0 ? "" : displayValue}
+                                                    onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseInt(e.target.value))}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -272,8 +272,8 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                                 placeholder="0"
                                                 className="h-12 border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal font-bold"
                                                 {...field}
-                                                value={field.value as number}
-                                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                                value={field.value === 0 ? "" : field.value}
+                                                onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -443,7 +443,8 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                                                 type="number"
                                                                 className="h-10 text-xs border-white bg-white focus:bg-white"
                                                                 {...field}
-                                                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                                                value={field.value === 0 ? "" : field.value}
+                                                                onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseInt(e.target.value))}
                                                             />
                                                         </FormControl>
                                                         <FormMessage />
