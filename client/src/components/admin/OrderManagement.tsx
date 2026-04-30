@@ -12,14 +12,14 @@ import {
     Eye,
     Truck,
     Loader2,
-    CheckCircle2,
     Clock,
     AlertCircle,
     XCircle,
     PackageCheck,
     CreditCard,
     ClipboardList,
-    ChevronRight
+    Copy,
+    Ban
 } from "lucide-react";
 import Image from "next/image";
 import { useState, useMemo } from "react";
@@ -37,15 +37,15 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogFooter,
 } from "@/components/ui/dialog";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {
@@ -63,9 +63,6 @@ export function OrderManagement() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-    const [isShipmentDialogOpen, setIsShipmentDialogOpen] = useState(false);
-    const [orderToShip, setOrderToShip] = useState<string | null>(null);
-    const [selectedCarrier, setSelectedCarrier] = useState("STANDARD");
     
     const { data: orderData, isLoading, isError } = useGetAllOrdersQuery();
     const [processShipment, { isLoading: isProcessingShipment }] = useProcessShipmentMutation();
@@ -81,13 +78,10 @@ export function OrderManagement() {
         );
     }, [orders, searchTerm]);
 
-    const handleProcessShipment = async () => {
-        if (!orderToShip) return;
+    const handleProcessShipment = async (orderId: string) => {
         try {
-            await processShipment({ orderId: orderToShip, carrier: selectedCarrier }).unwrap();
+            await processShipment({ orderId }).unwrap();
             toast.success("Shipment processed successfully");
-            setIsShipmentDialogOpen(false);
-            setOrderToShip(null);
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to process shipment");
         }
@@ -107,9 +101,9 @@ export function OrderManagement() {
         setIsDetailsOpen(true);
     };
 
-    const openShipmentDialog = (orderId: string) => {
-        setOrderToShip(orderId);
-        setIsShipmentDialogOpen(true);
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success("Order ID copied to clipboard");
     };
 
     const formatPrice = (amount: number) => {
@@ -156,7 +150,7 @@ export function OrderManagement() {
                     />
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="outline" className="h-10 border-slate-200 dark:border-slate-800 flex items-center gap-2 font-semibold text-xs uppercase tracking-widest">
+                    <Button variant="outline" className="h-10 border-slate-200 dark:border-slate-800 flex items-center gap-2 font-semibold text-xs uppercase tracking-widest text-slate-500 hover:text-slate-900">
                         <Filter className="w-3 h-3" />
                         Filters
                     </Button>
@@ -180,7 +174,7 @@ export function OrderManagement() {
                                 <tr>
                                     <th className="px-6 py-4">Order Details</th>
                                     <th className="px-6 py-4">Customer</th>
-                                    <th className="px-6 py-4">Status & Logistics</th>
+                                    <th className="px-6 py-4">Shipping Status</th>
                                     <th className="px-6 py-4 text-right">Total</th>
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
@@ -226,18 +220,24 @@ export function OrderManagement() {
                                                             <span className="text-[8px] text-slate-400 uppercase font-bold">{order.shipment.shippingMethod} Delivery</span>
                                                         </div>
                                                     ) : (
-                                                        <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                                                            {order.paymentMethod === "COD" ? (
-                                                                <span className="flex items-center gap-1">
-                                                                    <CreditCard size={10} className="text-amber-500" />
-                                                                    COD
-                                                                </span>
-                                                            ) : (
-                                                                <span className="flex items-center gap-1">
-                                                                    <CreditCard size={10} className="text-blue-500" />
-                                                                    Prepaid
-                                                                </span>
-                                                            )}
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight flex items-center gap-1.5">
+                                                                <Truck size={10} className="text-slate-400" />
+                                                                {order.shippingMethod}
+                                                            </span>
+                                                            <div className="flex items-center gap-1.5 text-[9px] text-slate-400 font-medium">
+                                                                {order.paymentMethod === "COD" ? (
+                                                                    <span className="flex items-center gap-1">
+                                                                        <CreditCard size={10} className="text-amber-500/50" />
+                                                                        COD
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="flex items-center gap-1">
+                                                                        <CreditCard size={10} className="text-blue-500/50" />
+                                                                        Prepaid
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>
@@ -247,26 +247,39 @@ export function OrderManagement() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-8 w-8 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                                        title="View Details"
-                                                        onClick={() => openDetails(order)}
-                                                    >
-                                                        <Eye className="w-4 h-4 text-slate-500" />
-                                                    </Button>
-                                                    
+                                                    {/* Mark as Processing */}
+                                                    {order.status.toUpperCase() === "PENDING" && (
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            className="h-8 w-8 hover:bg-blue-100 text-blue-600"
+                                                            onClick={() => handleUpdateStatus(order.id, "PROCESSING")}
+                                                            disabled={isUpdatingStatus}
+                                                            title="Mark as Processing"
+                                                        >
+                                                            {isUpdatingStatus ? (
+                                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                            ) : (
+                                                                <ClipboardList className="w-4 h-4" />
+                                                            )}
+                                                        </Button>
+                                                    )}
+
                                                     {/* Process Shipment */}
-                                                    {(order.status.toUpperCase() === "PAID" || (order.status.toUpperCase() === "PENDING" && order.paymentMethod === "COD")) && !order.shipment && (
+                                                    {(order.status.toUpperCase() === "PAID" || order.status.toUpperCase() === "PROCESSING" || (order.status.toUpperCase() === "PENDING" && order.paymentMethod === "COD")) && !order.shipment && (
                                                         <Button 
                                                             variant="ghost" 
                                                             size="icon" 
                                                             className="h-8 w-8 hover:bg-primary/10 text-primary"
-                                                            onClick={() => openShipmentDialog(order.id)}
+                                                            onClick={() => handleProcessShipment(order.id)}
+                                                            disabled={isProcessingShipment}
                                                             title="Process Shipment"
                                                         >
-                                                            <Truck className="w-4 h-4" />
+                                                            {isProcessingShipment ? (
+                                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                            ) : (
+                                                                <Truck className="w-4 h-4" />
+                                                            )}
                                                         </Button>
                                                     )}
 
@@ -288,23 +301,38 @@ export function OrderManagement() {
                                                         </Button>
                                                     )}
 
-                                                    {/* Cancel Order */}
-                                                    {(order.status.toUpperCase() === "PENDING" || order.status.toUpperCase() === "PROCESSING") && (
-                                                        <Button 
-                                                            variant="ghost" 
-                                                            size="icon" 
-                                                            className="h-8 w-8 hover:bg-rose-100 text-rose-600"
-                                                            onClick={() => handleUpdateStatus(order.id, "CANCELLED")}
-                                                            disabled={isUpdatingStatus}
-                                                            title="Cancel Order"
-                                                        >
-                                                            <XCircle className="w-4 h-4" />
-                                                        </Button>
-                                                    )}
-                                                    
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-100 dark:hover:bg-slate-800">
-                                                        <MoreHorizontal className="w-4 h-4 text-slate-500" />
-                                                    </Button>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                                                <MoreHorizontal className="w-4 h-4 text-slate-500" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="bg-white border-none shadow-xl rounded-2xl p-2 min-w-[180px]">
+                                                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-neutral-400 px-3 py-2">Quick Actions</DropdownMenuLabel>
+                                                            <DropdownMenuItem className="rounded-xl font-bold text-xs gap-3 px-3 py-2.5 cursor-pointer hover:bg-slate-50" onClick={() => copyToClipboard(order.id)}>
+                                                                <Copy size={14} className="text-slate-400" />
+                                                                Copy Order ID
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem className="rounded-xl font-bold text-xs gap-3 px-3 py-2.5 cursor-pointer hover:bg-slate-50" onClick={() => openDetails(order)}>
+                                                                <Eye size={14} className="text-slate-400" />
+                                                                View Full Details
+                                                            </DropdownMenuItem>
+                                                            
+                                                            {(order.status.toUpperCase() === "PENDING" || order.status.toUpperCase() === "PROCESSING") && (
+                                                                <>
+                                                                    <DropdownMenuSeparator className="bg-slate-100 my-1 mx-2" />
+                                                                    <DropdownMenuItem 
+                                                                        className="rounded-xl font-bold text-xs gap-3 px-3 py-2.5 cursor-pointer hover:bg-rose-50 text-rose-600"
+                                                                        onClick={() => handleUpdateStatus(order.id, "CANCELLED")}
+                                                                        disabled={isUpdatingStatus}
+                                                                    >
+                                                                        <Ban size={14} />
+                                                                        Cancel Order
+                                                                    </DropdownMenuItem>
+                                                                </>
+                                                            )}
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </div>
                                             </td>
                                         </tr>
@@ -315,48 +343,6 @@ export function OrderManagement() {
                     </div>
                 </CardContent>
             </Card>
-
-            {/* Shipment Selection Dialog */}
-            <Dialog open={isShipmentDialogOpen} onOpenChange={setIsShipmentDialogOpen}>
-                <DialogContent className="sm:max-w-[425px] bg-white/95 backdrop-blur-xl border-none shadow-2xl rounded-[2rem]">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl font-serif italic text-luxury-charcoal">Process Shipment</DialogTitle>
-                        <DialogDescription className="text-xs text-neutral-500">
-                            Select a shipping carrier to generate a tracking number.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-6 py-4">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Select Carrier</label>
-                            <Select value={selectedCarrier} onValueChange={setSelectedCarrier}>
-                                <SelectTrigger className="w-full h-12 bg-neutral-50 border-none rounded-xl font-bold">
-                                    <SelectValue placeholder="Select carrier" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-white border-none shadow-xl rounded-xl">
-                                    <SelectItem value="STANDARD" className="font-bold">Standard Delivery (50 PHP/500g)</SelectItem>
-                                    <SelectItem value="EXPRESS" className="font-bold">Premium Express (150 PHP/500g)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button 
-                            className="w-full h-14 bg-luxury-charcoal hover:bg-black text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all group"
-                            onClick={handleProcessShipment}
-                            disabled={isProcessingShipment}
-                        >
-                            {isProcessingShipment ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                                <span className="flex items-center gap-2">
-                                    Confirm & Generate Tracking
-                                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                </span>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
 
             {/* Order Details Modal */}
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
@@ -392,6 +378,10 @@ export function OrderManagement() {
                                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Logistics</h4>
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2">
+                                        <Truck size={14} className="text-luxury-gold" />
+                                        <p className="text-xs font-bold text-luxury-charcoal uppercase tracking-tighter">{selectedOrder?.shippingMethod} Delivery</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                         <CreditCard size={14} className="text-luxury-gold" />
                                         <p className="text-xs font-bold text-luxury-charcoal uppercase tracking-tighter">{selectedOrder?.paymentMethod}</p>
                                     </div>
@@ -402,7 +392,6 @@ export function OrderManagement() {
                                                 <Truck size={14} className="text-primary" />
                                                 <p className="text-xs font-black text-primary italic uppercase">{selectedOrder.shipment.trackingNumber}</p>
                                             </div>
-                                            <p className="text-[9px] text-neutral-500 font-bold uppercase mt-1">{selectedOrder.shipment.shippingMethod} Delivery</p>
                                         </div>
                                     )}
                                 </div>
@@ -440,13 +429,14 @@ export function OrderManagement() {
                     <div className="flex gap-3 pt-4 justify-end">
                         <Button variant="outline" className="rounded-xl text-[10px] font-black uppercase tracking-widest" onClick={() => setIsDetailsOpen(false)}>Close</Button>
                         
-                        {(selectedOrder?.status.toUpperCase() === "PAID" || (selectedOrder?.status.toUpperCase() === "PENDING" && selectedOrder?.paymentMethod === "COD")) && !selectedOrder?.shipment && (
+                        {(selectedOrder?.status.toUpperCase() === "PAID" || (selectedOrder?.status.toUpperCase() === "PENDING" && selectedOrder?.paymentMethod === "COD") || selectedOrder?.status.toUpperCase() === "PROCESSING") && !selectedOrder?.shipment && (
                             <Button 
                                 className="bg-luxury-charcoal hover:bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2"
                                 onClick={() => {
-                                    openShipmentDialog(selectedOrder.id);
+                                    handleProcessShipment(selectedOrder.id);
                                     setIsDetailsOpen(false);
                                 }}
+                                disabled={isProcessingShipment}
                             >
                                 <Truck size={14} />
                                 Process Shipment

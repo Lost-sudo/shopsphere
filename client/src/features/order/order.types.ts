@@ -14,6 +14,7 @@ export interface CreateOrderRequest {
     totalAmount: number;
     shippingAddress: string;
     paymentMethod: string;
+    shippingMethod: string;
     idempotencyKey?: string;
     status?: string;
 }
@@ -39,6 +40,7 @@ export interface Order {
     totalAmount: number;
     shippingAddress: string;
     paymentMethod: string;
+    shippingMethod: string;
     status: string;
     createdAt: string;
     updatedAt: string;
@@ -69,7 +71,6 @@ export interface GetOrderResponse {
 
 export interface ProcessShipmentRequest {
     orderId: string;
-    carrier: string;
 }
 
 export interface ProcessShipmentResponse {

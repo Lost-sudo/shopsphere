@@ -85,10 +85,8 @@ export class OrderController {
 
   processShipment = asyncHandler(async (req: Request, res: Response) => {
     const orderId = req.params.id;
-    const { carrier } = req.body;
     const shipment = await this.orderService.processShipment(
       orderId as string,
-      carrier,
     );
 
     res.status(200).json({

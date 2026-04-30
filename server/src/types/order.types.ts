@@ -8,6 +8,7 @@ export type Order = {
   totalAmount: number;
   shippingAddress: string;
   paymentMethod: string;
+  shippingMethod: string;
   idempotencyKey?: string | null;
   status: string;
   payment?: Payment;

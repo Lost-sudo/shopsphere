@@ -120,7 +120,6 @@ export class OrderService implements IOrderService {
 
   async processShipment(
     orderId: string,
-    method: ShippingMethod,
   ): Promise<Shipment> {
     const order = await this.orderRepository.getOrderById(orderId);
     if (!order) {
@@ -153,7 +152,7 @@ export class OrderService implements IOrderService {
 
     const shipment = await this.shipmentService.createShipment({
       orderId: order.id,
-      shippingMethod: method,
+      shippingMethod: order.shippingMethod as ShippingMethod,
       status: ShipmentStatus.PENDING,
       sender,
       recipient,

@@ -34,6 +34,7 @@ export class OrderRepository implements IOrderRepository {
       totalAmount: Number(prismaOrder.totalAmount),
       shippingAddress: prismaOrder.shippingAddress,
       paymentMethod: prismaOrder.paymentMethod,
+      shippingMethod: prismaOrder.shippingMethod,
       status: prismaOrder.status.toLowerCase(),
       payment: prismaOrder.payment ? {
         id: prismaOrder.payment.id,
@@ -75,6 +76,7 @@ export class OrderRepository implements IOrderRepository {
         totalAmount: input.totalAmount,
         shippingAddress: input.shippingAddress,
         paymentMethod: input.paymentMethod,
+        shippingMethod: input.shippingMethod,
         idempotencyKey: input.idempotencyKey,
         status: (input.status?.toUpperCase() as OrderStatus) || OrderStatus.PENDING,
         items: {
@@ -190,6 +192,7 @@ export class OrderRepository implements IOrderRepository {
         totalAmount: input.totalAmount,
         shippingAddress: input.shippingAddress,
         paymentMethod: input.paymentMethod,
+        shippingMethod: input.shippingMethod,
       },
       include: {
         items: {

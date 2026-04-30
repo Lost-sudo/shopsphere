@@ -27,5 +27,5 @@ export interface IOrderService {
   ): Promise<Order | null>;
   deleteOrder(orderId: string): Promise<boolean>;
   getOrderByIdempotencyKey(key: string): Promise<Order | null>;
-  processShipment(orderId: string, method: ShippingMethod): Promise<Shipment>;
+  processShipment(orderId: string): Promise<Shipment>;
 }

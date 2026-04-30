@@ -54,10 +54,9 @@ export const orderApi = baseApi.injectEndpoints({
             providesTags: (_result, _error, id) => [{ type: "Orders", id }],
         }),
         processShipment: builder.mutation<ProcessShipmentResponse, ProcessShipmentRequest>({
-            query: ({ orderId, ...body }) => ({
+            query: ({ orderId }) => ({
                 url: `/orders/process-shipment/${orderId}`,
                 method: "POST",
-                body,
             }),
             invalidatesTags: (_result, _error, { orderId }) => [
                 { type: "Orders", id: orderId },
