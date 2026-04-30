@@ -35,14 +35,26 @@ export default function CartClient() {
     };
 
     const handleUpdateQuantity = async (itemId: string, currentQuantity: number, delta: number) => {
+        const item = items.find(i => i.id === itemId);
+        if (!item) return;
+
         const newQuantity = currentQuantity + delta;
         if (newQuantity < 1) return;
+
+        // Check stock
+        const availableStock = item.variant?.stock ?? item.product?.stock ?? 0;
+        if (delta > 0 && newQuantity > availableStock) {
+            toast.error("Insufficient stock", {
+                description: `Only ${availableStock} items available.`
+            });
+            return;
+        }
         
         try {
             await updateItem({ itemId, quantity: newQuantity }).unwrap();
             toast.success("Quantity updated");
-        } catch {
-            toast.error("Failed to update quantity");
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to update quantity");
         }
     };
 
@@ -270,7 +282,7 @@ export default function CartClient() {
                                                         <span className="w-8 text-center font-black text-xs text-luxury-charcoal">{item.quantity}</span>
                                                         <button 
                                                             onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)}
-                                                            disabled={isUpdating}
+                                                            disabled={isUpdating || item.quantity >= (item.variant?.stock ?? item.product?.stock ?? 0)}
                                                             className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-sm disabled:opacity-30 transition-all text-luxury-charcoal"
                                                         >
                                                             <Plus size={14} strokeWidth={3} />

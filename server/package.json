@@ -10,7 +10,8 @@
     "migrate": "docker compose exec backend npx prisma migrate dev",
     "generate": "docker compose exec backend npx prisma generate",
     "studio": "docker compose exec backend npx prisma studio --browser none --port 5555",
-    "test": "jest"
+    "test": "jest",
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",

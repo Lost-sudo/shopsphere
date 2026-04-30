@@ -19,12 +19,14 @@ export class CartRepository implements ICartRepository {
           price: Number(item.product.price),
           images: item.product.images,
           weight: Number(item.product.weight),
+          stock: item.product.stock,
         },
         variant: item.variant
           ? {
             name: item.variant.name,
             value: item.variant.value,
             price: item.variant.price ? Number(item.variant.price) : null,
+            stock: item.variant.stock,
           }
           : null,
       })),
@@ -91,12 +93,14 @@ export class CartRepository implements ICartRepository {
         price: Number(item.product.price),
         images: item.product.images,
         weight: Number(item.product.weight),
+        stock: item.product.stock,
       },
       variant: item.variant
         ? {
           name: item.variant.name,
           value: item.variant.value,
           price: item.variant.price ? Number(item.variant.price) : null,
+          stock: item.variant.stock,
         }
         : null,
     };
@@ -123,12 +127,14 @@ export class CartRepository implements ICartRepository {
         price: Number(item.product.price),
         images: item.product.images,
         weight: Number(item.product.weight),
+        stock: item.product.stock,
       },
       variant: item.variant
         ? {
           name: item.variant.name,
           value: item.variant.value,
           price: item.variant.price ? Number(item.variant.price) : null,
+          stock: item.variant.stock,
         }
         : null,
     };
@@ -166,13 +172,23 @@ export class CartRepository implements ICartRepository {
       id: item.id,
       cartId: item.cartId,
       productId: item.productId,
+      variantId: item.variantId,
       quantity: item.quantity,
       product: {
         name: item.product.name,
         price: Number(item.product.price),
         images: item.product.images,
         weight: Number(item.product.weight),
+        stock: item.product.stock,
       },
+      variant: item.variant
+        ? {
+          name: item.variant.name,
+          value: item.variant.value,
+          price: item.variant.price ? Number(item.variant.price) : null,
+          stock: item.variant.stock,
+        }
+        : null,
     };
   }
 

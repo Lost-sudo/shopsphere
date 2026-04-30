@@ -2,6 +2,7 @@ import { ICartService, ICartRepository } from "../interfaces/cart.interface";
 import { Cart, CartItem } from "../types/cart.types";
 import { AddCartItemInput } from "../schemas/cart.schema";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { BadRequestError } from "../utils/errors/badRequestError";
 import { cartRepository } from "../repositories/cart.repository";
 import { IProductService } from "../interfaces/product.interface";
 import { productService } from "./product.service";
@@ -22,6 +23,15 @@ export class CartService implements ICartService {
 
   async addItem(userId: string, input: AddCartItemInput): Promise<CartItem> {
     await this.productService.validateVariantSelection(input.productId, input.variantId);
+    const product = await this.productService.getProduct(input.productId);
+    if (!product) throw new NotFoundError("Product not found");
+
+    let availableStock = product.stock || 0;
+    if (input.variantId) {
+      const variant = await this.productService.getVariant(input.productId, input.variantId);
+      availableStock = variant.stock;
+    }
+
     const cart = await this.getCart(userId);
 
     // Check if item already exists in cart
@@ -31,10 +41,20 @@ export class CartService implements ICartService {
       input.variantId,
     );
 
+    const totalQuantityRequested = (existingItem?.quantity || 0) + input.quantity;
+
+    if (totalQuantityRequested > availableStock) {
+      throw new BadRequestError(
+        availableStock === 0 
+          ? "This item is currently out of stock." 
+          : `Only ${availableStock} items available in stock.`
+      );
+    }
+
     if (existingItem) {
       return await this.cartRepository.updateItemQuantity(
         existingItem.id,
-        existingItem.quantity + input.quantity,
+        totalQuantityRequested,
       );
     }
 
@@ -52,6 +72,20 @@ export class CartService implements ICartService {
     const item = cart.items.find((i) => i.id === itemId);
     if (!item) {
       throw new NotFoundError("Cart item not found.");
+    }
+
+    // Check available stock
+    const product = await this.productService.getProduct(item.productId);
+    if (!product) throw new NotFoundError("Product not found");
+
+    let availableStock = product.stock || 0;
+    if (item.variantId) {
+      const variant = await this.productService.getVariant(item.productId, item.variantId);
+      availableStock = variant.stock;
+    }
+
+    if (quantity > availableStock) {
+      throw new BadRequestError(`Only ${availableStock} items available in stock.`);
     }
 
     return await this.cartRepository.updateItemQuantity(itemId, quantity);

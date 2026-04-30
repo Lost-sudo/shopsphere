@@ -101,9 +101,19 @@ export class ProductService implements IProductService {
 
   async reduceStock(productId: string, quantity: number, variantId?: string): Promise<void> {
     if (variantId) {
+      const variant = await this.productRepository.findVariantById(variantId);
+      if (!variant) throw new NotFoundError("Variant not found");
+      if (variant.stock < quantity) {
+        throw new BadRequestError(`Insufficient stock for variant ${variant.name} (${variant.value}). Only ${variant.stock} left.`);
+      }
       await this.productRepository.reduceVariantStock(variantId, quantity);
       await this.syncProductStock(productId);
     } else {
+      const product = await this.productRepository.findById(productId);
+      if (!product) throw new NotFoundError("Product not found");
+      if ((product.stock || 0) < quantity) {
+        throw new BadRequestError(`Insufficient stock for product ${product.name}. Only ${product.stock} left.`);
+      }
       await this.productRepository.reduceStock(productId, quantity);
     }
   }

@@ -17,11 +17,13 @@ export type CartItem = {
         price: number;
         images: string[];
         weight: number;
+        stock: number;
     }
     variant?: {
         name: string;
         value: string;
         price: number | null;
+        stock: number;
     } | null;
 }
 

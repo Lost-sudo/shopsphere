@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAddItemMutation } from "@/features/cart/cart.api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
     id: string;
@@ -19,6 +20,8 @@ interface ProductCardProps {
     soldCount: number;
     discount?: number;
     isFlashSale?: boolean;
+    stock: number;
+    hasVariants?: boolean;
 }
 
 export function ProductCard({
@@ -31,6 +34,8 @@ export function ProductCard({
     soldCount,
     discount,
     isFlashSale,
+    stock,
+    hasVariants = false,
 }: ProductCardProps) {
     const router = useRouter();
     const [addItem, { isLoading: isAdding }] = useAddItemMutation();
@@ -45,6 +50,11 @@ export function ProductCard({
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (hasVariants) {
+            router.push(`/product/${id}`);
+            return;
+        }
         
         try {
             await addItem({ productId: id, quantity: 1 }).unwrap();
@@ -57,7 +67,9 @@ export function ProductCard({
                 toast.error("Please login first");
                 router.push("/login");
             } else {
-                toast.error("Failed to add to cart");
+                toast.error("Failed to add to cart", {
+                    description: error?.data?.message || "Insufficient stock"
+                });
             }
         }
     };
@@ -77,11 +89,21 @@ export function ProductCard({
                         alt={name}
                         fill
                         unoptimized
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className={cn(
+                            "object-cover group-hover:scale-105 transition-transform duration-500",
+                            stock <= 0 && "grayscale opacity-60"
+                        )}
                     />
-                    {isFlashSale && (
+                    {isFlashSale && stock > 0 && (
                         <div className="absolute bottom-0 left-0 w-full bg-shopee/90 text-white text-[10px] font-bold py-1 px-2 flex items-center gap-1">
                             <span className="animate-pulse">🔥</span> FLASH SALE
+                        </div>
+                    )}
+                    {stock <= 0 && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
+                            <div className="bg-white/90 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-neutral-500 border border-black/5 shadow-xl">
+                                Sold Out
+                            </div>
                         </div>
                     )}
                 </div>
@@ -119,9 +141,10 @@ export function ProductCard({
                         <Button
                             size="icon"
                             variant="ghost"
-                            className="h-7 w-7 rounded-full text-shopee hover:bg-shopee/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-7 w-7 rounded-full text-shopee hover:bg-shopee/10 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
                             onClick={handleAddToCart}
-                            disabled={isAdding}
+                            disabled={isAdding || stock <= 0}
+                            title={hasVariants ? "Select options" : stock <= 0 ? "Out of stock" : "Add to cart"}
                         >
                             <ShoppingCart size={14} />
                         </Button>

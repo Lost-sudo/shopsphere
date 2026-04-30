@@ -41,8 +41,26 @@ export default function ProductPage({ params }: ProductPageProps) {
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
 
+
     const product = data?.data?.product;
     const variants = product?.variants || [];
+    
+    // Reset quantity if it exceeds stock of newly selected variant
+    useEffect(() => {
+        if (product) {
+            const currentStock = selectedVariantId 
+                ? variants.find(v => v.id === selectedVariantId)?.stock || 0
+                : product.stock || 0;
+            
+            if (currentStock === 0) {
+                setQuantity(0);
+            } else if (quantity > currentStock) {
+                setQuantity(currentStock);
+            } else if (quantity === 0 && currentStock > 0) {
+                setQuantity(1);
+            }
+        }
+    }, [selectedVariantId, product, variants, quantity]);
     
     // Group variants by name (e.g., "Size", "Color")
     const variantGroups = variants.reduce((acc, variant) => {
@@ -310,14 +328,16 @@ export default function ProductPage({ params }: ProductPageProps) {
                                 <div className="flex items-center bg-[#fafafa] rounded-full p-1.5 border border-black/5">
                                     <button 
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="w-10 h-10 rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-white hover:shadow-sm transition-all"
+                                        disabled={displayStock <= 0}
+                                        className="w-10 h-10 rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-white hover:shadow-sm transition-all disabled:opacity-30 disabled:hover:bg-transparent"
                                     >
                                         <Minus size={14} />
                                     </button>
-                                    <span className="w-10 text-center font-bold text-xs">{quantity}</span>
+                                    <span className="w-10 text-center font-bold text-xs">{displayStock > 0 ? quantity : 0}</span>
                                     <button 
-                                        onClick={() => setQuantity(quantity + 1)}
-                                        className="w-10 h-10 rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-white hover:shadow-sm transition-all"
+                                        onClick={() => setQuantity(prev => Math.min(displayStock, prev + 1))}
+                                        disabled={quantity >= displayStock || displayStock <= 0}
+                                        className="w-10 h-10 rounded-full flex items-center justify-center text-luxury-charcoal hover:bg-white hover:shadow-sm transition-all disabled:opacity-30 disabled:hover:bg-transparent"
                                     >
                                         <Plus size={14} />
                                     </button>
@@ -330,16 +350,18 @@ export default function ProductPage({ params }: ProductPageProps) {
 
                             <div className="flex flex-col gap-3">
                                 <Button 
-                                    className="w-full bg-luxury-charcoal hover:bg-black text-white rounded-full h-16 text-xs font-bold uppercase tracking-[0.2em] transition-all hover:scale-[1.02] shadow-xl shadow-black/10 active:scale-95"
+                                    className="w-full bg-luxury-charcoal hover:bg-black text-white rounded-full h-16 text-xs font-bold uppercase tracking-[0.2em] transition-all hover:scale-[1.02] shadow-xl shadow-black/10 active:scale-95 disabled:bg-neutral-200 disabled:text-neutral-400 disabled:scale-100 disabled:shadow-none"
                                     onClick={handleAddToCart}
-                                    disabled={isAdding}
+                                    disabled={isAdding || displayStock <= 0}
                                 >
                                     <ShoppingCart size={16} className="mr-2" />
                                     {isAdding 
                                         ? "Adding to Collection..." 
-                                        : (variants.length > 0 && !selectedVariantId) 
-                                            ? "Select Variant" 
-                                            : "Add to Bag"}
+                                        : displayStock <= 0 
+                                            ? "Out of Stock"
+                                            : (variants.length > 0 && !selectedVariantId) 
+                                                ? "Select Variant" 
+                                                : "Add to Bag"}
                                 </Button>
                                 
                                 <p className="text-center text-[9px] font-medium text-neutral-400 uppercase tracking-widest mt-2">
