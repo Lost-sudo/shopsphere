@@ -15,7 +15,7 @@ export class PaymentService implements IPaymentService {
   constructor(
     private readonly paymentRepository: IPaymentRepository,
     private readonly orderRepository: IOrderRepository,
-  ) { }
+  ) {}
 
   async processPayment(
     orderId: string,
@@ -67,7 +67,10 @@ export class PaymentService implements IPaymentService {
     return payment;
   }
 
-  async updatePaymentStatus(paymentId: string, status: string): Promise<Payment> {
+  async updatePaymentStatus(
+    paymentId: string,
+    status: string,
+  ): Promise<Payment> {
     return await this.paymentRepository.updatePaymentStatus(paymentId, status);
   }
 }

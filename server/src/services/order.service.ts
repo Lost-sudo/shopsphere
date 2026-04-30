@@ -98,10 +98,38 @@ export class OrderService implements IOrderService {
     const existingOrder = await this.orderRepository.getOrderById(orderId);
     if (!existingOrder)
       throw new NotFoundError("Order with the given ID does not exist.");
+    if (input.status) {
+      const newStatus = input.status.toUpperCase();
+      const currentStatus = existingOrder.status.toUpperCase();
+
+      if (newStatus === "PAID" && currentStatus !== "PENDING") {
+        throw new BadRequestError(
+          "Order can only be marked as PAID if it is currently PENDING.",
+        );
+      }
+      if (newStatus === "PROCESSING" && currentStatus !== "PAID") {
+        throw new BadRequestError(
+          "Order can only be marked as PROCESSING if it is currently PAID.",
+        );
+      }
+      if (newStatus === "SHIPPED" && currentStatus !== "PROCESSING") {
+        throw new BadRequestError(
+          "Order can only be marked as SHIPPED if it is currently PROCESSING (Packed).",
+        );
+      }
+      if (newStatus === "DELIVERED" && currentStatus !== "SHIPPED") {
+        throw new BadRequestError(
+          "Order can only be marked as DELIVERED if it is currently SHIPPED.",
+        );
+      }
+    }
     const updatedOrder = await this.orderRepository.updateOrder(orderId, input);
-    
+
     // If order is marked as DELIVERED and it's COD, we should also mark payment as COMPLETED
-    if (input.status?.toUpperCase() === "DELIVERED" && updatedOrder?.paymentMethod.toUpperCase() === "COD") {
+    if (
+      input.status?.toUpperCase() === "DELIVERED" &&
+      updatedOrder?.paymentMethod.toUpperCase() === "COD"
+    ) {
       const payment = await this.paymentService.getPaymentByOrderId(orderId);
       if (payment && payment.status !== "COMPLETED") {
         await this.paymentService.updatePaymentStatus(payment.id, "COMPLETED");
@@ -118,17 +146,15 @@ export class OrderService implements IOrderService {
     return true;
   }
 
-  async processShipment(
-    orderId: string,
-  ): Promise<Shipment> {
+  async processShipment(orderId: string): Promise<Shipment> {
     const order = await this.orderRepository.getOrderById(orderId);
     if (!order) {
       throw new NotFoundError("Order not found.");
     }
 
-    if (order.status.toUpperCase() !== "PAID" && order.paymentMethod.toUpperCase() !== "COD") {
+    if (order.status.toUpperCase() !== "PROCESSING") {
       throw new BadRequestError(
-        "Order must be paid or COD before processing shipment.",
+        "Order must be packed and in PROCESSING status before shipment.",
       );
     }
 
