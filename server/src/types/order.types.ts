@@ -1,5 +1,5 @@
 import { Payment } from "./payment.types";
-import { Product } from "./product.types";
+import { Shipment } from "./shipment.types";
 
 export type Order = {
   id: string;
@@ -11,6 +11,11 @@ export type Order = {
   idempotencyKey?: string | null;
   status: string;
   payment?: Payment;
+  user?: {
+    name: string | null;
+    email: string;
+  };
+  shipment?: Shipment;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -21,7 +26,7 @@ export type OrderItem = {
   productId: string;
   quantity: number;
   price: number;
-  product?: Product;
+  product?: any; // Avoiding circular dependency or complex types for now
   createdAt: Date;
   updatedAt: Date;
 };

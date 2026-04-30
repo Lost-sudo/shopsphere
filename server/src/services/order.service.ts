@@ -87,6 +87,10 @@ export class OrderService implements IOrderService {
     const orders = await this.orderRepository.getOrdersByUserId(userId);
     return orders;
   }
+  async getAllOrders(): Promise<Order[]> {
+    const orders = await this.orderRepository.getAllOrders();
+    return orders;
+  }
   async updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,
@@ -95,6 +99,15 @@ export class OrderService implements IOrderService {
     if (!existingOrder)
       throw new NotFoundError("Order with the given ID does not exist.");
     const updatedOrder = await this.orderRepository.updateOrder(orderId, input);
+    
+    // If order is marked as DELIVERED and it's COD, we should also mark payment as COMPLETED
+    if (input.status?.toUpperCase() === "DELIVERED" && updatedOrder?.paymentMethod.toUpperCase() === "COD") {
+      const payment = await this.paymentService.getPaymentByOrderId(orderId);
+      if (payment && payment.status !== "COMPLETED") {
+        await this.paymentService.updatePaymentStatus(payment.id, "COMPLETED");
+      }
+    }
+
     return updatedOrder;
   }
   async deleteOrder(orderId: string): Promise<boolean> {
@@ -114,9 +127,9 @@ export class OrderService implements IOrderService {
       throw new NotFoundError("Order not found.");
     }
 
-    if (order.status.toUpperCase() !== "PAID") {
+    if (order.status.toUpperCase() !== "PAID" && order.paymentMethod.toUpperCase() !== "COD") {
       throw new BadRequestError(
-        "Order must be paid before processing shipment.",
+        "Order must be paid or COD before processing shipment.",
       );
     }
 

@@ -51,6 +51,16 @@ export class OrderController {
     });
   });
 
+  getAllOrders = asyncHandler(async (req: Request, res: Response) => {
+    const orders = await this.orderService.getAllOrders();
+
+    res.status(200).json({
+      success: true,
+      message: "All orders fetched successfully",
+      orders,
+    });
+  });
+
   updateOrder = asyncHandler(async (req: Request, res: Response) => {
     const orderId = req.params.id;
     const orderInput = req.body as UpdateOrderInput;

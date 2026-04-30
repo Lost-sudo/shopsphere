@@ -17,8 +17,6 @@ export class PaymentService implements IPaymentService {
     private readonly orderRepository: IOrderRepository,
   ) { }
 
-
-
   async processPayment(
     orderId: string,
     paymentMethod: PaymentMethod,
@@ -67,6 +65,10 @@ export class PaymentService implements IPaymentService {
       throw new NotFoundError("Payment for this order not found.");
     }
     return payment;
+  }
+
+  async updatePaymentStatus(paymentId: string, status: string): Promise<Payment> {
+    return await this.paymentRepository.updatePaymentStatus(paymentId, status);
   }
 }
 

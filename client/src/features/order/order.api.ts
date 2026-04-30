@@ -3,7 +3,11 @@ import type {
     CreateOrderRequest,
     CreateOrderResponse,
     GetOrdersResponse,
-    GetOrderResponse
+    GetOrderResponse,
+    ProcessShipmentRequest,
+    ProcessShipmentResponse,
+    UpdateOrderStatusRequest,
+    UpdateOrderStatusResponse
 } from "./order.types";
 
 export const orderApi = baseApi.injectEndpoints({
@@ -29,6 +33,19 @@ export const orderApi = baseApi.injectEndpoints({
                     ]
                     : [{ type: "Orders" as const, id: "LIST" }],
         }),
+        getAllOrders: builder.query<GetOrdersResponse, void>({
+            query: () => ({
+                url: "/orders/get-all-orders",
+                method: "GET",
+            }),
+            providesTags: (result) => 
+                result?.orders 
+                    ? [
+                        { type: "Orders" as const, id: "ADMIN_LIST" },
+                        ...result.orders.map((o) => ({ type: "Orders" as const, id: o.id }))
+                    ]
+                    : [{ type: "Orders" as const, id: "ADMIN_LIST" }],
+        }),
         getOrderById: builder.query<GetOrderResponse, string>({
             query: (id) => ({
                 url: `/orders/get-order/${id}`,
@@ -36,11 +53,38 @@ export const orderApi = baseApi.injectEndpoints({
             }),
             providesTags: (_result, _error, id) => [{ type: "Orders", id }],
         }),
+        processShipment: builder.mutation<ProcessShipmentResponse, ProcessShipmentRequest>({
+            query: ({ orderId, ...body }) => ({
+                url: `/orders/process-shipment/${orderId}`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: (_result, _error, { orderId }) => [
+                { type: "Orders", id: orderId },
+                { type: "Orders", id: "LIST" },
+                { type: "Orders", id: "ADMIN_LIST" }
+            ],
+        }),
+        updateOrderStatus: builder.mutation<UpdateOrderStatusResponse, UpdateOrderStatusRequest>({
+            query: ({ orderId, ...body }) => ({
+                url: `/orders/update-order/${orderId}`,
+                method: "PUT",
+                body,
+            }),
+            invalidatesTags: (_result, _error, { orderId }) => [
+                { type: "Orders", id: orderId },
+                { type: "Orders", id: "LIST" },
+                { type: "Orders", id: "ADMIN_LIST" }
+            ],
+        }),
     }),
 });
 
 export const {
     useCreateOrderMutation,
     useGetUserOrdersQuery,
+    useGetAllOrdersQuery,
     useGetOrderByIdQuery,
+    useProcessShipmentMutation,
+    useUpdateOrderStatusMutation,
 } = orderApi;

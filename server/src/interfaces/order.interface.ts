@@ -7,6 +7,7 @@ export interface IOrderRepository {
   createOrder(input: OrderInput, userId: string): Promise<Order>;
   getOrderById(orderId: string): Promise<Order | null>;
   getOrdersByUserId(userId: string): Promise<Order[]>;
+  getAllOrders(): Promise<Order[]>;
   updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,
@@ -19,6 +20,7 @@ export interface IOrderService {
   createOrder(input: OrderInput, userId: string): Promise<Order>;
   getOrderById(orderId: string): Promise<Order | null>;
   getOrdersByUserId(userId: string): Promise<Order[]>;
+  getAllOrders(): Promise<Order[]>;
   updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,

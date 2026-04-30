@@ -2,6 +2,10 @@ export interface OrderItem {
     productId: string;
     quantity: number;
     price: number;
+    product?: {
+        name: string;
+        images: string[];
+    };
 }
 
 export interface CreateOrderRequest {
@@ -14,16 +18,35 @@ export interface CreateOrderRequest {
     status?: string;
 }
 
+export interface Shipment {
+    id: string;
+    orderId: string;
+    trackingNumber: string;
+    shippingMethod: string;
+    status: string;
+    shipping_fee: number;
+    weight: number;
+    sender: any;
+    recipient: any;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface Order {
     id: string;
     userId: string;
-    items: any[]; // We can refine this later if we have product details
+    items: OrderItem[];
     totalAmount: number;
     shippingAddress: string;
     paymentMethod: string;
     status: string;
     createdAt: string;
     updatedAt: string;
+    user?: {
+        name: string;
+        email: string;
+    };
+    shipment?: Shipment;
 }
 
 export interface CreateOrderResponse {
@@ -39,6 +62,28 @@ export interface GetOrdersResponse {
 }
 
 export interface GetOrderResponse {
+    success: boolean;
+    message: string;
+    order: Order;
+}
+
+export interface ProcessShipmentRequest {
+    orderId: string;
+    carrier: string;
+}
+
+export interface ProcessShipmentResponse {
+    success: boolean;
+    message: string;
+    shipment: any;
+}
+
+export interface UpdateOrderStatusRequest {
+    orderId: string;
+    status: string;
+}
+
+export interface UpdateOrderStatusResponse {
     success: boolean;
     message: string;
     order: Order;

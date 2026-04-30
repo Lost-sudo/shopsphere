@@ -21,6 +21,12 @@ router.get(
   orderController.getOrdersByUserId,
 );
 router.get(
+  "/get-all-orders",
+  authenticated,
+  authorized(["ADMIN", "SUPER_ADMIN"]),
+  orderController.getAllOrders,
+);
+router.get(
   "/get-order/:id",
   authenticated,
   authorized(["CUSTOMER", "ADMIN", "SUPER_ADMIN"]),

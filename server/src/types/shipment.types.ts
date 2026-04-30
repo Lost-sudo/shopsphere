@@ -13,6 +13,7 @@ export type Recipient = {
 };
 
 export type Shipment = {
+  id?: string;
   orderId: string;
   trackingNumber: string;
   shippingMethod: ShippingMethod;
@@ -21,4 +22,6 @@ export type Shipment = {
   sender: Sender;
   recipient: Recipient;
   weight: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

@@ -45,6 +45,23 @@ export class OrderRepository implements IOrderRepository {
         createdAt: prismaOrder.payment.createdAt,
         updatedAt: prismaOrder.payment.updatedAt,
       } : undefined,
+      user: prismaOrder.user ? {
+        name: prismaOrder.user.name,
+        email: prismaOrder.user.email,
+      } : undefined,
+      shipment: prismaOrder.shipment ? {
+        id: prismaOrder.shipment.id,
+        orderId: prismaOrder.shipment.orderId,
+        trackingNumber: prismaOrder.shipment.trackingNumber,
+        shippingMethod: prismaOrder.shipment.shippingMethod,
+        status: prismaOrder.shipment.status,
+        shipping_fee: Number(prismaOrder.shipment.shipping_fee),
+        weight: Number(prismaOrder.shipment.weight),
+        sender: prismaOrder.shipment.sender,
+        recipient: prismaOrder.shipment.recipient,
+        createdAt: prismaOrder.shipment.createdAt,
+        updatedAt: prismaOrder.shipment.updatedAt,
+      } : undefined,
       idempotencyKey: prismaOrder.idempotencyKey,
       createdAt: prismaOrder.createdAt,
       updatedAt: prismaOrder.updatedAt,
@@ -75,6 +92,8 @@ export class OrderRepository implements IOrderRepository {
           },
         },
         payment: true,
+        user: true,
+        shipment: true,
       },
     });
 
@@ -91,6 +110,8 @@ export class OrderRepository implements IOrderRepository {
           },
         },
         payment: true,
+        user: true,
+        shipment: true,
       },
     });
 
@@ -108,6 +129,8 @@ export class OrderRepository implements IOrderRepository {
           },
         },
         payment: true,
+        user: true,
+        shipment: true,
       },
     });
 
@@ -125,6 +148,28 @@ export class OrderRepository implements IOrderRepository {
           },
         },
         payment: true,
+        user: true,
+        shipment: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return orders.map((order) => this.mapPrismaOrderToOrder(order));
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    const orders = await prisma.order.findMany({
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        payment: true,
+        user: true,
+        shipment: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -153,6 +198,8 @@ export class OrderRepository implements IOrderRepository {
           },
         },
         payment: true,
+        user: true,
+        shipment: true,
       },
     });
 
