@@ -13,15 +13,37 @@ async function main() {
   await prisma.order.deleteMany();
   await prisma.cart.deleteMany();
   await prisma.productVariant.deleteMany();
+  await prisma.productCategory.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
 
   // 2. Create Categories
   console.log("Creating categories...");
-  const apparel = await prisma.category.create({
+  const newArrivals = await prisma.category.create({
     data: {
-      name: "Apparel",
-      description: "Premium clothing for the modern individual.",
+      name: "New Arrivals",
+      description: "Freshly added premium pieces.",
+    },
+  });
+
+  const summerDrop = await prisma.category.create({
+    data: {
+      name: "Summer Drop",
+      description: "Breezy and lightweight clothing for warm days.",
+    },
+  });
+
+  const streetwear = await prisma.category.create({
+    data: {
+      name: "Streetwear",
+      description: "Bold and comfortable urban fashion.",
+    },
+  });
+
+  const minimalLuxe = await prisma.category.create({
+    data: {
+      name: "Minimal Luxe",
+      description: "Understated luxury and essential silhouettes.",
     },
   });
 
@@ -32,25 +54,25 @@ async function main() {
     },
   });
 
-  const homeDecor = await prisma.category.create({
-    data: {
-      name: "Home Decor",
-      description: "Curated objects for a refined living space.",
-    },
-  });
-
-  // 3. Create Products and Variants
+  // 3. Create Products, Categories relations, and Variants
   console.log("Creating products...");
 
-  // --- Product 1: Apparel ---
+  // --- Product 1: Luxe Cotton Tee ---
   await prisma.product.create({
     data: {
       name: "Luxe Cotton Tee",
-      description: "Indulge in the epitome of comfort. Our Luxe Cotton Tee is crafted from 100% organic long-staple cotton, providing an ultra-soft feel and a perfect drape. A timeless essential for any curated wardrobe.",
+      description: "Indulge in the epitome of comfort. Our Luxe Cotton Tee is crafted from 100% organic long-staple cotton, providing an ultra-soft feel and a perfect drape. An essential foundation for any curated wardrobe.",
       price: 2450.00,
       weight: 200,
-      categoryId: apparel.id,
-      images: ["/images/products/premium_tshirt.png"],
+      images: ["/images/products/luxe_cotton_tee.png"],
+      stock: 50,
+      categories: {
+        create: [
+          { categoryId: newArrivals.id },
+          { categoryId: summerDrop.id },
+          { categoryId: minimalLuxe.id },
+        ],
+      },
       variants: {
         create: [
           { name: "Size", value: "Small", sku: "APP-TEE-S", stock: 15, price: 2450.00 },
@@ -58,65 +80,229 @@ async function main() {
           { name: "Size", value: "Large", sku: "APP-TEE-L", stock: 10, price: 2450.00 },
         ],
       },
-      stock: 50,
     },
   });
 
-  // --- Product 2: Accessories ---
+  // --- Product 2: Aura Chronograph Watch ---
   await prisma.product.create({
     data: {
       name: "Aura Chronograph Watch",
-      description: "A masterpiece of horology. The Aura Chronograph features a precision Swiss movement housed in a surgical-grade stainless steel case. Minimalist design meets functional excellence.",
+      description: "A masterpiece of modern horology. The Aura Chronograph features a precision Swiss movement housed in a surgical-grade stainless steel case. Minimalist luxury meets outstanding functional excellence.",
       price: 18500.00,
       weight: 150,
-      categoryId: accessories.id,
-      images: ["/images/products/luxury_watch.png"],
+      images: ["/images/products/aura_chronograph_watch.png"],
+      stock: 13,
+      categories: {
+        create: [
+          { categoryId: minimalLuxe.id },
+          { categoryId: accessories.id },
+        ],
+      },
       variants: {
         create: [
           { name: "Strap", value: "Italian Leather", sku: "ACC-WCH-LEA", stock: 5, price: 18500.00 },
           { name: "Strap", value: "Stainless Steel", sku: "ACC-WCH-STL", stock: 8, price: 19500.00 },
         ],
       },
-      stock: 13,
     },
   });
 
-  // --- Product 3: Home Decor ---
+  // --- Product 3: Oversized Utility Cargo Pants ---
   await prisma.product.create({
     data: {
-      name: "Velvet Lounge Cushion",
-      description: "Elevate your living space with the rich texture of our Velvet Lounge Cushion. Each piece is hand-finished with a hidden zipper and filled with premium down-alternative for lasting loft and luxury.",
-      price: 3200.00,
-      weight: 500,
-      categoryId: homeDecor.id,
+      name: "Oversized Utility Cargo Pants",
+      description: "Designed for urban exploration. Engineered from durable cotton ripstop with a modern relaxed fit. Finished with multiple tactical pockets, custom buckles, and adjustable drawcords.",
+      price: 4200.00,
+      weight: 650,
+      images: ["/images/products/oversized_utility_cargos.png"],
+      stock: 35,
+      categories: {
+        create: [
+          { categoryId: streetwear.id },
+          { categoryId: newArrivals.id },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Size", value: "Small", sku: "STR-CAR-S", stock: 10, price: 4200.00 },
+          { name: "Size", value: "Medium", sku: "STR-CAR-M", stock: 15, price: 4200.00 },
+          { name: "Size", value: "Large", sku: "STR-CAR-L", stock: 10, price: 4200.00 },
+        ],
+      },
+    },
+  });
+
+  // --- Product 4: Sleek Leather Bomber Jacket ---
+  await prisma.product.create({
+    data: {
+      name: "Sleek Leather Bomber Jacket",
+      description: "A classic silhouette refined. Handcrafted from buttery-soft premium nappa leather. Features clean lines, ribbed knit trims, custom gunmetal zippers, and a subtle modern satin lining.",
+      price: 12500.00,
+      weight: 1200,
+      images: ["/images/products/sleek_leather_bomber.png"],
+      stock: 15,
+      categories: {
+        create: [
+          { categoryId: streetwear.id },
+          { categoryId: minimalLuxe.id },
+          { categoryId: newArrivals.id },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Size", value: "Medium", sku: "APP-BMB-M", stock: 5, price: 12500.00 },
+          { name: "Size", value: "Large", sku: "APP-BMB-L", stock: 7, price: 12500.00 },
+          { name: "Size", value: "X-Large", sku: "APP-BMB-XL", stock: 3, price: 12900.00 },
+        ],
+      },
+    },
+  });
+
+  // --- Product 5: Linen Vacation Shirt ---
+  await prisma.product.create({
+    data: {
+      name: "Linen Vacation Shirt",
+      description: "Stay breezy under the sun. Woven from 100% pure Belgian linen, this shirt features a relaxed camp collar and pre-washed softness. Perfect for effortless resort elegance.",
+      price: 3500.00,
+      weight: 180,
+      images: ["/images/products/premium_tshirt.png"],
+      stock: 40,
+      categories: {
+        create: [
+          { categoryId: summerDrop.id },
+          { categoryId: minimalLuxe.id },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Size", value: "S", sku: "SUM-LIN-S", stock: 10, price: 3500.00 },
+          { name: "Size", value: "M", sku: "SUM-LIN-M", stock: 20, price: 3500.00 },
+          { name: "Size", value: "L", sku: "SUM-LIN-L", stock: 10, price: 3500.00 },
+        ],
+      },
+    },
+  });
+
+  // --- Product 6: Premium Fleece Hoodie ---
+  await prisma.product.create({
+    data: {
+      name: "Premium Fleece Hoodie",
+      description: "The ultimate cozy essential. Crafted from heavyweight 450gsm organic cotton French terry. Boasts a double-lined hood, dropped shoulders, and a clean minimalist aesthetic.",
+      price: 4900.00,
+      weight: 750,
+      images: ["/images/home/trending_streetwear.png"],
+      stock: 25,
+      categories: {
+        create: [
+          { categoryId: streetwear.id },
+          { categoryId: minimalLuxe.id },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Size", value: "M", sku: "STR-HUD-M", stock: 10, price: 4900.00 },
+          { name: "Size", value: "L", sku: "STR-HUD-L", stock: 10, price: 4900.00 },
+          { name: "Size", value: "XL", sku: "STR-HUD-XL", stock: 5, price: 4900.00 },
+        ],
+      },
+    },
+  });
+
+  // --- Product 7: Breezy Swim Shorts ---
+  await prisma.product.create({
+    data: {
+      name: "Breezy Swim Shorts",
+      description: "Resort-ready style and performance. Made from ultra-lightweight, quick-drying recycled nylon. Features an elasticated waistband, custom drawcords, and a mesh-lined interior.",
+      price: 2200.00,
+      weight: 150,
+      images: ["/images/home/trending_summer.png"],
+      stock: 30,
+      categories: {
+        create: [
+          { categoryId: summerDrop.id },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Size", value: "S", sku: "SUM-SWM-S", stock: 10, price: 2200.00 },
+          { name: "Size", value: "M", sku: "SUM-SWM-M", stock: 15, price: 2200.00 },
+          { name: "Size", value: "L", sku: "SUM-SWM-L", stock: 5, price: 2200.00 },
+        ],
+      },
+    },
+  });
+
+  // --- Product 8: Urban Tech Backpack ---
+  await prisma.product.create({
+    data: {
+      name: "Urban Tech Backpack",
+      description: "The ultimate commuter companion. Built with water-resistant ballistic nylon, a padded 16-inch laptop compartment, and sleek magnetic Fidlock closures. Ideal for tech-savvy travelers.",
+      price: 6800.00,
+      weight: 950,
+      images: ["/images/home/featured_masonry_1.png"],
+      stock: 20,
+      categories: {
+        create: [
+          { categoryId: streetwear.id },
+          { categoryId: accessories.id },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Color", value: "Stealth Black", sku: "ACC-BPK-BLK", stock: 12, price: 6800.00 },
+          { name: "Color", value: "Slate Grey", sku: "ACC-BPK-GRY", stock: 8, price: 6800.00 },
+        ],
+      },
+    },
+  });
+
+  // --- Product 9: Classic Silk Scarf ---
+  await prisma.product.create({
+    data: {
+      name: "Classic Silk Scarf",
+      description: "Woven from 100% pure Mulberry silk, this scarf exhibits a luminous sheen and hand-rolled edges. A versatile accent piece that adds effortless sophistication to any outfit.",
+      price: 2800.00,
+      weight: 50,
       images: ["/images/products/velvet_cushion.png"],
-      variants: {
+      stock: 15,
+      categories: {
         create: [
-          { name: "Color", value: "Emerald Green", sku: "HOM-CSH-EMR", stock: 12, price: 3200.00 },
-          { name: "Color", value: "Midnight Blue", sku: "HOM-CSH-MID", stock: 12, price: 3200.00 },
-          { name: "Color", value: "Charcoal Grey", sku: "HOM-CSH-CHR", stock: 12, price: 3200.00 },
+          { categoryId: minimalLuxe.id },
+          { categoryId: accessories.id },
+          { categoryId: summerDrop.id },
         ],
       },
-      stock: 36,
+      variants: {
+        create: [
+          { name: "Color", value: "Champagne Gold", sku: "ACC-SCF-GLD", stock: 7, price: 2800.00 },
+          { name: "Color", value: "Emerald Green", sku: "ACC-SCF-EMR", stock: 8, price: 2800.00 },
+        ],
+      },
     },
   });
 
-  // --- Product 4: Apparel (Another one) ---
+  // --- Product 10: Vintage Distressed Denim ---
   await prisma.product.create({
     data: {
-      name: "Cashmere Blend Sweater",
-      description: "Woven from a delicate blend of Mongolian cashmere and fine merino wool, this sweater offers unparalleled warmth without the weight. Designed with a modern silhouette for versatile styling.",
-      price: 8900.00,
-      weight: 400,
-      categoryId: apparel.id,
-      images: ["/images/products/premium_tshirt.png"], // Reuse for now
-      variants: {
+      name: "Vintage Distressed Denim",
+      description: "Reimagined heritage denim. Crafted from 13.5oz Japanese selvedge cotton denim. Hand-distressed with unique vintage washes and subtle paint splatters for an authentic lived-in feel.",
+      price: 5400.00,
+      weight: 700,
+      images: ["/images/home/hero_lookbook.png"],
+      stock: 22,
+      categories: {
         create: [
-          { name: "Size", value: "M", sku: "APP-SWT-M", stock: 8, price: 8900.00 },
-          { name: "Size", value: "L", sku: "APP-SWT-L", stock: 5, price: 8900.00 },
+          { categoryId: streetwear.id },
+          { categoryId: newArrivals.id },
         ],
       },
-      stock: 13,
+      variants: {
+        create: [
+          { name: "Size", value: "30", sku: "STR-DNM-30", stock: 5, price: 5400.00 },
+          { name: "Size", value: "32", sku: "STR-DNM-32", stock: 12, price: 5400.00 },
+          { name: "Size", value: "34", sku: "STR-DNM-34", stock: 5, price: 5400.00 },
+        ],
+      },
     },
   });
 
