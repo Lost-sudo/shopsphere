@@ -253,10 +253,12 @@ export default function ProductPage({ params }: ProductPageProps) {
                     {/* Right: Product Info Editorial */}
                     <div className="lg:sticky lg:top-32 space-y-10">
                         <div className="space-y-6">
-                            <div className="flex items-center gap-3">
-                                <Badge className="bg-luxury-gold/10 text-luxury-gold border-luxury-gold/20 hover:bg-luxury-gold/20 font-bold px-4 py-1.5 rounded-full text-[9px] uppercase tracking-[0.2em]">
-                                    {product.category?.name || "Premium Piece"}
-                                </Badge>
+                            <div className="flex items-center gap-3 flex-wrap">
+                                {(product.categories?.length > 0 ? product.categories : [{ name: "Premium Piece", id: "" }]).map((cat) => (
+                                    <Badge key={cat.id || cat.name} className="bg-luxury-gold/10 text-luxury-gold border-luxury-gold/20 hover:bg-luxury-gold/20 font-bold px-4 py-1.5 rounded-full text-[9px] uppercase tracking-[0.2em]">
+                                        {cat.name}
+                                    </Badge>
+                                ))}
                                 <div className="h-px w-12 bg-black/10" />
                                 <div className="flex items-center gap-1 text-luxury-gold">
                                     <Star size={10} fill="currentColor" />

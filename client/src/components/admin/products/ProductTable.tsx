@@ -52,7 +52,7 @@ export function ProductTable({ products, onDelete, onEdit, onDuplicate, onToggle
         <tbody className="divide-y divide-black/5">
           {products.map((product) => {
             const imageUrl = product.images?.[0];
-            const categoryName = product.category?.name ?? "—";
+            const categoryNames = product.categories?.map((c) => c.name) ?? [];
             const status = deriveStockStatus(product.stock);
 
             return (
@@ -84,12 +84,17 @@ export function ProductTable({ products, onDelete, onEdit, onDuplicate, onToggle
                   </div>
                 </td>
                 <td className="px-8 py-6 whitespace-nowrap">
-                  <Badge
-                    variant="outline"
-                    className="font-bold text-[10px] uppercase tracking-widest bg-white/40 border-white/60 text-luxury-charcoal shadow-sm px-3 py-1"
-                  >
-                    {categoryName}
-                  </Badge>
+                  <div className="flex flex-wrap gap-1.5">
+                    {categoryNames.length > 0 ? categoryNames.map((name) => (
+                      <Badge
+                        key={name}
+                        variant="outline"
+                        className="font-bold text-[10px] uppercase tracking-widest bg-white/40 border-white/60 text-luxury-charcoal shadow-sm px-3 py-1"
+                      >
+                        {name}
+                      </Badge>
+                    )) : <span className="text-xs text-neutral-400">—</span>}
+                  </div>
                 </td>
                 <td className="px-8 py-6 whitespace-nowrap text-right">
                   <span className="text-sm font-serif italic text-luxury-gold font-bold">

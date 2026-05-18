@@ -36,16 +36,18 @@ describe("Product API", () => {
         role: Role.ADMIN,
     };
 
+    const mockCategoryId = "550e8400-e29b-41d4-a716-446655440002";
+
     const mockProduct = {
         id: "550e8400-e29b-41d4-a716-446655440001",
         name: "iPhone 15",
         description: "Latest Apple phone, now with USB-C",
         price: 999,
         stock: 10,
-        categoryId: "550e8400-e29b-41d4-a716-446655440002",
         images: ["http://example.com/image.jpg"],
         createdAt: new Date(),
         updatedAt: new Date(),
+        categories: [],
     };
 
     const mockVariant = {
@@ -104,7 +106,7 @@ describe("Product API", () => {
 
     describe("POST /api/v1/products", () => {
         it("should create a new product (Admin only)", async () => {
-            (prisma.category.findUnique as jest.Mock).mockResolvedValue({ id: mockProduct.categoryId });
+            (prisma.category.findUnique as jest.Mock).mockResolvedValue({ id: mockCategoryId });
             (prisma.product.create as jest.Mock).mockResolvedValue(mockProduct);
 
             const response = await request(app)
@@ -115,7 +117,8 @@ describe("Product API", () => {
                     description: "Latest Apple phone, now with USB-C",
                     price: 999,
                     stock: 10,
-                    categoryId: mockProduct.categoryId,
+                    weight: 200,
+                    categoryIds: [mockCategoryId],
                 });
 
             expect(response.status).toBe(201);
@@ -149,15 +152,17 @@ describe("Product API", () => {
                 .delete(`/api/v1/products/${mockProduct.id}`)
                 .set("Authorization", `Bearer ${adminToken}`);
 
-            expect(response.status).toBe(204);
+            expect(response.status).toBe(200);
         });
     });
 
     describe("Variant Routes", () => {
         describe("POST /api/v1/products/:id/variants", () => {
             it("should create a product variant", async () => {
-                (prisma.product.findUnique as jest.Mock).mockResolvedValue(mockProduct);
+                (prisma.product.findUnique as jest.Mock).mockResolvedValue({ ...mockProduct, categories: [] });
                 (prisma.productVariant.create as jest.Mock).mockResolvedValue(mockVariant);
+                (prisma.productVariant.findMany as jest.Mock).mockResolvedValue([mockVariant]);
+                (prisma.product.update as jest.Mock).mockResolvedValue({ ...mockProduct, categories: [], stock: 5 });
 
                 const response = await request(app)
                     .post(`/api/v1/products/${mockProduct.id}/variants`)

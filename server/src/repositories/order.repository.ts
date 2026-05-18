@@ -15,7 +15,7 @@ export class OrderRepository implements IOrderRepository {
         productId: item.productId,
         quantity: item.quantity,
         price: Number(item.price),
-        product: item.product ? {
+          product: item.product ? {
           id: item.product.id,
           name: item.product.name,
           description: item.product.description,
@@ -23,7 +23,6 @@ export class OrderRepository implements IOrderRepository {
           stock: item.product.stock,
           images: item.product.images,
           isActive: item.product.isActive,
-          categoryId: item.product.categoryId,
           weight: Number(item.product.weight),
           createdAt: item.product.createdAt,
           updatedAt: item.product.updatedAt,

@@ -21,12 +21,11 @@ export type Product = {
   stock: number;
   images: string[];
   isActive: boolean;
-  categoryId: string;
   createdAt: string;
   updatedAt: string;
   weight: number;
   variants?: ProductVariant[];
-  category?: ProductCategorySummary;
+  categories: ProductCategorySummary[];
 };
 
 export type ProductSort = "price_asc" | "price_desc" | "newest" | "oldest";
@@ -85,7 +84,7 @@ export type CreateProductRequest = {
   stock?: number;
   weight?: number;
   isActive?: boolean;
-  categoryId: string;
+  categoryIds: string[];
   variants?: ProductVariantInput[];
   images?: File[];
 };

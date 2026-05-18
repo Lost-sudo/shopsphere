@@ -26,10 +26,9 @@ function buildCreateProductFormData(input: CreateProductRequest): FormData {
   if (input.stock !== undefined) fd.append("stock", String(input.stock));
   if (input.weight !== undefined) fd.append("weight", String(input.weight));
   if (input.isActive !== undefined) fd.append("isActive", String(input.isActive));
-  fd.append("categoryId", input.categoryId);
+  fd.append("categoryIds", JSON.stringify(input.categoryIds));
 
   if (input.variants?.length) {
-    // Server accepts variants as JSON string or array; multipart will deliver strings.
     fd.append("variants", JSON.stringify(input.variants));
   }
 

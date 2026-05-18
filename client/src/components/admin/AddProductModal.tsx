@@ -31,12 +31,13 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Package, Loader2, Plus, Trash2, Layers } from "lucide-react";
+import { Package, Loader2, Plus, Trash2, Layers, BadgeCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { useCreateProductMutation } from "@/features/product/product.api";
 import { useGetCategoriesQuery } from "@/features/category/category.api";
 import { CreateCategoryModal } from "./CreateCategoryModal";
+import { cn } from "@/lib/utils";
 
 const productSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters").max(255),
@@ -44,7 +45,7 @@ const productSchema = z.object({
     price: z.number().min(0, "Price must be positive"),
     stock: z.number().int().min(0, "Stock cannot be negative").optional(),
     weight: z.number().min(0, "Weight must be positive"),
-    categoryId: z.string().uuid("Invalid category"),
+    categoryIds: z.array(z.string().uuid("Invalid category")).min(1, "Select at least one category"),
     isActive: z.boolean(),
     variants: z.array(z.object({
         name: z.string().min(1, "Name is required"),
@@ -85,7 +86,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
             price: 0,
             stock: 0,
             weight: 0,
-            categoryId: "",
+            categoryIds: [],
             isActive: true,
             variants: [],
         },
@@ -105,7 +106,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                 price: values.price,
                 stock: values.stock,
                 weight: values.weight,
-                categoryId: values.categoryId,
+                categoryIds: values.categoryIds,
                 isActive: values.isActive,
                 variants: values.variants,
                 images,
@@ -164,13 +165,13 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 )}
                             />
 
-                            <FormField<ProductFormValues, "categoryId">
+                            <FormField<ProductFormValues, "categoryIds">
                                 control={form.control}
-                                name="categoryId"
-                                render={({ field }) => (
+                                name="categoryIds"
+                                render={() => (
                                     <FormItem className="md:col-span-2">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Category</FormLabel>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Categories</FormLabel>
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -182,29 +183,46 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                                 New Category
                                             </Button>
                                         </div>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value as string}
-                                            disabled={isCategoriesLoading}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger className="h-12 border-white/60 bg-white/40 focus:ring-luxury-gold focus:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal">
-                                                    <SelectValue placeholder={isCategoriesLoading ? "Loading..." : "Select a category"} />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="border border-white/60 bg-white/80 backdrop-blur-2xl rounded-xl shadow-xl z-[100]">
-                                                {categories.map((category) => (
-                                                    <SelectItem key={category.id} value={category.id} className="rounded-lg focus:bg-white/60 focus:text-luxury-charcoal">
-                                                        {category.name}
-                                                    </SelectItem>
-                                                ))}
-                                                {categories.length === 0 && !isCategoriesLoading && (
-                                                    <div className="p-4 text-center text-xs text-neutral-500">
-                                                        No categories found.
-                                                    </div>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {categories.map((category) => {
+                                                const checked = (form.watch("categoryIds") || []).includes(category.id);
+                                                return (
+                                                    <label
+                                                        key={category.id}
+                                                        className={cn(
+                                                            "flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all",
+                                                            checked
+                                                                ? "bg-luxury-charcoal text-white border-luxury-charcoal shadow-md"
+                                                                : "bg-white/40 border-white/60 hover:bg-white/60 text-luxury-charcoal"
+                                                        )}
+                                                    >
+                                                        <Checkbox
+                                                            checked={checked}
+                                                            onCheckedChange={() => {
+                                                                const current = form.getValues("categoryIds") || [];
+                                                                if (checked) {
+                                                                    form.setValue("categoryIds", current.filter((id) => id !== category.id), { shouldValidate: true });
+                                                                } else {
+                                                                    form.setValue("categoryIds", [...current, category.id], { shouldValidate: true });
+                                                                }
+                                                            }}
+                                                            className={cn(
+                                                                "rounded-md w-4 h-4",
+                                                                checked
+                                                                    ? "data-[state=checked]:bg-white data-[state=checked]:text-luxury-charcoal"
+                                                                    : "border-white/60"
+                                                            )}
+                                                        />
+                                                        <span className="text-xs font-bold tracking-tight">{category.name}</span>
+                                                    </label>
+                                                );
+                                            })}
+                                            {categories.length === 0 && !isCategoriesLoading && (
+                                                <div className="col-span-full p-4 text-center text-xs text-neutral-500">
+                                                    No categories found.
+                                                </div>
+                                            )}
+                                        </div>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -515,8 +533,8 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                 open={isCategoryModalOpen}
                 onOpenChange={setIsCategoryModalOpen}
                 onSuccess={(id) => {
-                    form.setValue("categoryId", id);
-                    form.trigger("categoryId");
+                    const current = form.getValues("categoryIds") || [];
+                    form.setValue("categoryIds", [...current, id], { shouldValidate: true });
                     toast.success("New category selected!");
                 }}
             />

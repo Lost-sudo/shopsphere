@@ -39,8 +39,8 @@ const CARRIERS_BASE = [
 ];
 
 const PAYMENT_METHODS = [
-    { id: "CARD", name: "Credit / Debit Card", icon: CreditCard, description: "Visa, Mastercard, Amex" },
-    { id: "GCASH", name: "GCash", icon: Wallet, description: "Pay securely via GCash App" },
+    { id: "CARD", name: "Credit / Debit Card", icon: CreditCard, description: "Visa, Mastercard, Amex", disabled: true },
+    { id: "GCASH", name: "GCash", icon: Wallet, description: "Pay securely via GCash App", disabled: true },
     { id: "COD", name: "Cash on Delivery", icon: Banknote, description: "Pay when you receive" },
 ];
 
@@ -61,7 +61,7 @@ export default function CheckoutClient() {
     
     const [currentStep, setCurrentStep] = useState(1);
     const [selectedCarrier, setSelectedCarrier] = useState(CARRIERS_BASE[0].id);
-    const [selectedPayment, setSelectedPayment] = useState(PAYMENT_METHODS[0].id);
+    const [selectedPayment, setSelectedPayment] = useState("COD");
     const [overrideAddressId, setOverrideAddressId] = useState<string | null>(null);
     const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
@@ -387,35 +387,48 @@ export default function CheckoutClient() {
                             >
                                 <h2 className="text-2xl font-light text-[#1a1a1a] font-serif">Payment Method</h2>
                                 
+                                <div className="space-y-3">
+                                    <div className="rounded-2xl border border-yellow-200 bg-yellow-50/80 p-4 text-sm text-yellow-900">
+                                        Note: Credit/Debit Card and GCash payments are coming soon as future payment methods. For now, only Cash on Delivery is supported.
+                                    </div>
+                                </div>
                                 <div className="space-y-4">
-                                    {PAYMENT_METHODS.map((method) => (
-                                        <div
-                                            key={method.id}
-                                            onClick={() => setSelectedPayment(method.id)}
-                                            className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 flex items-center gap-6 ${
-                                                selectedPayment === method.id
-                                                    ? "bg-white/80 border-[#c5a059] shadow-md ring-1 ring-[#c5a059]/20"
-                                                    : "bg-white/40 border-white hover:bg-white/60 hover:border-gray-200"
-                                            }`}
-                                        >
-                                            <div className={`w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
-                                                selectedPayment === method.id ? "border-[#c5a059]" : "border-gray-300"
-                                            }`}>
-                                                {selectedPayment === method.id && (
-                                                    <div className="w-3 h-3 rounded-full bg-[#c5a059]" />
-                                                )}
-                                            </div>
-                                            <div className="flex-1 flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-500">
-                                                    <method.icon size={20} strokeWidth={1.5} />
+                                    {PAYMENT_METHODS.map((method) => {
+                                        const isDisabled = method.disabled === true;
+                                        return (
+                                            <div
+                                                key={method.id}
+                                                onClick={() => !isDisabled && setSelectedPayment(method.id)}
+                                                className={`p-6 rounded-2xl border transition-all duration-300 flex items-center gap-6 ${
+                                                    selectedPayment === method.id
+                                                        ? "bg-white/80 border-[#c5a059] shadow-md ring-1 ring-[#c5a059]/20"
+                                                        : isDisabled
+                                                            ? "bg-gray-100 border-gray-200 cursor-not-allowed opacity-70"
+                                                            : "bg-white/40 border-white hover:bg-white/60 hover:border-gray-200 cursor-pointer"
+                                                }`}
+                                            >
+                                                <div className={`w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                                                    selectedPayment === method.id ? "border-[#c5a059]" : "border-gray-300"
+                                                }`}>
+                                                    {selectedPayment === method.id && !isDisabled && (
+                                                        <div className="w-3 h-3 rounded-full bg-[#c5a059]" />
+                                                    )}
                                                 </div>
-                                                <div>
-                                                    <p className="font-medium text-[#1a1a1a]">{method.name}</p>
-                                                    <p className="text-sm text-gray-500 font-light mt-0.5">{method.description}</p>
+                                                <div className="flex-1 flex items-center gap-4">
+                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDisabled ? "bg-gray-200 text-gray-400" : "bg-gray-50 text-gray-500"}`}>
+                                                        <method.icon size={20} strokeWidth={1.5} />
+                                                    </div>
+                                                    <div>
+                                                        <p className={`font-medium ${isDisabled ? "text-gray-500" : "text-[#1a1a1a]"}`}>{method.name}</p>
+                                                        <p className="text-sm text-gray-500 font-light mt-0.5">{method.description}</p>
+                                                        {isDisabled && (
+                                                            <p className="text-[11px] text-gray-500 mt-1">Currently unavailable. Coming soon.</p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
 
                                 <div className="flex justify-between pt-4">

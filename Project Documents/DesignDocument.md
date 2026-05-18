@@ -40,7 +40,7 @@
 | UI System      | shadcn/ui (custom themed)            |
 | Icons          | lucide-react                         |
 | Animation      | Framer Motion                        |
-| State          | React Context + Server Actions       |
+| State          | Redux Toolkit + RTK Query            |
 | Forms          | react-hook-form + zod                |
 | Image Handling | next/image (critical for fashion UX) |
 

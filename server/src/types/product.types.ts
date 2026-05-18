@@ -17,15 +17,14 @@ export type Product = {
     stock: number;
     images: string[];
     isActive: boolean;
-    categoryId: string;
     createdAt: Date;
     updatedAt: Date;
     weight: number;
     variants?: ProductVariant[];
-    category?: {
+    categories: {
         id: string;
         name: string;
-    };
+    }[];
 };
 
 export type ProductListResponse = {

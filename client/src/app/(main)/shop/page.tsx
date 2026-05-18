@@ -354,7 +354,7 @@ export default function ShopPage() {
                                         <div className="mt-6 flex justify-between items-start">
                                             <div className="space-y-1">
                                                 <p className="text-[10px] font-bold text-luxury-gold uppercase tracking-[0.2em]">
-                                                    {categories.find(c => c.id === product.categoryId)?.name || "Collection"}
+                                                    {(product.categories?.[0]?.name) || "Collection"}
                                                 </p>
                                                 <h3 className="text-sm font-medium text-luxury-charcoal line-clamp-1 group-hover:text-luxury-gold transition-colors">
                                                     {product.name}

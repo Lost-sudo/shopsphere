@@ -23,12 +23,11 @@ export class ProductRepository implements IProductRepository {
       price: Number(prismaProduct.price),
       variants:
         prismaProduct.variants?.map((v: any) => this.mapToVariant(v)) || [],
-      category: prismaProduct.category
-        ? {
-            id: prismaProduct.category.id,
-            name: prismaProduct.category.name,
-          }
-        : undefined,
+      categories:
+        prismaProduct.categories?.map((pc: any) => ({
+          id: pc.category.id,
+          name: pc.category.name,
+        })) || [],
     };
   }
 
@@ -42,20 +41,23 @@ export class ProductRepository implements IProductRepository {
   // ─── Product CRUD ─────────────────────────────────────────────────────────────
 
   async create(data: ProductInput): Promise<Product> {
-    const { variants, ...productData } = data;
+    const { variants, categoryIds, ...productData } = data;
 
     const createdProduct = await prisma.product.create({
       data: {
         ...productData,
         images: productData.images || [],
         isActive: productData.isActive ?? true,
+        categories: {
+          create: categoryIds.map((id: string) => ({ categoryId: id })),
+        },
         variants: {
           create: variants || [],
         },
       },
       include: {
         variants: true,
-        category: true,
+        categories: { include: { category: true } },
       },
     });
 
@@ -91,7 +93,11 @@ export class ProductRepository implements IProductRepository {
     }
 
     if (categoryId) {
-      where.categoryId = categoryId;
+      where.categories = {
+        some: {
+          categoryId: categoryId,
+        },
+      };
     }
 
     if (isActive !== undefined) {
@@ -123,7 +129,7 @@ export class ProductRepository implements IProductRepository {
         skip,
         take: limit,
         include: {
-          category: true,
+          categories: { include: { category: true } },
           variants: true,
         },
       }),
@@ -143,7 +149,7 @@ export class ProductRepository implements IProductRepository {
       where: { id },
       include: {
         variants: true,
-        category: true,
+        categories: { include: { category: true } },
       },
     });
 
@@ -155,9 +161,16 @@ export class ProductRepository implements IProductRepository {
     id: string,
     data: Partial<UpdateProductInput>,
   ): Promise<Product | null> {
-    const { variants, ...productData } = data;
+    const { variants, categoryIds, ...productData } = data;
 
     const updateData: any = { ...productData };
+
+    if (categoryIds) {
+      updateData.categories = {
+        deleteMany: {},
+        create: categoryIds.map((id: string) => ({ categoryId: id })),
+      };
+    }
 
     if (variants) {
       updateData.variants = {
@@ -171,7 +184,7 @@ export class ProductRepository implements IProductRepository {
       data: updateData,
       include: {
         variants: true,
-        category: true,
+        categories: { include: { category: true } },
       },
     });
 

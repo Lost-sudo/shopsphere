@@ -190,23 +190,24 @@ Build a scalable, secure, and production-ready e-commerce platform that enables 
 
 ---
 
-## 6. Tech Stack (Suggested)
+## 6. Tech Stack
 
 ### Backend
-- **Node.js** (Fastify / Express)
+- **Node.js** (Express 5)
 - **TypeScript**
-- **Prisma ORM**
-- **PostgreSQL**
-- **Redis**
+- **Prisma ORM** (v7)
+- **PostgreSQL** (v15)
+- **Redis** (ioredis)
 - **Docker + Docker Compose**
 
 ### Frontend
-- **React / Next.js**
-- **Tailwind CSS**
-- **React Query**
+- **Next.js** (v16, App Router)
+- **Tailwind CSS** (v4)
+- **Redux Toolkit + RTK Query**
+- **shadcn/ui** + **Framer Motion**
 
 ### Infrastructure
-- **NGINX**
+- **Docker Compose** (PostgreSQL, Redis, Backend, Frontend)
 - **Cloud Storage** (S3-compatible)
 - **CI/CD** (GitHub Actions)
 
@@ -234,15 +235,19 @@ Build a scalable, secure, and production-ready e-commerce platform that enables 
 
 ## 8. Database Design (High Level)
 
-### Key Tables
-- `users`
-- `products`
-- `categories`
-- `orders`
-- `order_items`
-- `payments`
-- `addresses`
-- `refresh_sessions` (Redis)
+### Models
+- `User` — Customer/admin accounts, role-based access
+- `VerificationToken` — Email verification & password reset tokens
+- `Address` — User shipping addresses
+- `Category` — Product categories
+- `Product` — Product catalog with pricing, stock, images
+- `ProductVariant` — Variants (size, color) with SKU & stock
+- `Cart` — Per-user shopping cart
+- `CartItem` — Individual items in cart
+- `Order` — Customer orders with status workflow
+- `OrderItem` — Line items in an order
+- `Payment` — Payment transactions linked to orders
+- `Shipment` — Shipping/tracking info linked to orders
 
 ---
 

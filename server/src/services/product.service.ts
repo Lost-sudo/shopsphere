@@ -29,11 +29,11 @@ export class ProductService implements IProductService {
   // ─── Product methods ──────────────────────────────────────────────────────────
 
   async createProduct(input: ProductInput): Promise<Product> {
-    const category = await this.categoryRepository.getCategoryById(
-      input.categoryId,
-    );
-    if (!category) {
-      throw new BadRequestError("Invalid category ID");
+    for (const id of input.categoryIds) {
+      const category = await this.categoryRepository.getCategoryById(id);
+      if (!category) {
+        throw new BadRequestError(`Invalid category ID: ${id}`);
+      }
     }
 
     // Calculate total stock from variants if provided
@@ -61,12 +61,12 @@ export class ProductService implements IProductService {
     id: string,
     input: Partial<UpdateProductInput>,
   ): Promise<Product | null> {
-    if (input.categoryId) {
-      const category = await this.categoryRepository.getCategoryById(
-        input.categoryId,
-      );
-      if (!category) {
-        throw new BadRequestError("Invalid category ID");
+    if (input.categoryIds) {
+      for (const id of input.categoryIds) {
+        const category = await this.categoryRepository.getCategoryById(id);
+        if (!category) {
+          throw new BadRequestError(`Invalid category ID: ${id}`);
+        }
       }
     }
 

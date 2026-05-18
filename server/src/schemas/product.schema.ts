@@ -18,7 +18,19 @@ export const productSchema = z.object({
   isActive: z
     .union([z.boolean(), z.string().transform((val) => val === "true")])
     .optional(),
-  categoryId: z.uuid(),
+  categoryIds: z
+    .union([
+      z.string().transform((str, ctx) => {
+        try {
+          return JSON.parse(str);
+        } catch (e) {
+          ctx.addIssue({ code: "custom", message: "Invalid JSON in categoryIds" });
+          return z.NEVER;
+        }
+      }),
+      z.array(z.string().uuid("Invalid category ID")),
+    ])
+    .pipe(z.array(z.string().uuid("Invalid category ID")).min(1, "At least one category is required")),
   variants: z
     .union([
       z.string().transform((str, ctx) => {

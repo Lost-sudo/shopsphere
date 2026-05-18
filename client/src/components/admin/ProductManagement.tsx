@@ -70,14 +70,13 @@ export function ProductManagement() {
 
   async function onDuplicate(product: Product) {
     try {
-      // Create a shallow copy without images for now, or prefix name
       await createProduct({
         name: `${product.name} (Copy)`,
         description: product.description,
         price: product.price,
         stock: product.stock,
         weight: Number(product.weight),
-        categoryId: product.categoryId,
+        categoryIds: (product.categories || []).map((c) => c.id),
         isActive: product.isActive,
       }).unwrap();
       toast.success("Product duplicated successfully!");

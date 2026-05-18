@@ -132,20 +132,22 @@ graph TD
 - No runtime CSS overhead.
 - Accessible by default.
 
-### 4.3 State Management (Optional)
+### 4.3 State Management
 
 | Technology | Purpose |
 | :--- | :--- |
 | **Redux Toolkit** | Global state management |
+| **RTK Query** | Server data fetching & caching |
 
-**Recommended Usage:**
+**Usage:**
 - Auth state.
 - Cart state.
 - User preferences.
-- *Avoid overuse; rely on server data when possible.*
+- API data fetching with automatic cache invalidation.
 
 ### 4.4 Data Fetching
-- Native `fetch` (Next.js enhanced).
+- **RTK Query** for client-side API calls with caching & auto-refresh.
+- Native `fetch` (Next.js enhanced) for server components.
 - Server Components for initial data.
 - Client Components for interactions.
 - Optional caching via Next.js revalidation.
@@ -172,7 +174,8 @@ graph TD
 | **Docker Compose** | Multi-service orchestration |
 
 **Services:**
-- API
+- Backend (Express API)
+- Frontend (Next.js)
 - PostgreSQL
 - Redis
 
