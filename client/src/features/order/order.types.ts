@@ -1,11 +1,12 @@
 export interface OrderItem {
+    id: string;
     productId: string;
     quantity: number;
     price: number;
     product?: {
         name: string;
         images: string[];
-    };
+    } | null;
 }
 
 export interface CreateOrderRequest {

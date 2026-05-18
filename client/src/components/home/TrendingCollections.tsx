@@ -1,29 +1,42 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Loader2 } from "lucide-react";
+import { useGetCategoriesQuery } from "@/features/category/category.api";
 
-const collections = [
+const collectionConfig = [
     {
-        title: "Summer Drop",
+        name: "Summer Drop",
         image: "/images/home/trending_summer.png",
-        href: "/category/summer",
         span: "md:col-span-2 md:row-span-2",
     },
     {
-        title: "Streetwear",
+        name: "Streetwear",
         image: "/images/home/trending_streetwear.png",
-        href: "/category/streetwear",
         span: "md:col-span-1 md:row-span-1",
     },
     {
-        title: "Minimal Luxe",
+        name: "Minimal Luxe",
         image: "/images/home/trending_minimal.png",
-        href: "/category/minimal",
         span: "md:col-span-1 md:row-span-1",
     },
 ];
 
 export function TrendingCollections() {
+    const { data: categoriesData, isLoading } = useGetCategoriesQuery();
+
+    const collections = collectionConfig.map((config) => {
+        const category = categoriesData?.data?.categories?.find(
+            (c) => c.name === config.name,
+        );
+        return {
+            ...config,
+            id: category?.id,
+            href: category ? `/shop?category=${category.id}` : "#",
+        };
+    });
+
     return (
         <section className="py-24 px-4 container mx-auto max-w-7xl">
             <div className="flex flex-col md:flex-row justify-between items-end mb-12">
@@ -36,7 +49,7 @@ export function TrendingCollections() {
                     </p>
                 </div>
                 <Link
-                    href="/categories"
+                    href="/shop"
                     className="group flex items-center gap-2 text-sm uppercase tracking-widest font-semibold text-luxury-charcoal hover:text-luxury-gold transition-colors mt-6 md:mt-0"
                 >
                     View All
@@ -44,35 +57,40 @@ export function TrendingCollections() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:auto-rows-[300px]">
-                {collections.map((collection, index) => (
-                    <Link
-                        key={collection.title}
-                        href={collection.href}
-                        className={`group relative overflow-hidden rounded-2xl block ${collection.span}`}
-                    >
-                        <div className="absolute inset-0 bg-neutral-200">
-                            <Image
-                                src={collection.image}
-                                alt={collection.title}
-                                fill
-                                className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                            />
-                        </div>
-                        {/* Glassmorphism gradient overlay */}
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
-                        
-                        <div className="absolute bottom-0 left-0 p-8 w-full flex items-end justify-between">
-                            <h3 className="text-2xl md:text-3xl font-light text-white tracking-wide">
-                                {collection.title}
-                            </h3>
-                            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                                <ArrowUpRight className="w-5 h-5" />
+            {isLoading ? (
+                <div className="flex items-center justify-center py-20">
+                    <Loader2 className="w-8 h-8 animate-spin text-luxury-gold" />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:auto-rows-[300px]">
+                    {collections.map((collection) => (
+                        <Link
+                            key={collection.name}
+                            href={collection.href}
+                            className={`group relative overflow-hidden rounded-2xl block ${collection.span}`}
+                        >
+                            <div className="absolute inset-0 bg-neutral-200">
+                                <Image
+                                    src={collection.image}
+                                    alt={collection.name}
+                                    fill
+                                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                />
                             </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
+                            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+
+                            <div className="absolute bottom-0 left-0 p-8 w-full flex items-end justify-between">
+                                <h3 className="text-2xl md:text-3xl font-light text-white tracking-wide">
+                                    {collection.name}
+                                </h3>
+                                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                                    <ArrowUpRight className="w-5 h-5" />
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            )}
         </section>
     );
 }

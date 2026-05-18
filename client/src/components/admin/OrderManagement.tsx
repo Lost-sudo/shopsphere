@@ -14,7 +14,6 @@ import {
     Loader2,
     Clock,
     AlertCircle,
-    XCircle,
     PackageCheck,
     CreditCard,
     ClipboardList,
@@ -43,7 +42,6 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -247,59 +245,15 @@ export function OrderManagement() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    {/* Mark as Processing */}
-                                                    {order.status.toUpperCase() === "PENDING" && (
-                                                        <Button 
-                                                            variant="ghost" 
-                                                            size="icon" 
-                                                            className="h-8 w-8 hover:bg-blue-100 text-blue-600"
-                                                            onClick={() => handleUpdateStatus(order.id, "PROCESSING")}
-                                                            disabled={isUpdatingStatus}
-                                                            title="Mark as Processing"
-                                                        >
-                                                            {isUpdatingStatus ? (
-                                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                            ) : (
-                                                                <ClipboardList className="w-4 h-4" />
-                                                            )}
-                                                        </Button>
-                                                    )}
-
-                                                    {/* Process Shipment */}
-                                                    {(order.status.toUpperCase() === "PAID" || order.status.toUpperCase() === "PROCESSING" || (order.status.toUpperCase() === "PENDING" && order.paymentMethod === "COD")) && !order.shipment && (
-                                                        <Button 
-                                                            variant="ghost" 
-                                                            size="icon" 
-                                                            className="h-8 w-8 hover:bg-primary/10 text-primary"
-                                                            onClick={() => handleProcessShipment(order.id)}
-                                                            disabled={isProcessingShipment}
-                                                            title="Process Shipment"
-                                                        >
-                                                            {isProcessingShipment ? (
-                                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                            ) : (
-                                                                <Truck className="w-4 h-4" />
-                                                            )}
-                                                        </Button>
-                                                    )}
-
-                                                    {/* Mark as Delivered */}
-                                                    {order.status.toUpperCase() === "SHIPPED" && (
-                                                        <Button 
-                                                            variant="ghost" 
-                                                            size="icon" 
-                                                            className="h-8 w-8 hover:bg-emerald-100 text-emerald-600"
-                                                            onClick={() => handleUpdateStatus(order.id, "DELIVERED")}
-                                                            disabled={isUpdatingStatus}
-                                                            title="Mark as Delivered"
-                                                        >
-                                                            {isUpdatingStatus ? (
-                                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                            ) : (
-                                                                <PackageCheck className="w-4 h-4" />
-                                                            )}
-                                                        </Button>
-                                                    )}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 text-xs font-bold uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-800 gap-1.5"
+                                                        onClick={() => openDetails(order)}
+                                                    >
+                                                        <Eye className="w-3.5 h-3.5 text-slate-400" />
+                                                        View
+                                                    </Button>
 
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
@@ -317,20 +271,6 @@ export function OrderManagement() {
                                                                 <Eye size={14} className="text-slate-400" />
                                                                 View Full Details
                                                             </DropdownMenuItem>
-                                                            
-                                                            {(order.status.toUpperCase() === "PENDING" || order.status.toUpperCase() === "PROCESSING") && (
-                                                                <>
-                                                                    <DropdownMenuSeparator className="bg-slate-100 my-1 mx-2" />
-                                                                    <DropdownMenuItem 
-                                                                        className="rounded-xl font-bold text-xs gap-3 px-3 py-2.5 cursor-pointer hover:bg-rose-50 text-rose-600"
-                                                                        onClick={() => handleUpdateStatus(order.id, "CANCELLED")}
-                                                                        disabled={isUpdatingStatus}
-                                                                    >
-                                                                        <Ban size={14} />
-                                                                        Cancel Order
-                                                                    </DropdownMenuItem>
-                                                                </>
-                                                            )}
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </div>
@@ -428,7 +368,25 @@ export function OrderManagement() {
 
                     <div className="flex gap-3 pt-4 justify-end">
                         <Button variant="outline" className="rounded-xl text-[10px] font-black uppercase tracking-widest" onClick={() => setIsDetailsOpen(false)}>Close</Button>
-                        
+
+                        {selectedOrder?.status.toUpperCase() === "PENDING" && (
+                            <Button 
+                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2"
+                                onClick={() => {
+                                    handleUpdateStatus(selectedOrder.id, "PROCESSING");
+                                    setIsDetailsOpen(false);
+                                }}
+                                disabled={isUpdatingStatus}
+                            >
+                                {isUpdatingStatus ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <ClipboardList size={14} />
+                                )}
+                                Mark as Processing
+                            </Button>
+                        )}
+
                         {(selectedOrder?.status.toUpperCase() === "PAID" || (selectedOrder?.status.toUpperCase() === "PENDING" && selectedOrder?.paymentMethod === "COD") || selectedOrder?.status.toUpperCase() === "PROCESSING") && !selectedOrder?.shipment && (
                             <Button 
                                 className="bg-luxury-charcoal hover:bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2"
@@ -438,8 +396,49 @@ export function OrderManagement() {
                                 }}
                                 disabled={isProcessingShipment}
                             >
-                                <Truck size={14} />
+                                {isProcessingShipment ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Truck size={14} />
+                                )}
                                 Process Shipment
+                            </Button>
+                        )}
+
+                        {selectedOrder?.status.toUpperCase() === "SHIPPED" && (
+                            <Button 
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest gap-2"
+                                onClick={() => {
+                                    handleUpdateStatus(selectedOrder.id, "DELIVERED");
+                                    setIsDetailsOpen(false);
+                                }}
+                                disabled={isUpdatingStatus}
+                            >
+                                {isUpdatingStatus ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <PackageCheck size={14} />
+                                )}
+                                Mark as Delivered
+                            </Button>
+                        )}
+
+                        {(selectedOrder?.status.toUpperCase() === "PENDING" || selectedOrder?.status.toUpperCase() === "PROCESSING") && (
+                            <Button 
+                                variant="outline"
+                                className="rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 text-rose-600 border-rose-200 hover:bg-rose-50"
+                                onClick={() => {
+                                    handleUpdateStatus(selectedOrder.id, "CANCELLED");
+                                    setIsDetailsOpen(false);
+                                }}
+                                disabled={isUpdatingStatus}
+                            >
+                                {isUpdatingStatus ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Ban size={14} />
+                                )}
+                                Cancel Order
                             </Button>
                         )}
                     </div>
