@@ -91,6 +91,26 @@ export class OrderService implements IOrderService {
     const orders = await this.orderRepository.getAllOrders();
     return orders;
   }
+  async getRecentOrders(limit: number): Promise<Order[]> {
+    return this.orderRepository.getRecentOrders(limit);
+  }
+  async getOrderStats(): Promise<{
+    totalRevenue: number;
+    totalOrders: number;
+    orderStatusCounts: { status: string; count: number }[];
+    revenueByMonth: { month: string; value: number }[];
+  }> {
+    return this.orderRepository.getOrderStats();
+  }
+  async getRevenueByPeriod(months: number): Promise<{ month: string; value: number }[]> {
+    return this.orderRepository.getRevenueByPeriod(months);
+  }
+  async getAverageOrderValue(): Promise<number> {
+    return this.orderRepository.getAverageOrderValue();
+  }
+  async getRevenueByPaymentMethod(): Promise<{ method: string; revenue: number; count: number }[]> {
+    return this.orderRepository.getRevenueByPaymentMethod();
+  }
   async updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,

@@ -40,3 +40,32 @@ export type UpdateUserRoleResponse = {
   message: string;
   user: User;
 };
+
+export type UpdateProfileRequest = {
+  name: string;
+};
+
+export type UpdateProfileResponse = {
+  success: boolean;
+  message: string;
+  user: User;
+};
+
+export type UpdateEmailRequest = {
+  email: string;
+};
+
+export type UpdateEmailResponse = {
+  success: boolean;
+  message: string;
+  user: User;
+};
+
+export type UpdatePasswordRequest = {
+  password: string;
+};
+
+export type UpdatePasswordResponse = {
+  success: boolean;
+  message: string;
+};

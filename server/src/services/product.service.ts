@@ -196,6 +196,17 @@ export class ProductService implements IProductService {
     await this.syncProductStock(productId);
     return true;
   }
+
+  async getTopProducts(limit: number): Promise<{ id: string; name: string; sales: number }[]> {
+    return this.productRepository.getTopProducts(limit);
+  }
+
+  async getProductStats(): Promise<{ totalProducts: number; lowStockCount: number }> {
+    return this.productRepository.getProductStats();
+  }
+  async getCategorySales(): Promise<{ category: string; sales: number; revenue: number }[]> {
+    return this.productRepository.getCategorySales();
+  }
 }
 
 export const productService = new ProductService(

@@ -35,6 +35,11 @@ export interface IProductRepository {
     data: Partial<UpdateVariantInput>,
   ): Promise<ProductVariant | null>;
   deleteVariant(variantId: string): Promise<boolean>;
+
+  // Dashboard
+  getTopProducts(limit: number): Promise<{ id: string; name: string; sales: number }[]>;
+  getProductStats(): Promise<{ totalProducts: number; lowStockCount: number }>;
+  getCategorySales(): Promise<{ category: string; sales: number; revenue: number }[]>;
 }
 
 export interface IProductService {
@@ -62,4 +67,9 @@ export interface IProductService {
     data: Partial<UpdateVariantInput>,
   ): Promise<ProductVariant>;
   removeVariant(productId: string, variantId: string): Promise<boolean>;
+
+  // Dashboard
+  getTopProducts(limit: number): Promise<{ id: string; name: string; sales: number }[]>;
+  getProductStats(): Promise<{ totalProducts: number; lowStockCount: number }>;
+  getCategorySales(): Promise<{ category: string; sales: number; revenue: number }[]>;
 }

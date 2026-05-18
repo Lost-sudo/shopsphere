@@ -1,10 +1,43 @@
+"use client";
+
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminCharts } from "@/components/admin/AdminCharts";
 import { RecentOrders } from "@/components/admin/RecentOrders";
 import { Button } from "@/components/ui/button";
-import { Download, Plus } from "lucide-react";
+import { Download, Plus, RefreshCw } from "lucide-react";
+import { useGetDashboardDataQuery } from "@/features/dashboard/dashboard.api";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/lib/store";
 
 export default function AdminPage() {
+    const user = useSelector((state: RootState) => state.auth.user);
+    const { data, isLoading, isError, refetch } = useGetDashboardDataQuery();
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="flex items-center gap-3 text-neutral-400">
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                    <span className="text-sm font-light">Loading dashboard data...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (isError || !data?.data) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <p className="text-neutral-500 font-light">Failed to load dashboard data.</p>
+                <Button onClick={refetch} variant="ghost" className="h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-widest">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Retry
+                </Button>
+            </div>
+        );
+    }
+
+    const { totalRevenue, totalOrders, totalCustomers, growthRate, revenueByMonth, topProducts, recentOrders, totalProducts, lowStockCount, newCustomersThisMonth } = data.data;
+
     return (
         <div className="space-y-12 animate-fade-up">
             {/* Page Header */}
@@ -14,7 +47,7 @@ export default function AdminPage() {
                         Dashboard <span className="font-serif italic text-luxury-gold">Overview</span>
                     </h1>
                     <p className="mt-2 text-neutral-500 font-light">
-                        Welcome back, <span className="font-medium text-luxury-charcoal">Administrator</span>. Here&apos;s your premium business summary.
+                        Welcome back, <span className="font-medium text-luxury-charcoal">{user?.name || "Administrator"}</span>. Here&apos;s your premium business summary.
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -31,18 +64,31 @@ export default function AdminPage() {
 
             {/* Stats Cards */}
             <div className="animate-fade-up [animation-delay:100ms]">
-                <AdminStats />
+                <AdminStats
+                    totalRevenue={totalRevenue}
+                    totalOrders={totalOrders}
+                    totalCustomers={totalCustomers}
+                    growthRate={growthRate}
+                    totalProducts={totalProducts}
+                    lowStockCount={lowStockCount}
+                />
             </div>
 
             {/* Charts & Graphs */}
             <div className="animate-fade-up [animation-delay:200ms]">
-                <AdminCharts />
+                <AdminCharts
+                    revenueByMonth={revenueByMonth}
+                    topProducts={topProducts}
+                    totalProducts={totalProducts}
+                    lowStockCount={lowStockCount}
+                    newCustomersThisMonth={newCustomersThisMonth}
+                />
             </div>
 
             {/* Bottom Section */}
             <div className="grid gap-8 lg:grid-cols-2 animate-fade-up [animation-delay:300ms]">
-                <RecentOrders />
-                {/* Placeholder for Quick Actions or Activity Feed */}
+                <RecentOrders orders={recentOrders} />
+                {/* Quick Stats Summary */}
                 <div className="bg-white/60 backdrop-blur-2xl border border-white/40 rounded-3xl p-8 shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center">
                     <div className="w-16 h-16 bg-luxury-gold/10 rounded-full flex items-center justify-center mb-4">
                         <Plus className="text-luxury-gold" size={24} />

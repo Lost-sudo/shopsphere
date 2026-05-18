@@ -6,51 +6,74 @@ import {
     ArrowUpRight, 
     ArrowDownRight, 
     Users, 
-    TrendingUp 
+    TrendingUp,
+    Package,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-const stats = [
-    {
-        title: "Total Revenue",
-        value: "$45,231.89",
-        diff: "+20.1%",
-        trend: "up",
-        icon: DollarSign,
-        color: "text-luxury-gold",
-        bgColor: "bg-luxury-gold/10",
-    },
-    {
-        title: "Total Orders",
-        value: "2,350",
-        diff: "+180.1%",
-        trend: "up",
-        icon: ShoppingCart,
-        color: "text-luxury-charcoal",
-        bgColor: "bg-luxury-charcoal/10",
-    },
-    {
-        title: "Total Customers",
-        value: "12,234",
-        diff: "+19%",
-        trend: "up",
-        icon: Users,
-        color: "text-luxury-gold",
-        bgColor: "bg-luxury-gold/10",
-    },
-    {
-        title: "Growth Rate",
-        value: "+12.2%",
-        diff: "-2.4%",
-        trend: "down",
-        icon: TrendingUp,
-        color: "text-luxury-charcoal",
-        bgColor: "bg-luxury-charcoal/10",
-    },
-];
+interface AdminStatsProps {
+    totalRevenue: number;
+    totalOrders: number;
+    totalCustomers: number;
+    growthRate: number;
+    totalProducts: number;
+    lowStockCount: number;
+}
 
-export function AdminStats() {
+function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(amount);
+}
+
+function formatNumber(num: number): string {
+    return new Intl.NumberFormat("en-US").format(num);
+}
+
+export function AdminStats({ totalRevenue, totalOrders, totalCustomers, growthRate, totalProducts, lowStockCount }: AdminStatsProps) {
+    const stats = [
+        {
+            title: "Total Revenue",
+            value: formatCurrency(totalRevenue),
+            diff: "",
+            trend: "up" as const,
+            icon: DollarSign,
+            color: "text-luxury-gold",
+            bgColor: "bg-luxury-gold/10",
+        },
+        {
+            title: "Total Orders",
+            value: formatNumber(totalOrders),
+            diff: "",
+            trend: "up" as const,
+            icon: ShoppingCart,
+            color: "text-luxury-charcoal",
+            bgColor: "bg-luxury-charcoal/10",
+        },
+        {
+            title: "Total Customers",
+            value: formatNumber(totalCustomers),
+            diff: "",
+            trend: "up" as const,
+            icon: Users,
+            color: "text-luxury-gold",
+            bgColor: "bg-luxury-gold/10",
+        },
+        {
+            title: "Growth Rate",
+            value: `${growthRate >= 0 ? "+" : ""}${growthRate}%`,
+            diff: `${growthRate >= 0 ? "+" : ""}${growthRate}%`,
+            trend: growthRate >= 0 ? "up" as const : "down" as const,
+            icon: TrendingUp,
+            color: "text-luxury-charcoal",
+            bgColor: "bg-luxury-charcoal/10",
+        },
+    ];
+
     return (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, i) => {
@@ -68,7 +91,7 @@ export function AdminStats() {
                                         ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
                                         : "bg-red-50 text-red-600 border border-red-100"
                                 )}>
-                                    {stat.diff}
+                                    {stat.diff || (stat.trend === "up" ? "+" : "") + stat.value}
                                     {stat.trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                                 </div>
                             </div>

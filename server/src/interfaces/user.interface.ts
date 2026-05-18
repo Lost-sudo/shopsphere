@@ -15,6 +15,12 @@ export interface IUserRepository {
     createUser(user: UserRegisterInput): Promise<User>;
     updateUser(id: string, user: Partial<User>): Promise<User>;
     deleteUser(id: string): Promise<User>;
+    getUserStats(): Promise<{
+        totalCustomers: number;
+        newCustomersThisMonth: number;
+        previousMonthCustomers: number;
+    }>;
+    getUserGrowthByMonth(months: number): Promise<{ month: string; count: number }[]>;
 }
 
 export interface IRefreshSessionService {

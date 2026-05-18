@@ -9,9 +9,9 @@ import type { Product } from "@/features/product/product.types";
 const aspectRatios = ["aspect-[3/4]", "aspect-square", "aspect-[4/5]", "aspect-[3/4]"];
 
 function formatPrice(price: number): string {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-PH", {
         style: "currency",
-        currency: "USD",
+        currency: "PHP",
     }).format(price);
 }
 

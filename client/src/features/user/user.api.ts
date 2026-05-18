@@ -7,6 +7,12 @@ import {
   AdminCreateUserResponse,
   UpdateUserRoleRequest,
   UpdateUserRoleResponse,
+  UpdateProfileRequest,
+  UpdateProfileResponse,
+  UpdateEmailRequest,
+  UpdateEmailResponse,
+  UpdatePasswordRequest,
+  UpdatePasswordResponse,
 } from "./user.types";
 
 export const userApi = baseApi.injectEndpoints({
@@ -52,6 +58,32 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
+
+    updateProfile: builder.mutation<UpdateProfileResponse, UpdateProfileRequest>({
+      query: (body) => ({
+        url: "/users",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Users"],
+    }),
+
+    updateEmail: builder.mutation<UpdateEmailResponse, UpdateEmailRequest>({
+      query: (body) => ({
+        url: "/users/email",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Users"],
+    }),
+
+    updatePassword: builder.mutation<UpdatePasswordResponse, UpdatePasswordRequest>({
+      query: (body) => ({
+        url: "/users/password",
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -61,4 +93,7 @@ export const {
   useDeleteUserMutation,
   useAdminCreateUserMutation,
   useUpdateUserRoleMutation,
+  useUpdateProfileMutation,
+  useUpdateEmailMutation,
+  useUpdatePasswordMutation,
 } = userApi;

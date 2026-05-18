@@ -180,6 +180,156 @@ export class OrderRepository implements IOrderRepository {
     return orders.map((order) => this.mapPrismaOrderToOrder(order));
   }
 
+  async getRecentOrders(limit: number): Promise<Order[]> {
+    const orders = await prisma.order.findMany({
+      take: limit,
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        payment: true,
+        user: true,
+        shipment: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return orders.map((order) => this.mapPrismaOrderToOrder(order));
+  }
+
+  async getOrderStats(): Promise<{
+    totalRevenue: number;
+    totalOrders: number;
+    orderStatusCounts: { status: string; count: number }[];
+    revenueByMonth: { month: string; value: number }[];
+  }> {
+    const orders = await prisma.order.findMany({
+      select: {
+        status: true,
+        totalAmount: true,
+        createdAt: true,
+      },
+    });
+
+    const totalOrders = orders.length;
+
+    const completedOrders = orders.filter(
+      (o) => o.status === "DELIVERED" || o.status === "PAID",
+    );
+    const totalRevenue = completedOrders.reduce(
+      (sum, o) => sum + Number(o.totalAmount),
+      0,
+    );
+
+    const statusMap = new Map<string, number>();
+    for (const o of orders) {
+      const status = o.status.toLowerCase();
+      statusMap.set(status, (statusMap.get(status) || 0) + 1);
+    }
+    const orderStatusCounts = Array.from(statusMap.entries()).map(
+      ([status, count]) => ({ status, count }),
+    );
+
+    // Revenue by month for last 7 months
+    const now = new Date();
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+    const monthlyMap = new Map<string, number>();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      monthlyMap.set(key, 0);
+    }
+    for (const o of completedOrders) {
+      const d = new Date(o.createdAt);
+      const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      if (monthlyMap.has(key)) {
+        monthlyMap.set(key, monthlyMap.get(key)! + Number(o.totalAmount));
+      }
+    }
+    const revenueByMonth = Array.from(monthlyMap.entries()).map(
+      ([month, value]) => ({ month, value }),
+    );
+
+    return { totalRevenue, totalOrders, orderStatusCounts, revenueByMonth };
+  }
+
+  async getRevenueByPeriod(months: number): Promise<{ month: string; value: number }[]> {
+    const now = new Date();
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+
+    const startDate = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
+
+    const orders = await prisma.order.findMany({
+      where: {
+        status: { in: ["DELIVERED", "PAID"] },
+        createdAt: { gte: startDate },
+      },
+      select: {
+        totalAmount: true,
+        createdAt: true,
+      },
+    });
+
+    const monthlyMap = new Map<string, number>();
+    for (let i = months - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      monthlyMap.set(key, 0);
+    }
+    for (const o of orders) {
+      const d = new Date(o.createdAt);
+      const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      if (monthlyMap.has(key)) {
+        monthlyMap.set(key, monthlyMap.get(key)! + Number(o.totalAmount));
+      }
+    }
+
+    return Array.from(monthlyMap.entries()).map(([month, value]) => ({ month, value }));
+  }
+
+  async getAverageOrderValue(): Promise<number> {
+    const result = await prisma.order.aggregate({
+      _avg: { totalAmount: true },
+      where: { status: { in: ["DELIVERED", "PAID"] } },
+    });
+    return Number(result._avg.totalAmount) || 0;
+  }
+
+  async getRevenueByPaymentMethod(): Promise<{ method: string; revenue: number; count: number }[]> {
+    const orders = await prisma.order.findMany({
+      where: { status: { in: ["DELIVERED", "PAID"] } },
+      select: {
+        paymentMethod: true,
+        totalAmount: true,
+      },
+    });
+
+    const methodMap = new Map<string, { revenue: number; count: number }>();
+    for (const o of orders) {
+      const method = o.paymentMethod.toUpperCase();
+      const existing = methodMap.get(method) || { revenue: 0, count: 0 };
+      existing.revenue += Number(o.totalAmount);
+      existing.count += 1;
+      methodMap.set(method, existing);
+    }
+
+    return Array.from(methodMap.entries()).map(([method, data]) => ({
+      method,
+      revenue: data.revenue,
+      count: data.count,
+    }));
+  }
+
   async updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,

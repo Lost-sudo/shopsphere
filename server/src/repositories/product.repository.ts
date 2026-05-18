@@ -275,6 +275,79 @@ export class ProductRepository implements IProductRepository {
       return false;
     }
   }
+
+  async getTopProducts(limit: number): Promise<{ id: string; name: string; sales: number }[]> {
+    const topProducts = await prisma.orderItem.groupBy({
+      by: ["productId"],
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: "desc" } },
+      take: limit,
+    });
+
+    if (topProducts.length === 0) return [];
+
+    const productIds = topProducts.map((p) => p.productId);
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true, name: true },
+    });
+
+    const productMap = new Map(products.map((p) => [p.id, p.name]));
+
+    return topProducts.map((p) => ({
+      id: p.productId,
+      name: productMap.get(p.productId) || "Unknown",
+      sales: p._sum.quantity || 0,
+    }));
+  }
+
+  async getProductStats(): Promise<{
+    totalProducts: number;
+    lowStockCount: number;
+  }> {
+    const [totalProducts, lowStockCount] = await Promise.all([
+      prisma.product.count({ where: { isActive: true } }),
+      prisma.product.count({ where: { stock: { lte: 5 } } }),
+    ]);
+
+    return { totalProducts, lowStockCount };
+  }
+
+  async getCategorySales(): Promise<{ category: string; sales: number; revenue: number }[]> {
+    const orderItems = await prisma.orderItem.findMany({
+      where: {
+        order: { status: { in: ["DELIVERED", "PAID"] } },
+      },
+      select: {
+        quantity: true,
+        price: true,
+        product: {
+          select: {
+            categories: {
+              select: {
+                category: { select: { name: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const categoryMap = new Map<string, { sales: number; revenue: number }>();
+    for (const item of orderItems) {
+      for (const pc of item.product.categories) {
+        const name = pc.category.name;
+        const existing = categoryMap.get(name) || { sales: 0, revenue: 0 };
+        existing.sales += item.quantity;
+        existing.revenue += Number(item.price) * item.quantity;
+        categoryMap.set(name, existing);
+      }
+    }
+
+    return Array.from(categoryMap.entries())
+      .map(([category, data]) => ({ category, sales: data.sales, revenue: data.revenue }))
+      .sort((a, b) => b.sales - a.sales);
+  }
 }
 
 export const productRepository = new ProductRepository();

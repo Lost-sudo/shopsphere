@@ -8,6 +8,8 @@ import orderRoutes from "./order.routes";
 import paymentRoutes from "./payment.routes";
 import cartRoutes from "./cart.routes";
 import verificationRoutes from "./verification.routes";
+import dashboardRoutes from "./dashboard.routes";
+import analyticsRoutes from "./analytics.routes";
 
 const router = Router();
 
@@ -20,5 +22,7 @@ router.use("/orders", orderRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/cart", cartRoutes);
 router.use("/verification", verificationRoutes);
+router.use("/admin/dashboard", dashboardRoutes);
+router.use("/admin/analytics", analyticsRoutes);
 
 export default router;

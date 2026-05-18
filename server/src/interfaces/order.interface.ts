@@ -8,6 +8,16 @@ export interface IOrderRepository {
   getOrderById(orderId: string): Promise<Order | null>;
   getOrdersByUserId(userId: string): Promise<Order[]>;
   getAllOrders(): Promise<Order[]>;
+  getRecentOrders(limit: number): Promise<Order[]>;
+  getOrderStats(): Promise<{
+    totalRevenue: number;
+    totalOrders: number;
+    orderStatusCounts: { status: string; count: number }[];
+    revenueByMonth: { month: string; value: number }[];
+  }>;
+  getRevenueByPeriod(months: number): Promise<{ month: string; value: number }[]>;
+  getAverageOrderValue(): Promise<number>;
+  getRevenueByPaymentMethod(): Promise<{ method: string; revenue: number; count: number }[]>;
   updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,
@@ -21,6 +31,16 @@ export interface IOrderService {
   getOrderById(orderId: string): Promise<Order | null>;
   getOrdersByUserId(userId: string): Promise<Order[]>;
   getAllOrders(): Promise<Order[]>;
+  getRecentOrders(limit: number): Promise<Order[]>;
+  getOrderStats(): Promise<{
+    totalRevenue: number;
+    totalOrders: number;
+    orderStatusCounts: { status: string; count: number }[];
+    revenueByMonth: { month: string; value: number }[];
+  }>;
+  getRevenueByPeriod(months: number): Promise<{ month: string; value: number }[]>;
+  getAverageOrderValue(): Promise<number>;
+  getRevenueByPaymentMethod(): Promise<{ method: string; revenue: number; count: number }[]>;
   updateOrder(
     orderId: string,
     input: Partial<UpdateOrderInput>,
