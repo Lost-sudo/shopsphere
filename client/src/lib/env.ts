@@ -6,10 +6,13 @@ function getEnv(key: string, defaultValue: string = "") {
   return value;
 }
 
-const nextEnv = process.env.NEXT_PUBLIC_NEXT_ENV || process.env.NEXT_ENV || "development";
+const isProduction = 
+  process.env.NODE_ENV === "production" || 
+  process.env.NEXT_PUBLIC_NEXT_ENV === "production" || 
+  process.env.NEXT_ENV === "production";
 
 export const env = {
-  apiBaseUrl: nextEnv === "production"
+  apiBaseUrl: isProduction
     ? getEnv("NEXT_PUBLIC_API_URL")
     : "http://localhost:5000/api/v1",
 };
