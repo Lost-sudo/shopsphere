@@ -1,7 +1,12 @@
 #!/bin/sh
 
-echo "Waiting for database (db:5432) to be ready..."
-while ! nc -z db 5432; do
+DB_HOST=$(echo "$DATABASE_URL" | sed -E 's|.*@([^:/]+).*|\1|')
+DB_PORT=$(echo "$DATABASE_URL" | sed -E 's|.*:([0-9]+)/.*|\1|')
+DB_HOST="${DB_HOST:-localhost}"
+DB_PORT="${DB_PORT:-5432}"
+
+echo "Waiting for database (${DB_HOST}:${DB_PORT}) to be ready..."
+while ! nc -z "$DB_HOST" "$DB_PORT"; do
   sleep 1
 done
 
