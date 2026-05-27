@@ -5,7 +5,7 @@
   "main": "dist/src/server.js",
   "scripts": {
     "dev": "npx nodemon",
-    "build": "rimraf dist && npx prisma generate && tsc && tsc-alias && cp -R src/generated dist/src/",
+    "build": "rimraf dist && tsc && tsc-alias && cp -R src/generated dist/src/",
     "start": "npx prisma migrate deploy && node dist/src/server.js",
     "migrate": "docker compose exec backend npx prisma migrate dev",
     "generate": "docker compose exec backend npx prisma generate",

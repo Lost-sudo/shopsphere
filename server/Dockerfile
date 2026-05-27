@@ -9,6 +9,7 @@ COPY prisma ./prisma/
 RUN npm ci
 
 COPY . .
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN npx prisma generate
 RUN npm run build
 
@@ -23,6 +24,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/generated ./src/generated
 COPY prisma ./prisma/
+COPY prisma.config.ts .
 COPY docker-entrypoint.sh .
 
 RUN chmod +x ./docker-entrypoint.sh
