@@ -7,9 +7,9 @@ async function startServer() {
     // Graceful Connection
     await connectDBs();
 
-    const server = app.listen(port, () => {
+    const server = app.listen(port, '0.0.0.0', () => {
         console.log(
-            `⚡️[server]: Server is running at http://localhost:${port}`,
+            `⚡️[server]: Server is running at http://0.0.0.0:${port}`,
         );
     });
 
