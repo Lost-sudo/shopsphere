@@ -9,24 +9,25 @@ import {
   UpdateVariantInput,
 } from "../schemas/product.schema";
 import { productService } from "@/services/product.service";
+import { getStorageProvider } from "../utils/storage";
 
 export class ProductController {
   constructor(private productService: IProductService) {}
 
-  // ─── Product handlers ─────────────────────────────────────────────────────────
-
   createProduct = asyncHandler(async (req: Request, res: Response) => {
     const data: ProductInput = req.body;
 
-    if (req.files && Array.isArray(req.files)) {
-      const protocol = req.protocol;
-      const host = req.get("host");
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const storage = getStorageProvider();
       const files = req.files as Express.Multer.File[];
-
-      const imageUrls = files.map((file) => {
-        return `${protocol}://${host}/public/uploads/products/${file.filename}`;
-      });
-
+      const imageUrls = await Promise.all(
+        files.map((file) =>
+          storage.upload(file, {
+            protocol: req.protocol,
+            host: req.get("host"),
+          }),
+        ),
+      );
       data.images = imageUrls;
     }
 
@@ -59,6 +60,21 @@ export class ProductController {
   updateProduct = asyncHandler(async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const data: UpdateProductInput = req.body;
+
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const storage = getStorageProvider();
+      const files = req.files as Express.Multer.File[];
+      const imageUrls = await Promise.all(
+        files.map((file) =>
+          storage.upload(file, {
+            protocol: req.protocol,
+            host: req.get("host"),
+          }),
+        ),
+      );
+      data.images = imageUrls;
+    }
+
     const product = await this.productService.updateProduct(id, data);
     res.status(200).json({
       status: "success",

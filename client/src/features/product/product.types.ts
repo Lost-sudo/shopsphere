@@ -90,7 +90,7 @@ export type CreateProductRequest = {
 };
 
 export type UpdateProductRequest = Partial<
-  Omit<CreateProductRequest, "images" | "variants">
+  Omit<CreateProductRequest, "variants">
 > & {
   id: string;
   variants?: ProductVariantInput[];

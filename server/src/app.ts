@@ -41,7 +41,9 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use("/public", express.static(path.join(process.cwd(), "public")));
+if (process.env.NODE_ENV !== "production") {
+  app.use("/public", express.static(path.join(process.cwd(), "public")));
+}
 
 // Routes
 app.get("/health", (req: Request, res: Response) => {

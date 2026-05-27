@@ -69,6 +69,7 @@ interface EditProductModalProps {
 export function EditProductModal({ product, open, onOpenChange }: EditProductModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [newImages, setNewImages] = useState<File[]>([]);
     const [updateProduct] = useUpdateProductMutation();
     const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategoriesQuery();
 
@@ -105,6 +106,7 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                 isActive: product.isActive,
                 variants: product.variants || [],
             });
+            setNewImages([]);
         }
     }, [product, open, form]);
 
@@ -116,6 +118,7 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                 id: product.id,
                 ...values,
                 categoryIds: values.categoryIds,
+                images: newImages.length > 0 ? newImages : undefined,
             }).unwrap();
 
             toast.success("Product updated successfully!");
@@ -321,12 +324,12 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                             />
                         </div>
 
-                        {product?.images && product.images.length > 0 && (
-                            <div className="col-span-full space-y-3">
-                                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                                    Current Images
-                                </FormLabel>
-                                <div className="flex flex-wrap gap-4">
+                        <div className="col-span-full space-y-3">
+                            <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                                Images
+                            </FormLabel>
+                            {product?.images && product.images.length > 0 && (
+                                <div className="flex flex-wrap gap-4 mb-4">
                                     {product.images.map((img, i) => (
                                         <div
                                             key={i}
@@ -342,11 +345,25 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
                                         </div>
                                     ))}
                                 </div>
-                                <p className="text-[10px] font-light text-neutral-400">
-                                    Current product images stored on the server. To change images, you must delete this product and create a new one.
-                                </p>
-                            </div>
-                        )}
+                            )}
+                            <FormControl>
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="h-12 border border-white/60 bg-white/40 focus-visible:ring-luxury-gold focus-visible:bg-white/60 transition-all rounded-xl shadow-sm text-luxury-charcoal file:mr-4 file:rounded-lg file:border-0 file:bg-luxury-charcoal file:text-white file:px-4 file:py-2 file:text-[10px] file:font-bold file:uppercase file:tracking-widest cursor-pointer pt-1"
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files ?? []);
+                                        setNewImages(files.slice(0, 5));
+                                    }}
+                                />
+                            </FormControl>
+                            <p className="text-[10px] font-light text-neutral-400">
+                                {newImages.length > 0
+                                    ? `${newImages.length} new image(s) selected. Uploading new images will replace existing ones.`
+                                    : "Upload new images to replace the current ones. Max 5 images."}
+                            </p>
+                        </div>
 
                         <FormField<ProductFormValues, "isActive">
                             control={form.control}

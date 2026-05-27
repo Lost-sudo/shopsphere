@@ -1,24 +1,32 @@
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 import prisma from "../src/config/db";
+
+const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@shopsphere.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin@123";
 
 async function main() {
   console.log("Starting seeding...");
 
-  // 1. Clean the database (Order matters due to foreign keys)
-  console.log("Cleaning database...");
-  await prisma.cartItem.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.payment.deleteMany();
-  await prisma.shipment.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.cart.deleteMany();
-  await prisma.productVariant.deleteMany();
-  await prisma.productCategory.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
+  const existingCategories = await prisma.category.count();
 
-  // 2. Create Categories
-  console.log("Creating categories...");
+  if (existingCategories > 0) {
+    console.log("Database already seeded, skipping product seed.");
+  } else {
+    console.log("Cleaning database...");
+    await prisma.cartItem.deleteMany();
+    await prisma.orderItem.deleteMany();
+    await prisma.payment.deleteMany();
+    await prisma.shipment.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.cart.deleteMany();
+    await prisma.productVariant.deleteMany();
+    await prisma.productCategory.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.category.deleteMany();
+
+    console.log("Creating categories...");
   const newArrivals = await prisma.category.create({
     data: {
       name: "New Arrivals",
@@ -305,6 +313,31 @@ async function main() {
       },
     },
   });
+
+  }
+
+  // Always ensure admin user exists
+  console.log("Seeding admin user...");
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: ADMIN_EMAIL },
+  });
+
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, SALT_ROUNDS);
+    await prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        name: "Admin",
+        password: hashedPassword,
+        role: "ADMIN",
+        isActive: true,
+        emailVerified: true,
+      },
+    });
+    console.log(`Admin user created: ${ADMIN_EMAIL}`);
+  } else {
+    console.log(`Admin user already exists: ${ADMIN_EMAIL}`);
+  }
 
   console.log("Seeding completed successfully.");
 }

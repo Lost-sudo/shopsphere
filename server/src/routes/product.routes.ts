@@ -36,6 +36,7 @@ router.patch(
   "/:id",
   authenticated,
   authorized(["ADMIN", "SUPER_ADMIN"]),
+  upload.array("images", 5),
   validate(updateProductSchema),
   productController.updateProduct,
 );

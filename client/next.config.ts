@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+    output: process.env.NODE_ENV === "production" ? "standalone" : undefined,
     images: {
         remotePatterns: [
             {
@@ -11,6 +12,10 @@ const nextConfig: NextConfig = {
                 protocol: "http",
                 hostname: "localhost",
                 port: "5000",
+            },
+            {
+                protocol: "https",
+                hostname: "res.cloudinary.com",
             },
         ],
     },

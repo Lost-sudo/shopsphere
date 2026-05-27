@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# Wait for the database to be ready using netcat
 echo "Waiting for database (db:5432) to be ready..."
 while ! nc -z db 5432; do
   sleep 1
@@ -8,14 +7,18 @@ done
 
 echo "Database is up!"
 
-# Run migrations (non-interactive db push for dev sync)
-echo "Syncing database schema..."
-npx prisma db push
+echo "Running database migrations..."
+npx prisma migrate deploy
 
-# Generate Prisma client (outputs to src/generated/client as per schema.prisma)
 echo "Generating Prisma client..."
 npx prisma generate
 
-# Start the application
-echo "Starting application..."
-npm run dev
+if [ "$NODE_ENV" = "production" ]; then
+  echo "Running database seed (idempotent - skips if already seeded)..."
+  npx ts-node prisma/seed.ts
+  echo "Starting production server..."
+  npm run start
+else
+  echo "Starting development server..."
+  npm run dev
+fi

@@ -17,6 +17,7 @@ import {
 } from "../types/product.types";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { getStorageProvider } from "../utils/storage";
 import { productRepository } from "../repositories/product.repository";
 import { categoryRepository } from "../repositories/category.repository";
 
@@ -26,8 +27,6 @@ export class ProductService implements IProductService {
     private categoryRepository: ICategoryRepository,
   ) {}
 
-  // ─── Product methods ──────────────────────────────────────────────────────────
-
   async createProduct(input: ProductInput): Promise<Product> {
     for (const id of input.categoryIds) {
       const category = await this.categoryRepository.getCategoryById(id);
@@ -36,7 +35,6 @@ export class ProductService implements IProductService {
       }
     }
 
-    // Calculate total stock from variants if provided
     if (input.variants && input.variants.length > 0) {
       input.stock = input.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
     }
@@ -70,9 +68,16 @@ export class ProductService implements IProductService {
       }
     }
 
-    // Recalculate stock if variants are provided in update
     if (input.variants && input.variants.length > 0) {
       input.stock = input.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+    }
+
+    if (input.images) {
+      const oldProduct = await this.productRepository.findById(id);
+      if (oldProduct && oldProduct.images.length > 0) {
+        const storage = getStorageProvider();
+        await Promise.all(oldProduct.images.map((url) => storage.delete(url)));
+      }
     }
 
     const product = await this.productRepository.update(id, input);
@@ -83,6 +88,16 @@ export class ProductService implements IProductService {
   }
 
   async deleteProduct(id: string): Promise<boolean> {
+    const product = await this.productRepository.findById(id);
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    if (product.images && product.images.length > 0) {
+      const storage = getStorageProvider();
+      await Promise.all(product.images.map((url) => storage.delete(url)));
+    }
+
     const result = await this.productRepository.delete(id);
     if (!result) {
       throw new NotFoundError("Product not found");
@@ -204,6 +219,7 @@ export class ProductService implements IProductService {
   async getProductStats(): Promise<{ totalProducts: number; lowStockCount: number }> {
     return this.productRepository.getProductStats();
   }
+
   async getCategorySales(): Promise<{ category: string; sales: number; revenue: number }[]> {
     return this.productRepository.getCategorySales();
   }

@@ -79,7 +79,9 @@ export const productApi = baseApi.injectEndpoints({
       query: ({ id, ...patch }) => ({
         url: `/products/${id}`,
         method: "PATCH",
-        body: patch,
+        body: "images" in patch && (patch as any).images?.length
+          ? buildCreateProductFormData(patch as any)
+          : patch,
       }),
       invalidatesTags: (_result, _error, { id }) => [
         { type: "Products", id: "LIST" },
