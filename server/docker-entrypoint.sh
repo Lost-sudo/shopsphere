@@ -12,17 +12,15 @@ done
 
 echo "Database is up!"
 
-echo "Running database migrations..."
-npx prisma migrate deploy
-
-echo "Generating Prisma client..."
-npx prisma generate
-
 if [ "$NODE_ENV" = "production" ]; then
+  echo "Running database migrations..."
+  npx prisma migrate deploy
+
   echo "Running database seed (idempotent - skips if already seeded)..."
-  npx ts-node prisma/seed.ts
+  node dist/prisma/seed.js
+
   echo "Starting production server..."
-  npm run start
+  node dist/src/server.js
 else
   echo "Starting development server..."
   npm run dev

@@ -19,7 +19,7 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*", "tests/**/*", "prisma/seed.ts"],
   "exclude": ["node_modules"],
   "ts-node": {
     "files": true,
