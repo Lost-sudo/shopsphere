@@ -79,8 +79,10 @@ export class OrderService implements IOrderService {
         throw error;
       }
       console.error("Unexpected error in createOrder:", error);
+      const message =
+        error instanceof Error ? error.message : "Unknown error";
       throw new BadRequestError(
-        "Failed to create order. Please try again.",
+        `Failed to create order: ${message}`,
       );
     }
   }
