@@ -16,9 +16,6 @@ if [ "$NODE_ENV" = "production" ]; then
   echo "Running database migrations..."
   npx prisma migrate deploy
 
-  echo "Running database seed (idempotent - skips if already seeded)..."
-  node dist/prisma/seed.js
-
   echo "Starting production server..."
   node dist/src/server.js
 else
