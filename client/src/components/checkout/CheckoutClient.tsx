@@ -134,6 +134,7 @@ export default function CheckoutClient() {
                 totalAmount: total,
                 shippingAddress: shippingAddr,
                 paymentMethod: selectedPayment,
+                shippingMethod: selectedCarrier,
                 idempotencyKey,
             }).unwrap();
 
@@ -143,7 +144,7 @@ export default function CheckoutClient() {
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to place order. Please try again.");
         }
-    }, [user, selectedAddress, items, total, selectedPayment, createOrder]);
+    }, [user, selectedAddress, items, total, selectedPayment, selectedCarrier, createOrder]);
 
     const isLoading = isCartLoading || isAddressLoading;
 
