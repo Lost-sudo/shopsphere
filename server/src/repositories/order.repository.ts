@@ -83,6 +83,7 @@ export class OrderRepository implements IOrderRepository {
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
+            variantId: item.variantId ?? null,
           })),
         },
       },

@@ -13,10 +13,26 @@ jest.mock("../src/config/db", () => ({
       createMany: jest.fn(),
     },
     payment: {
+      create: jest.fn(),
       findUnique: jest.fn(),
+      update: jest.fn(),
     },
     shipment: {
       create: jest.fn(),
+    },
+    product: {
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    },
+    productVariant: {
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    },
+    cart: {
+      findUnique: jest.fn(),
+    },
+    cartItem: {
+      deleteMany: jest.fn(),
     },
   },
 }));
@@ -79,7 +95,25 @@ describe("Order API", () => {
   describe("POST /api/v1/orders/create-order", () => {
     it("should create a new order successfully", async () => {
       (prisma.order.findUnique as jest.Mock).mockResolvedValue(null);
+      (prisma.product.findUnique as jest.Mock).mockResolvedValue({
+        id: "550e8400-e29b-41d4-a716-446655440007",
+        name: "Test Product",
+        variants: [],
+        price: 99.99,
+        stock: 10,
+      });
+      (prisma.cart.findUnique as jest.Mock).mockResolvedValue({ id: "cart-id" });
+      (prisma.cartItem.deleteMany as jest.Mock).mockResolvedValue({ count: 1 });
       (prisma.order.create as jest.Mock).mockResolvedValue(mockOrder);
+      (prisma.payment.create as jest.Mock).mockResolvedValue({
+        id: "payment-id",
+        orderId: mockOrder.id,
+        method: "COD",
+        transactionId: "COD-123",
+        amount: 199.98,
+        status: "PENDING",
+      });
+      (prisma.order.update as jest.Mock).mockResolvedValue(mockOrder);
 
       const response = await request(app)
         .post("/api/v1/orders/create-order")
@@ -96,7 +130,7 @@ describe("Order API", () => {
           ],
           totalAmount: 199.98,
           shippingAddress: "123 Street, City",
-          paymentMethod: "STRIPE",
+          paymentMethod: "COD",
         });
 
       if (response.status !== 201) console.log(response.body);

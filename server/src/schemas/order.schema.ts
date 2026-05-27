@@ -5,7 +5,7 @@ export const orderItemSchema = z.object({
   productId: z.uuid(),
   quantity: z.number().int().min(1),
   price: z.number().min(0),
-  variantId: z.uuid().optional(),
+  variantId: z.uuid().nullable().optional(),
 });
 
 export const orderSchema = z.object({

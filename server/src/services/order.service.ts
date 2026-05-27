@@ -3,6 +3,7 @@ import { Order } from "../types/order.types";
 import { OrderInput, UpdateOrderInput } from "../schemas/order.schema";
 import { BadRequestError } from "../utils/errors/badRequestError";
 import { NotFoundError } from "../utils/errors/notFoundError";
+import { AppError } from "../utils/errors/appError";
 import { IShipmentService } from "../interfaces/shipment.interface";
 import { ShippingMethod, ShipmentStatus } from "../schemas/shipment.schema";
 import { Shipment } from "../generated/client";
@@ -25,52 +26,63 @@ export class OrderService implements IOrderService {
   ) {}
 
   async createOrder(input: OrderInput, userId: string): Promise<Order> {
-    if (!userId) throw new BadRequestError("User ID is required.");
+    try {
+      if (!userId) throw new BadRequestError("User ID is required.");
 
-    if (input.items.length === 0)
-      throw new BadRequestError("Order must contain at least one item.");
+      if (input.items.length === 0)
+        throw new BadRequestError("Order must contain at least one item.");
 
-    if (input.idempotencyKey) {
-      const existingOrder = await this.orderRepository.getOrderByIdempotencyKey(
-        input.idempotencyKey,
-      );
-      if (existingOrder) {
-        return existingOrder;
+      if (input.idempotencyKey) {
+        const existingOrder =
+          await this.orderRepository.getOrderByIdempotencyKey(
+            input.idempotencyKey,
+          );
+        if (existingOrder) {
+          return existingOrder;
+        }
       }
-    }
-    // 1. Validate variants
-    for (const item of input.items) {
-      await this.productService.validateVariantSelection(
-        item.productId,
-        item.variantId,
+      // 1. Validate variants
+      for (const item of input.items) {
+        await this.productService.validateVariantSelection(
+          item.productId,
+          item.variantId ?? undefined,
+        );
+      }
+
+      // 2. Remove from cart
+      await this.cartService.removeItemsFromCart(
+        userId,
+        input.items.map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId ?? undefined,
+        })),
+      );
+
+      // 3. Create Order
+      const order = await this.orderRepository.createOrder(input, userId);
+
+      // 4. Reduce Stock
+      for (const item of input.items) {
+        await this.productService.reduceStock(
+          item.productId,
+          item.quantity,
+          item.variantId ?? undefined,
+        );
+      }
+
+      // 5. Process Payment
+      await this.paymentService.processPayment(order.id, input.paymentMethod);
+
+      return order;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      console.error("Unexpected error in createOrder:", error);
+      throw new BadRequestError(
+        "Failed to create order. Please try again.",
       );
     }
-
-    // 2. Remove from cart
-    await this.cartService.removeItemsFromCart(
-      userId,
-      input.items.map((item) => ({
-        productId: item.productId,
-        variantId: item.variantId,
-      })),
-    );
-
-    // 3. Create Order
-    const order = await this.orderRepository.createOrder(input, userId);
-
-    // 4. Reduce Stock
-    for (const item of input.items) {
-      await this.productService.reduceStock(
-        item.productId,
-        item.quantity,
-        item.variantId,
-      );
-    }
-
-    // 5. Process Payment
-    await this.paymentService.processPayment(order.id, input.paymentMethod);
-
-    return order;
   }
 
   async getOrderByIdempotencyKey(key: string): Promise<Order | null> {
