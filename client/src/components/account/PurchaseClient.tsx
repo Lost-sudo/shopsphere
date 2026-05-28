@@ -18,13 +18,25 @@ const tabs = [
 
 export function PurchaseClient() {
     const [activeTab, setActiveTab] = useState("ALL");
+    const [searchTerm, setSearchTerm] = useState("");
     const { data, isLoading } = useGetUserOrdersQuery();
 
     const orders = data?.orders || [];
     
-    const filteredOrders = activeTab === "ALL" 
+    const statusFiltered = activeTab === "ALL" 
         ? orders 
         : orders.filter(order => order.status.toUpperCase() === activeTab);
+
+    const filteredOrders = statusFiltered.filter(order => {
+        if (!searchTerm.trim()) return true;
+        const q = searchTerm.toLowerCase();
+        return (
+            order.id.toLowerCase().includes(q) ||
+            order.items.some(item =>
+                item.product?.name?.toLowerCase().includes(q)
+            )
+        );
+    });
 
     return (
         <div className="p-8 sm:p-12 space-y-10">
@@ -65,6 +77,8 @@ export function PurchaseClient() {
                         <Input 
                             placeholder="Search by Order ID or Product Name..." 
                             className="pl-12 h-14 bg-white/60 backdrop-blur-xl border-white/60 focus-visible:ring-luxury-gold focus-visible:bg-white/80 transition-all rounded-2xl text-sm shadow-xl shadow-black/5"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                 </div>

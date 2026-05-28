@@ -29,6 +29,7 @@ export function Header() {
     });
 
     const [scrolled, setScrolled] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         const handleScroll = () => {
@@ -70,6 +71,13 @@ export function Header() {
                         <Input
                             placeholder="Discover the collection..."
                             className="flex-1 border-none focus-visible:ring-0 h-11 bg-transparent text-sm font-medium text-luxury-charcoal placeholder:text-neutral-400"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && searchQuery.trim()) {
+                                    router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+                                }
+                            }}
                         />
                     </div>
                 </div>

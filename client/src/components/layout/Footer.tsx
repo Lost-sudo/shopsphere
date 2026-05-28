@@ -9,23 +9,23 @@ export function Footer() {
         {
             title: "Client Services",
             links: [
-                "Contact Us",
-                "Track Order",
-                "Returns & Exchanges",
-                "Shipping Information",
-                "Size Guide",
-                "FAQs",
+                { label: "Contact Us", href: "/contact-us" },
+                { label: "Track Order", href: "/track-order" },
+                { label: "Returns & Exchanges", href: "/returns-exchanges" },
+                { label: "Shipping Information", href: "/shipping-information" },
+                { label: "Size Guide", href: "/size-guide" },
+                { label: "FAQs", href: "/faqs" },
             ],
         },
         {
             title: "The Company",
             links: [
-                "About ShopSphere",
-                "Careers",
-                "Sustainability",
-                "Investors",
-                "Privacy Policy",
-                "Terms & Conditions",
+                { label: "About ShopSphere", href: "/about" },
+                { label: "Careers", href: "/careers" },
+                { label: "Sustainability", href: "/sustainability" },
+                { label: "Investors", href: "/investors" },
+                { label: "Privacy Policy", href: "/privacy-policy" },
+                { label: "Terms & Conditions", href: "/terms-conditions" },
             ],
         },
     ];
@@ -64,12 +64,12 @@ export function Footer() {
                                 </h4>
                                 <ul className="space-y-4">
                                     {section.links.map((link) => (
-                                        <li key={link}>
+                                        <li key={link.label}>
                                             <Link
-                                                href="#"
+                                                href={link.href}
                                                 className="text-xs text-neutral-500 hover:text-luxury-gold transition-colors font-medium"
                                             >
-                                                {link}
+                                                {link.label}
                                             </Link>
                                         </li>
                                     ))}

@@ -1,8 +1,17 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { useGetCategoriesQuery } from "@/features/category/category.api";
 
 export function HeroLookbook() {
+    const { data: categoriesData, isLoading } = useGetCategoriesQuery();
+
+    const newArrivalsCategory = categoriesData?.data?.categories?.find(
+        (c) => c.name === "New Arrivals",
+    );
+
     return (
         <section className="relative h-[85vh] min-h-[600px] w-full flex items-center justify-center overflow-hidden">
             {/* Background Image */}
@@ -29,13 +38,19 @@ export function HeroLookbook() {
                 <p className="text-lg text-white/90 font-medium max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up [animation-delay:400ms]">
                     Discover curated pieces designed for the modern individual. A seamless blend of comfort, luxury, and timeless aesthetic.
                 </p>
-                <Link
-                    href="/category/new-arrivals"
-                    className="group inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full text-sm font-semibold tracking-widest uppercase hover:bg-white/20 transition-all duration-500 animate-fade-up [animation-delay:600ms]"
-                >
-                    Explore Collection
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                {isLoading ? (
+                    <div className="flex items-center justify-center animate-fade-up [animation-delay:600ms]">
+                        <Loader2 className="w-6 h-6 animate-spin text-white" />
+                    </div>
+                ) : (
+                    <Link
+                        href={newArrivalsCategory ? `/shop?category=${newArrivalsCategory.id}` : "/shop"}
+                        className="group inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full text-sm font-semibold tracking-widest uppercase hover:bg-white/20 transition-all duration-500 animate-fade-up [animation-delay:600ms]"
+                    >
+                        Explore Collection
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                )}
             </div>
             
             {/* Scroll Indicator */}
